@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Manage Boxers — Phase Comparison</h2>
+
+<div class="content-container">
+  <div class="form-container">
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn" type="submit">Show Results</button>
+      <a class="btn" href="{% url 'tests_results' %}">Back to Results Matrix</a>
+    </form>
+  </div>
+
+  {% if boxer and test %}
+    <h3>{{ boxer.name }} — {{ test.name }}{% if test.unit %} [{{ test.unit }}]{% endif %}</h3>
+    <div>
+      <p>For <strong>Pre season</strong> {{ boxer.name }}’s result on {{ test.name }} is
+         {% if pre is not None %}{{ pre }}{% else %}No data{% endif %}{% if test.unit %} [{{ test.unit }}]{% endif %}.</p>
+      <p>For <strong>Mid season</strong> {{ boxer.name }}’s result on {{ test.name }} is
+         {% if mid is not None %}{{ mid }}{% else %}No data{% endif %}{% if test.unit %} [{{ test.unit }}]{% endif %}.</p>
+      <p><strong>Before the tournament</strong> {{ boxer.name }}’s result on {{ test.name }} is
+         {% if before is not None %}{{ before }}{% else %}No data{% endif %}{% if test.unit %} [{{ test.unit }}]{% endif %}.</p>
+
+      {% if improvement_text %}
+        <p style="margin-top:8px;">{{ improvement_text }}</p>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

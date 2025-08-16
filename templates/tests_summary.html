@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Battery Tests — Summary</h2>
+
+<style>
+  .summary-toolbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
+  .summary-table { border-collapse: collapse; width: 100%; }
+  .summary-table th, .summary-table td { padding: 6px 8px; border-bottom: 1px solid #eee; }
+  .summary-table th { white-space: nowrap; text-align: left; }
+  .summary-cell { min-width: 140px; text-align:center; vertical-align: top; }
+  .summary-notes { font-size:12px; color:#7bdc9f; margin-top:4px; }
+  .cell-actions { margin-top:6px; display:flex; gap:6px; justify-content:center; flex-wrap:wrap; }
+  .pill { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid #ddd; text-decoration:none; background:#fff; cursor:pointer; }
+  .pill:hover { background:#f7f7f7; }
+  .btn { cursor: pointer; }
+</style>
+
+<div class="content-container">
+
+  <!-- Phase switcher + back button (preserve phase) -->
+  <div class="summary-toolbar">
+    <form method="get" action="{% url 'tests_summary' %}" style="display:flex; gap:8px; align-items:center;">
+      {% if phase_form %}
+        {{ phase_form.phase }}
+      {% else %}
+        <select name="phase">
+          <option value="pre" {% if phase == 'pre' %}selected{% endif %}>Pre season</option>
+          <option value="mid" {% if phase == 'mid' %}selected{% endif %}>Mid season</option>
+          <option value="before" {% if phase == 'before' %}selected{% endif %}>Before Tournament</option>
+        </select>
+      {% endif %}
+      <button class="btn" type="submit">Switch Phase</button>
+    </form>
+
+    <a class="btn" href="{% url 'tests_results' %}?phase={{ phase }}">Back to Results Matrix</a>
+  </div>
+
+  {% if not tests %}
+    <p>No tests to display.</p>
+  {% else %}
+    <div style="overflow-x:auto;">
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Boxer \ Test</th>
+            {% for t in tests %}
+              <th>{{ t.name }}{% if t.unit %} [{{ t.unit }}]{% endif %}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+
+        <tbody>
+          {% if rows %}
+            {% for row in rows %}
+              <tr>
+                <th style="white-space:nowrap;">
+                  <a href="{% url 'boxer_tests' row.boxer.id %}">{{ row.boxer.name }}</a>
+                </th>
+
+                {% for tr in row.cells %}
+                  <td class="summary-cell">
+                    {% if tr %}
+                      <div>
+                        {{ tr.value1|default:"—" }} /
+                        {{ tr.value2|default:"—" }} /
+                        {{ tr.value3|default:"—" }}
+                      </div>
+                      {% if tr.notes %}
+                        <div class="summary-notes">{{ tr.notes }}</div>
+                      {% endif %}
+
+                      <!-- Actions -->
+                      <div class="cell-actions">
+
+                        <form method="get" action="{% url 'tests_result_edit' %}" style="display:inline;">
+                          <input type="hidden" name="boxer" value="{{ tr.boxer_id|default:tr.boxer.id }}">
+                          <input type="hidden" name="test" value="{{ tr.test_id|default:tr.test.id }}">
+                          <input type="hidden" name="phase" value="{{ phase }}">
+                          <button type="submit" class="pill">Edit</button>
+                        </form>
+
+
+                        <form method="post" action="{% url 'tests_summary_delete' %}" style="display:inline;">
+                          {% csrf_token %}
+                          <input type="hidden" name="boxer_id" value="{{ tr.boxer_id|default:tr.boxer.id }}">
+                          <input type="hidden" name="test_id" value="{{ tr.test_id|default:tr.test.id }}">
+                          <input type="hidden" name="phase" value="{{ phase }}">
+                          <button type="submit" class="pill" onclick="return confirm('Delete this result?')">Delete</button>
+                        </form>
+                      </div>
+                    {% else %}
+                      —
+                    {% endif %}
+                  </td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="{{ tests|length|add:1 }}">No boxers to display.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+

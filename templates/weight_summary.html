@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Weight — Summary</h2>
+
+<style>
+  .w-table { width:100%; border-collapse:collapse; }
+  .w-table th, .w-table td { padding:8px 10px; border-bottom:1px solid #eee; text-align:center; }
+  .w-table th:first-child, .w-table td:first-child { text-align:left; white-space:nowrap; }
+  .muted { color:#9aa0a6; font-size:12px; }
+</style>
+
+<div class="content-container">
+  <div style="margin-bottom:10px;">
+    <a class="btn" href="{% url 'home' %}">Back to Home</a>
+  </div>
+
+  {% if not rows %}
+    <p>No boxers found.</p>
+  {% else %}
+    <div style="overflow-x:auto;">
+      <table class="w-table">
+        <thead>
+          <tr>
+            <th>Boxer</th>
+            <th>Pre season</th>
+            <th>Mid season</th>
+            <th>Before tournament</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+          <tr>
+            <td>{{ r.boxer.name }}</td>
+            <td>
+              {% if r.pre %}<strong>{{ r.pre.kg }}</strong> kg
+                {% if r.pre.expected_kg %}<span class="muted">(expected {{ r.pre.expected_kg }} kg)</span>{% endif %}
+              {% else %}—{% endif %}
+            </td>
+            <td>
+              {% if r.mid %}<strong>{{ r.mid.kg }}</strong> kg
+                {% if r.mid.expected_kg %}<span class="muted">(expected {{ r.mid.expected_kg }} kg)</span>{% endif %}
+              {% else %}—{% endif %}
+            </td>
+            <td>
+              {% if r.before %}<strong>{{ r.before.kg }}</strong> kg
+                {% if r.before.expected_kg %}<span class="muted">(expected {{ r.before.expected_kg }} kg)</span>{% endif %}
+              {% else %}—{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

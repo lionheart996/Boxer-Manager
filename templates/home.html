@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Boxer Factory</h1>
+
+<!-- Boxer Manager -->
+<div class="form-container" style="border-radius: 10px">
+  <h3>Manage Boxers</h3>
+  <form method="post" action="{% url 'add_boxer' %}" style="display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;">
+    {% csrf_token %}
+    <input type="text" name="name" placeholder="Boxer name" required style="padding:4px;font-size:12px;">
+    <button type="submit" class="btn">Add Boxer</button>
+      <a class="btn" href="{% url 'boxer_list' %}">Manage</a>
+
+  </form>
+</div>
+
+<!-- Weight -->
+{% if weight_form %}
+<div class="card" style="background:#111;border:1px solid #00ff66;border-radius:12px;padding:16px; margin-top:16px;">
+  <h3>Record a boxer's weight</h3>
+  <form method="post" action="{% url 'record_weight' %}" style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">
+    {% csrf_token %}
+    <div>
+      <label style="display:block; font-size:12px;">Boxer</label>
+      {{ weight_form.boxer }}
+    </div>
+    <div>
+      <label style="display:block; font-size:12px;">Phase</label>
+      {{ weight_form.phase }}
+    </div>
+    <div>
+      <label style="display:block; font-size:12px;">Weight (kg)</label>
+      {{ weight_form.kg }}
+    </div>
+    <div>
+      <label style="display:block; font-size:12px;">Expected (kg)</label>
+      {{ weight_form.expected_kg }}
+    </div>
+    <div>
+      <label style="display:block; font-size:12px;">Date</label>
+      {{ weight_form.measured_at }}
+    </div>
+    <button class="btn" type="submit">Save</button>
+    <a class="btn" href="{% url 'weight_summary' %}">View Weight Table</a>
+  </form>
+</div>
+{% else %}
+<div style="color:#f66;">weight_form is missing from context</div>
+{% endif %}
+
+
+<!-- Heart Rate Form -->
+<div class="card" style="background:#111;border:1px solid #00ff66;border-radius:12px;padding:16px; margin-top:16px;">
+  <h3>Record a boxer's resting HR</h3>
+  <form method="post" action="{% url 'record_heart_rate' %}" style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">
+    {% csrf_token %}
+    <div>
+      <label style="display:block; font-size:12px;">Boxer</label>
+      {{ hr_form.boxer }}
+    </div>
+    <div>
+      <label style="display:block; font-size:12px;">Phase</label>
+      {{ hr_form.phase }}
+    </div>
+    <div>
+      <label style="display:block; font-size:12px;">Heart rate (bpm)</label>
+      {{ hr_form.bpm }}
+    </div>
+    <div>
+      <label style="display:block; font-size:12px;">Date</label>
+      {{ hr_form.measured_at }}
+    </div>
+    <button class="btn" type="submit">Save</button>
+    <a class="btn" href="{% url 'heart_rate_summary' %}">View Heart-Rate Table</a>
+  </form>
+</div>
+
+<!-- Battery Tests -->
+<div class="grid" style="display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:16px;">
+  <div class="card" style="background:#111;border:1px solid #00ff66;border-radius:12px;padding:16px;">
+    <h3>Battery Tests</h3>
+    <form action="{% url 'tests_results' %}" method="get" style="margin-top:8px; margin-bottom: 45px; display:flex; gap:8px; align-items:center;">
+      <label for="phase" class="date-label">Open results for:</label>
+      <select id="phase" name="phase" class="date-input">
+        <option value="pre">Pre season</option>
+        <option value="mid">Mid season</option>
+        <option value="before">Before Tournament</option>
+      </select>
+      <button class="btn" type="submit">Open</button>
+    </form>
+      <a class="btn" href="{% url 'tests_list' %}">Manage Tests</a>
+      <a class="btn" href="{% url 'tests_results' %}">Results Matrix</a>
+      <a class="btn" href="{% url 'tests_rankings' %}">Rankings</a>
+  </div>
+</div>
+
+<!-- Attendance -->
+<div class="grid" style="margin-top:16px; border: 1px solid #00ff66; border-radius: 10px">
+  <div class="card" style="padding-left: 15px">
+    <h3>Mark Attendance</h3>
+    <p>Quickly mark who’s present today.</p>
+    <p><a class="btn" href="{% url 'mark_attendance' %}">Go</a></p>
+  </div>
+</div>
+{% endblock %}
+

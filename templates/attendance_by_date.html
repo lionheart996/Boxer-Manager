@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Attendance on {{ date }}</h2>
+
+<div class="content-container">
+  <form method="get" action="{% url 'attendance_by_date' %}" style="margin-bottom: 12px;">
+    <label for="date">Select date:</label>
+    <input type="date" id="date" name="date" value="{{ date_value }}">
+    <button type="submit" class="btn">Filter</button>
+    <a class="btn" href="{% url 'mark_attendance' %}">Mark Attendance</a>
+  </form>
+
+  {% if records %}
+    <table>
+      <thead>
+        <tr>
+          <th>Boxer</th>
+          <th>Status</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rec in records %}
+          <tr>
+            <td>{{ rec.boxer.name }}</td>
+            <td>
+              {% if rec.is_present %}Present{% else %}Absent{% endif %}
+            </td>
+            <td>
+              {% if not rec.is_present %}
+                {% if rec.is_excused %}Excused{% else %}Unexcused{% endif %}
+              {% else %}
+                —
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No attendance records for {{ date }}.</p>
+  {% endif %}
+
+  <p style="margin-top: 10px;">
+    <a class="btn" href="{% url 'attendance_list' %}">Back to Attendance List</a>
+  </p>
+</div>
+{% endblock %}

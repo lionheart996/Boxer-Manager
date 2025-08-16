@@ -1,0 +1,48 @@
+{% load static %}
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Factory for Boxers</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<header>
+    <div>
+      {% if user.is_authenticated %}
+        Hi, {{ user.username }} !
+        <form method="post" action="{% url 'logout' %}" style="display:inline; float:right; margin-top:-10px;">
+              {% csrf_token %}
+                <a href="{% url 'home' %}" class="home-top-left">Home</a>
+                    <style>
+                      .home-top-left{
+                        position: fixed;
+                        top: 10px;
+                        left: 12px;
+                        color: #fff;
+                        text-decoration: none;
+                        font-weight: 600;
+                        z-index: 1000;
+                      }
+                      .home-top-left:hover{ text-decoration: underline; }
+                    </style>
+                      <button type="submit" class="btn" style="
+                        background-color:#8B0000;
+                        color:#FFFFFF;
+                        font-size:12px;
+                        padding:4px 8px;
+                        border-radius:6px;"> Logout
+                      </button>
+                </form>
+              {% else %}
+                <a href="{% url 'login' %}">Login</a>
+              {% endif %}
+            </div>
+        </header>
+
+<div class="content-container">
+  {% block content %}{% endblock %}
+</div>
+</body>
+</html>

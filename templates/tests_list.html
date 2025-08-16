@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Battery Tests</h2>
+
+<div class="content-container">
+  <div class="form-container">
+    <h3>Create a new test</h3>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn" type="submit">Save Test</button>
+    </form>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Unit</th>
+        <th>Description</th>
+        <th>Order</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for t in tests %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ t.name }}</td>
+        <td>[{{ t.unit }}]</td>
+        <td>{{ t.description|default:"—" }}</td>
+        <td>{{ t.display_order }}</td>
+        <td>
+          <a class="btn" href="{% url 'test_edit' t.pk %}">Edit</a>
+          <a class="btn" href="{% url 'test_delete' t.pk %}">Delete</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="6">No tests yet. Create one above.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  <p>
+    <a class="btn" href="{% url 'tests_results' %}">Open Results Matrix</a>
+  </p>
+</div>
+{% endblock %}

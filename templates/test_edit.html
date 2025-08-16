@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Edit Test</h2>
+
+<div class="content-container">
+  <div class="form-container">
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn" type="submit">Save Changes</button>
+      <a class="btn" href="{% url 'tests_list' %}">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

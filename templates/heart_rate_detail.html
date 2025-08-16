@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">{{ boxer.name }} — Resting Heart Rate</h2>
+
+<style>
+  .wrap { display: grid; gap: 16px; }
+  .toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .card { background:#111; border:1px solid #00ff66; border-radius:12px; padding:16px; }
+  .muted { color:#9aa0a6; font-size:12px; }
+  .line { margin: 6px 0; }
+</style>
+
+<div class="content-container wrap">
+
+  <div class="toolbar">
+    <a class="btn" href="{% url 'boxer_list' %}">Back to Boxers</a>
+  </div>
+
+  <div class="card">
+    <p class="line">
+      {{ boxer.name }}'s Resting heart rate in <strong>Pre season</strong>
+      is
+      {% if pre %}<strong>{{ pre.bpm }}</strong> bpm{% if pre.measured_at %} <span class="muted">(measured {{ pre.measured_at }})</span>{% endif %}
+      {% else %}<span class="muted">not recorded</span>{% endif %}.
+    </p>
+
+    <p class="line">
+      {{ boxer.name }}'s Resting heart rate in <strong>Mid season</strong>
+      is
+      {% if mid %}<strong>{{ mid.bpm }}</strong> bpm{% if mid.measured_at %} <span class="muted">(measured {{ mid.measured_at }})</span>{% endif %}
+      {% else %}<span class="muted">not recorded</span>{% endif %}.
+    </p>
+
+    <p class="line">
+      {{ boxer.name }}'s Resting heart rate in <strong>Before tournament</strong>
+      is
+      {% if before %}<strong>{{ before.bpm }}</strong> bpm{% if before.measured_at %} <span class="muted">(measured {{ before.measured_at }})</span>{% endif %}
+      {% else %}<span class="muted">not recorded</span>{% endif %}.
+    </p>
+  </div>
+
+</div>
+{% endblock %}

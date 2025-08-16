@@ -1,0 +1,30 @@
+
+{% extends "base.html" %}
+{% block content %}
+    <h2>Attendance Report for {{ boxer.name }}</h2>
+    <h3>Summary</h3>
+    <ul>
+        <li>Total Records: {{ total }}</li>
+        <li>Present: {{ present_pct }}%</li>
+        <li>Absent: {{ absent_pct }}%</li>
+        <li>Excused Absences: {{ excused_pct }}%</li>
+        <li>Unexcused Absences: {{ unexcused_pct }}%</li>
+    </ul>
+    <h3>Detailed Attendance</h3>
+    <table border="1">
+        <tr>
+            <th>Date</th>
+            <th>Present</th>
+            <th>Excused (if absent)</th>
+        </tr>
+        {% for record in records %}
+        <tr>
+            <td>{{ record.date }}</td>
+            <td>{{ record.is_present }}</td>
+            <td>{% if not record.is_present %}{{ record.is_excused }}{% else %}-{% endif %}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <a href="{% url 'boxer_list' %}">← Back to Boxer List</a>
+{% endblock %}

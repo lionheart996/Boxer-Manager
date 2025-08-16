@@ -1,0 +1,21 @@
+
+{% extends "base.html" %}
+{% block content %}
+    <h2>Attendance Summary</h2>
+    <table border="1">
+        <tr>
+            <th>Boxer</th>
+            <th>% Present</th>
+            <th>% Excused Absence</th>
+        </tr>
+        {% for row in summary %}
+        <tr>
+            <td>{{ row.name }}</td>
+            <td>{{ row.present }}%</td>
+            <td>{{ row.excused }}%</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <a href="{% url 'mark_attendance' %}">← Back to Attendance</a>
+{% endblock %}

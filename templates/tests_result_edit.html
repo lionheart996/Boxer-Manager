@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Edit Test Result</h2>
+
+<form method="post" action="{% url 'tests_summary_save' %}">
+  {% csrf_token %}
+  <input type="hidden" name="boxer_id" value="{{ boxer.id }}">
+  <input type="hidden" name="test_id" value="{{ test.id }}">
+  <input type="hidden" name="phase" value="{{ phase }}">
+
+  <p><strong>Boxer:</strong> {{ boxer.name }}</p>
+  <p><strong>Test:</strong> {{ test.display_label }}{% if test.unit %} ({{ test.unit }}){% endif %}</p>
+
+  <div><label>Value 1
+    <input type="number" step="0.01" name="value1" value="{{ result.value1|default_if_none:'' }}">
+  </label></div>
+  <div><label>Value 2
+    <input type="number" step="0.01" name="value2" value="{{ result.value2|default_if_none:'' }}">
+  </label></div>
+  <div><label>Value 3
+    <input type="number" step="0.01" name="value3" value="{{ result.value3|default_if_none:'' }}">
+  </label></div>
+  <div><label>Notes<br>
+    <textarea name="notes" rows="3">{{ result.notes }}</textarea>
+  </label></div>
+
+  <div style="margin-top:10px; display:flex; gap:8px;">
+    <button type="submit">Save</button>
+  </div>
+</form>
+
+{% if result %}
+<form method="post" action="{% url 'tests_summary_delete' %}" style="margin-top:8px;">
+  {% csrf_token %}
+  <input type="hidden" name="boxer_id" value="{{ boxer.id }}">
+  <input type="hidden" name="test_id" value="{{ test.id }}">
+  <input type="hidden" name="phase" value="{{ phase }}">
+  <button type="submit" onclick="return confirm('Delete this result?')">Delete</button>
+</form>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title" style="margin-left:75px;">Battery Test Results</h2>
+
+<style>
+  /* Page-scoped tweaks to make the table narrower */
+  .tests-table th, .tests-table td { padding: 4px; }
+  .tests-table th { white-space: nowrap; }
+  .cell { min-width: 120px; }
+  .vgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .test-input { width: 54px; padding: 2px; font-size: 12px; }
+  .test-notes { width: 100%; padding: 2px; font-size: 12px; }
+  .cell .btn { margin: 4px 0 0 0; padding: 6px 8px; }
+  .subtle { font-size: 11px; color: #7bdc9f; }
+  .toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:10px; }
+</style>
+
+<div class="content-container">
+
+  <!-- Top toolbar: navigation + phase switcher (GET) -->
+  <div class="toolbar">
+    <a class="btn" href="{% url 'tests_list' %}">Manage Tests</a>
+    <a class="btn" href="{% url 'tests_summary' %}">Tests Summary</a>
+    <a class="btn" href="{% url 'tests_manage_boxers' %}">Manage Boxers</a>
+
+    <form method="get" action="{% url 'tests_results' %}" style="display:flex; gap:8px; align-items:center;">
+      {% if phase_form %}{{ phase_form.phase }}{% else %}
+        <select name="phase">
+          <option value="pre" {% if phase == 'pre' %}selected{% endif %}>Pre season</option>
+          <option value="mid" {% if phase == 'mid' %}selected{% endif %}>Mid season</option>
+          <option value="before" {% if phase == 'before' %}selected{% endif %}>Before Tournament</option>
+        </select>
+      {% endif %}
+      <button class="btn" type="submit">Switch Phase</button>
+    </form>
+  </div>
+
+  {% if not tests %}
+    <p>No tests yet. <a class="btn" href="{% url 'tests_list' %}">Create one</a>.</p>
+  {% elif not boxers %}
+    <p>No boxers found.</p>
+  {% else %}
+
+  <!-- One global form powers both Save All and per-cell Save -->
+  <form id="matrix" method="post" action="{% url 'tests_results' %}?phase={{ phase }}">
+    {% csrf_token %}
+    <input type="hidden" name="phase" value="{{ phase }}">
+
+    <div style="overflow-x:auto;">
+      <table class="tests-table">
+        <thead>
+          <tr>
+            <th>Boxer \\ Test</th>
+            {% for t in tests %}
+              <th>
+                {{ t.name }}{% if t.unit %} [{{ t.unit }}]{% endif %}<br>
+                <span class="subtle">v1 / v2 / v3</span>
+              </th>
+            {% endfor %}
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for b in boxers %}
+            <tr>
+              <td><a href="{% url 'boxer_tests' b.id %}">{{ b.name }}</a></td>
+
+              {% for t in tests %}
+                <td class="cell">
+                  <!-- 3 compact inputs per boxer×test -->
+                  <div class="vgrid">
+                    <input class="test-input" name="r-{{ b.id }}-{{ t.id }}-value1" type="number" step="0.01" placeholder="v1" inputmode="decimal">
+                    <input class="test-input" name="r-{{ b.id }}-{{ t.id }}-value2" type="number" step="0.01" placeholder="v2" inputmode="decimal">
+                    <input class="test-input" name="r-{{ b.id }}-{{ t.id }}-value3" type="number" step="0.01" placeholder="v3" inputmode="decimal">
+                  </div>
+                  <input class="test-notes" name="r-{{ b.id }}-{{ t.id }}-notes" type="text" placeholder="notes">
+
+                  <!-- Hidden IDs for per-cell save -->
+                  <input type="hidden" name="boxer_id" value="{{ b.id }}">
+                  <input type="hidden" name="test_id"  value="{{ t.id }}">
+
+                  <!-- Per-cell Save (reuses the global form), keep phase in URL -->
+                  <button
+                    class="btn"
+                    type="submit"
+                    form="matrix"
+                    formaction="{% url 'tests_result_save' %}?b={{ b.id }}&t={{ t.id }}&phase={{ phase }}"
+                  >
+                    Save
+                  </button>
+                </td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <p><button class="btn" type="submit">Save All</button></p>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="content-container">
+    <h2 class="page-title">Mark Attendance</h2>
+    <br>
+    <a href="{% url 'home' %}" class="back-button">← Home</a>
+    <br>
+    <a href="{% url 'attendance_by_date' %}">📅 By Date</a>
+
+    <form method="post" onsubmit="return confirmSubmit();">
+        {% csrf_token %}
+
+        <label for="date" class="date-label">Date:</label>
+        <input type="date" id="date" name="date" class="date-input" value="{{ today|date:'Y-m-d' }}" required>
+        <br><br>
+
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Boxer</th>
+                    <th>Present</th>
+                    <th>Absent</th>
+                    <th>Excused Absence?</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for boxer in boxers %}
+                <tr>
+                    <td>{{ boxer.name }}</td>
+                    <td><input type="radio" name="attendance_{{ forloop.counter }}" value="Present"></td>
+                    <td><input type="radio" name="attendance_{{ forloop.counter }}" value="Absent"></td>
+                    <td><input type="checkbox" name="excused_{{ forloop.counter }}"></td>
+                    <input type="hidden" name="boxer_id_{{ forloop.counter }}" value="{{ boxer.id }}">
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <input type="hidden" name="total_boxers" value="{{ boxers|length }}">
+
+        <br>
+        <button type="submit">Submit Attendance</button>
+    </form>
+
+    <br>
+    <a href="{% url 'attendance_list' %}">View Attendance Records</a> |
+    <a href="{% url 'boxer_list' %}">Manage Boxers</a>
+</div>
+
+<script>
+    function confirmSubmit() {
+        return confirm("Are you sure you want to submit the attendance?");
+    }
+</script>
+{% endblock %}
