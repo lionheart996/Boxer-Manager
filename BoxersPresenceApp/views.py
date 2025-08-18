@@ -771,3 +771,10 @@ class TestRankingView(LoginRequiredMixin, TemplateView):
             "selected_phase": selected_phase,
         }
         return render(request, self.template_name, ctx)
+
+
+def debug_env(request):
+    return JsonResponse({
+        "ALLOWED_HOSTS": settings.ALLOWED_HOSTS,
+        "CSRF_TRUSTED_ORIGINS": settings.CSRF_TRUSTED_ORIGINS,
+    })

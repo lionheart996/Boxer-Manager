@@ -45,5 +45,6 @@ urlpatterns = [
     path('tests/rankings/<int:test_id>/', views.TestRankingView.as_view(), name='tests_rankings_for_test'),
     path('async/boxers-search/', boxers_search, name='boxers_search'),
     path('api/', include(router.urls)),
+    path("debug-env/", views.debug_env, name="debug-env"),
 ]
 
