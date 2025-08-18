@@ -43,6 +43,7 @@ class BatteryTest(models.Model):
 
 
 class TestResult(models.Model):
+    __test__ = False
     PHASE_PRE = "pre"
     PHASE_MID = "mid"
     PHASE_BEFORE = "before"

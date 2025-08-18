@@ -26,7 +26,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # App routes (attendance section)
-    path('boxer_factory/', include('BoxersPresenceApp.urls')),
+    path('', include('BoxersPresenceApp.urls')),
 
     # Home / Dashboard
     path('', HomeView.as_view(), name='home'),

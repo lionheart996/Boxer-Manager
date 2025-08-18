@@ -1,6 +1,15 @@
-from django.urls import path
-from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
+from . import views
+from .api import BoxerViewSet, TestResultViewSet, TestViewSet, WeightViewSet
+from .async_views import boxers_search
+
+router = DefaultRouter()
+router.register(r'boxers', BoxerViewSet, basename='boxer')
+router.register(r'tests', TestViewSet, basename='test')
+router.register(r'results', TestResultViewSet, basename='testresult')
+router.register(r'weights', WeightViewSet, basename='weight')
 urlpatterns = [
     # Boxers
     path('boxers/', views.BoxerListView.as_view(), name='boxer_list'),
@@ -34,5 +43,7 @@ urlpatterns = [
     path('weight/boxer/<int:boxer_id>/', views.WeightDetailView.as_view(), name='weight_detail'),
     path('tests/rankings/', views.TestRankingView.as_view(), name='tests_rankings'),
     path('tests/rankings/<int:test_id>/', views.TestRankingView.as_view(), name='tests_rankings_for_test'),
+    path('async/boxers-search/', boxers_search, name='boxers_search'),
+    path('api/', include(router.urls)),
 ]
 
