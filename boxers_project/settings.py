@@ -14,8 +14,9 @@ DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
 
 render_host = os.getenv("RENDER_EXTERNAL_HOSTNAME")
 
-ALLOWED_HOSTS = ["boxer-manager.onrender.com", ".onrender.com"]
-CSRF_TRUSTED_ORIGINS = ["https://boxer-manager.onrender.com"]
+ALLOWED_HOSTS = ["*"]
+RENDER_HOST = os.getenv("RENDER_EXTERNAL_HOSTNAME", "boxer-manager.onrender.com")
+CSRF_TRUSTED_ORIGINS = [f"https://{RENDER_HOST}"]
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # CSRF_TRUSTED_ORIGINS = [
