@@ -1,11 +1,16 @@
 # ===== BATTERY TESTS =====
+import io
 from datetime import date
 from datetime import date as Date
+
+from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
-from django.http import HttpResponseBadRequest, JsonResponse
+from django.core.management import call_command
+from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView, UpdateView, DeleteView, FormView, ListView, DetailView, CreateView
@@ -778,3 +783,21 @@ def debug_env(request):
         "ALLOWED_HOSTS": settings.ALLOWED_HOSTS,
         "CSRF_TRUSTED_ORIGINS": settings.CSRF_TRUSTED_ORIGINS,
     })
+
+@staff_member_required
+def export_fixture(request):
+    buf = io.StringIO()
+    call_command(
+        "dumpdata",
+        "--natural-foreign", "--natural-primary",
+        "-e", "contenttypes", "-e", "auth.permission", "-e", "admin.logentry", "-e", "sessions",
+        stdout=buf,
+    )
+    data = buf.getvalue()
+    resp = HttpResponse(data, content_type="application/json")
+    resp["Content-Disposition"] = 'attachment; filename="render_dump.json"'
+    return resp
+
+# tiny health check to confirm routing quickly
+def health(request):
+    return HttpResponse("ok")

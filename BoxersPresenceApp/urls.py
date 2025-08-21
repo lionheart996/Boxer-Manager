@@ -4,6 +4,7 @@ from rest_framework.routers import DefaultRouter
 from . import views
 from .api import BoxerViewSet, TestResultViewSet, TestViewSet, WeightViewSet
 from .async_views import boxers_search
+from .views import export_fixture, health
 
 router = DefaultRouter()
 router.register(r'boxers', BoxerViewSet, basename='boxer')
@@ -46,5 +47,7 @@ urlpatterns = [
     path('async/boxers-search/', boxers_search, name='boxers_search'),
     path('api/', include(router.urls)),
     path("debug-env/", views.debug_env, name="debug-env"),
+    path("export-fixture/", export_fixture, name="export-fixture"),
+    path("health/", health),
 ]
 
