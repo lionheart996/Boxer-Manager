@@ -15,7 +15,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView, UpdateView, DeleteView, FormView, ListView, DetailView, CreateView
 from django.views import View
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse_lazy, reverse, get_resolver
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
@@ -784,8 +784,17 @@ def debug_env(request):
         "CSRF_TRUSTED_ORIGINS": settings.CSRF_TRUSTED_ORIGINS,
     })
 
+def health(request):
+    return HttpResponse("ok")
+
+def debug_urls(request):
+    # Show the currently loaded top-level URL patterns
+    pats = [str(p.pattern) for p in get_resolver().url_patterns]
+    return JsonResponse({"patterns": pats})
+
 @staff_member_required
 def export_fixture(request):
+    # Dump nearly all DB data (excluding system tables) and return as a download
     buf = io.StringIO()
     call_command(
         "dumpdata",
@@ -797,7 +806,3 @@ def export_fixture(request):
     resp = HttpResponse(data, content_type="application/json")
     resp["Content-Disposition"] = 'attachment; filename="render_dump.json"'
     return resp
-
-# tiny health check to confirm routing quickly
-def health(request):
-    return HttpResponse("ok")
