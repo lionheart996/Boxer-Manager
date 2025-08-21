@@ -11,7 +11,14 @@ router.register(r'boxers', BoxerViewSet, basename='boxer')
 router.register(r'tests', TestViewSet, basename='test')
 router.register(r'results', TestResultViewSet, basename='testresult')
 router.register(r'weights', WeightViewSet, basename='weight')
+
 urlpatterns = [
+    # Health / debug / export
+    path("health/", views.health, name="health"),
+    path("debug-urls/", views.debug_urls, name="debug-urls"),
+    path("debug-env/", views.debug_env, name="debug-env"),
+    path("export-fixture/", views.export_fixture, name="export-fixture"),
+
     # Boxers
     path('boxers/', views.BoxerListView.as_view(), name='boxer_list'),
     path('boxers/delete/<int:pk>/', views.delete_boxer, name='delete_boxer'),
@@ -44,11 +51,8 @@ urlpatterns = [
     path('weight/boxer/<int:boxer_id>/', views.WeightDetailView.as_view(), name='weight_detail'),
     path('tests/rankings/', views.TestRankingView.as_view(), name='tests_rankings'),
     path('tests/rankings/<int:test_id>/', views.TestRankingView.as_view(), name='tests_rankings_for_test'),
+
+    # Async + API
     path('async/boxers-search/', boxers_search, name='boxers_search'),
     path('api/', include(router.urls)),
-    path("debug-env/", views.debug_env, name="debug-env"),
-    path("export-fixture/", export_fixture, name="export-fixture"),
-    path("health/", health),
-    path("debug-urls/", debug_urls),
 ]
-

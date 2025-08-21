@@ -23,23 +23,19 @@ from BoxersPresenceApp import views
 from BoxersPresenceApp.views import HomeView, RegisterView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
 
-    # App routes (attendance section)
-    path('', include('BoxersPresenceApp.urls')),
+    # Mount the app routes at root
+    path("", include("BoxersPresenceApp.urls")),
 
-    # Home / Dashboard
-    path('', HomeView.as_view(), name='home'),
+    # Make home explicit (optional):
+    path("home/", HomeView.as_view(), name="home"),
 
     # Auth
-    path('login/', auth_views.LoginView.as_view(
-        template_name='login.html',
+    path("login/", auth_views.LoginView.as_view(
+        template_name="login.html",
         redirect_authenticated_user=True
-    ), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
-    path('register/', RegisterView.as_view(), name='register'),
-    path('tests/', views.TestsListView.as_view(), name='tests_list'),
-    path('tests/results/', views.ResultsMatrixView.as_view(), name='tests_results'),
-    path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
-
+    ), name="login"),
+    path("logout/", LogoutView.as_view(next_page="login"), name="logout"),
+    path("register/", views.RegisterView.as_view(), name="register"),
 ]

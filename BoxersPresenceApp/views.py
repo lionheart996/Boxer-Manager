@@ -778,23 +778,23 @@ class TestRankingView(LoginRequiredMixin, TemplateView):
         return render(request, self.template_name, ctx)
 
 
-def debug_env(request):
-    return JsonResponse({
-        "ALLOWED_HOSTS": settings.ALLOWED_HOSTS,
-        "CSRF_TRUSTED_ORIGINS": settings.CSRF_TRUSTED_ORIGINS,
-    })
-
 def health(request):
     return HttpResponse("ok")
 
 def debug_urls(request):
-    # Show the currently loaded top-level URL patterns
     pats = [str(p.pattern) for p in get_resolver().url_patterns]
     return JsonResponse({"patterns": pats})
 
+def debug_env(request):
+    from django.conf import settings
+    return JsonResponse({
+        "ALLOWED_HOSTS": settings.ALLOWED_HOSTS,
+        "CSRF_TRUSTED_ORIGINS": getattr(settings, "CSRF_TRUSTED_ORIGINS", []),
+        "DEBUG": settings.DEBUG,
+    })
+
 @staff_member_required
 def export_fixture(request):
-    # Dump nearly all DB data (excluding system tables) and return as a download
     buf = io.StringIO()
     call_command(
         "dumpdata",
