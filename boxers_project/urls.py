@@ -29,7 +29,7 @@ urlpatterns = [
     path("", include("BoxersPresenceApp.urls")),
 
     # Make home explicit (optional):
-    path("home/", HomeView.as_view(), name="home"),
+    path("", views.HomeView.as_view(), name="home"),
 
     # Auth
     path("login/", auth_views.LoginView.as_view(
