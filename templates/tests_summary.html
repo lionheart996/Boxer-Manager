@@ -60,10 +60,10 @@
                 {% for tr in row.cells %}
                   <td class="summary-cell">
                     {% if tr %}
-                      <div>
-                        {{ tr.value1|default:"—" }} /
-                        {{ tr.value2|default:"—" }} /
-                        {{ tr.value3|default:"—" }}
+                      <div style="color: #00e5ff;">
+                        {{ tr.value1|default:"—" }} ;
+                        {{ tr.value2|default:"—" }} ;
+                        {{ tr.value3|default:"" }}
                       </div>
                       {% if tr.notes %}
                         <div class="summary-notes">{{ tr.notes }}</div>

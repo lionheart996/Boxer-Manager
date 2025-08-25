@@ -2,6 +2,7 @@
 import io
 from datetime import date
 from datetime import date as Date
+from decimal import InvalidOperation, Decimal
 
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
@@ -119,51 +120,127 @@ class TestDeleteView(LoginRequiredMixin, DeleteView):
 
 
 # ===== RESULTS MATRIX (phase-aware) =====
+# class ResultsMatrixView(LoginRequiredMixin, TemplateView):
+#     template_name = 'tests_results.html'
+#
+#     def current_phase(self):
+#         return self.request.GET.get('phase') or TestResult.PHASE_PRE
+#
+#     def get(self, request, *args, **kwargs):
+#         phase = self.current_phase()
+#         tests = BatteryTest.objects.filter(coach=request.user).order_by('display_order', 'name')
+#         boxers = Boxer.objects.filter(coach=request.user).order_by('name')
+#         results = {
+#             (r.boxer_id, r.test_id): r
+#             for r in TestResult.objects.filter(
+#                 boxer__coach=request.user, test__coach=request.user, phase=phase
+#             )
+#         }
+#         return render(request, self.template_name, {
+#             'phase_form': PhaseSelectForm(initial={'phase': phase}),
+#             'phase': phase,
+#             'tests': tests,
+#             'boxers': boxers,
+#             'results': results,
+#         })
+#
+#     def post(self, request, *args, **kwargs):
+#         # Save All for selected phase
+#         phase = request.GET.get('phase') or request.POST.get('phase') or TestResult.PHASE_PRE
+#         tests = BatteryTest.objects.filter(coach=request.user)
+#         boxers = Boxer.objects.filter(coach=request.user)
+#
+#         for b in boxers:
+#             for t in tests:
+#                 prefix = f"r-{b.id}-{t.id}-"
+#                 v1 = request.POST.get(prefix + "value1")
+#                 v2 = request.POST.get(prefix + "value2")
+#                 v3 = request.POST.get(prefix + "value3")
+#                 notes = (request.POST.get(prefix + "notes") or "").strip()
+#                 if all(x in (None, '') for x in (v1, v2, v3, notes)):
+#                     continue
+#                 obj, _ = TestResult.objects.get_or_create(boxer=b, test=t, phase=phase)
+#                 obj.value1, obj.value2, obj.value3 = v1 or None, v2 or None, v3 or None
+#                 obj.notes = notes
+#                 obj.save()
+#
+#         return redirect(f"{reverse_lazy('tests_results')}?phase={phase}")
 class ResultsMatrixView(LoginRequiredMixin, TemplateView):
     template_name = 'tests_results.html'
 
-    def current_phase(self):
-        return self.request.GET.get('phase') or TestResult.PHASE_PRE
-
     def get(self, request, *args, **kwargs):
-        phase = self.current_phase()
-        tests = BatteryTest.objects.filter(coach=request.user).order_by('display_order', 'name')
+        # Read current selection from query params
+        phase    = request.GET.get('phase') or TestResult.PHASE_PRE
+        boxer_id = request.GET.get('boxer')
+        test_id  = request.GET.get('test')
+
         boxers = Boxer.objects.filter(coach=request.user).order_by('name')
-        results = {
-            (r.boxer_id, r.test_id): r
-            for r in TestResult.objects.filter(
-                boxer__coach=request.user, test__coach=request.user, phase=phase
-            )
-        }
-        return render(request, self.template_name, {
-            'phase_form': PhaseSelectForm(initial={'phase': phase}),
-            'phase': phase,
-            'tests': tests,
+        tests  = BatteryTest.objects.filter(coach=request.user).order_by('display_order', 'name')
+
+        selected_boxer = None
+        selected_test  = None
+        result = None
+
+        if boxer_id and test_id:
+            try:
+                selected_boxer = get_object_or_404(Boxer, id=int(boxer_id), coach=request.user)
+                selected_test  = get_object_or_404(BatteryTest, id=int(test_id), coach=request.user)
+                result = TestResult.objects.filter(
+                    boxer=selected_boxer, test=selected_test, phase=phase
+                ).first()
+            except (TypeError, ValueError):
+                selected_boxer = None
+                selected_test = None
+
+        ctx = {
             'boxers': boxers,
-            'results': results,
-        })
+            'tests': tests,
+            'phase': phase,
+            'phase_choices': TestResult.PHASE_CHOICES,
+            'selected_boxer': selected_boxer,
+            'selected_test': selected_test,
+            'result': result,
+        }
+        return render(request, self.template_name, ctx)
 
     def post(self, request, *args, **kwargs):
-        # Save All for selected phase
-        phase = request.GET.get('phase') or request.POST.get('phase') or TestResult.PHASE_PRE
-        tests = BatteryTest.objects.filter(coach=request.user)
-        boxers = Boxer.objects.filter(coach=request.user)
+        # Save a single (boxer, test, phase) result from the detail form
+        phase    = request.POST.get('phase') or TestResult.PHASE_PRE
+        boxer_id = request.POST.get('boxer_id')
+        test_id  = request.POST.get('test_id')
 
-        for b in boxers:
-            for t in tests:
-                prefix = f"r-{b.id}-{t.id}-"
-                v1 = request.POST.get(prefix + "value1")
-                v2 = request.POST.get(prefix + "value2")
-                v3 = request.POST.get(prefix + "value3")
-                notes = (request.POST.get(prefix + "notes") or "").strip()
-                if all(x in (None, '') for x in (v1, v2, v3, notes)):
-                    continue
-                obj, _ = TestResult.objects.get_or_create(boxer=b, test=t, phase=phase)
-                obj.value1, obj.value2, obj.value3 = v1 or None, v2 or None, v3 or None
-                obj.notes = notes
-                obj.save()
+        try:
+            boxer = get_object_or_404(Boxer, id=int(boxer_id), coach=request.user)
+            test  = get_object_or_404(BatteryTest, id=int(test_id), coach=request.user)
+        except (TypeError, ValueError):
+            messages.error(request, "Please select a boxer and a test.")
+            return redirect(f"{reverse_lazy('tests_results')}?phase={phase}")
 
-        return redirect(f"{reverse_lazy('tests_results')}?phase={phase}")
+        def parse_val(name):
+            raw = (request.POST.get(name) or '').strip()
+            if raw == '':
+                return None
+            try:
+                return float(raw)
+            except ValueError:
+                raise ValidationError(f"{name} must be a number or blank.")
+
+        try:
+            v1 = parse_val('value1')
+            v2 = parse_val('value2')
+            v3 = parse_val('value3')
+        except ValidationError as e:
+            messages.error(request, str(e))
+            return redirect(f"{reverse_lazy('tests_results')}?boxer={boxer.id}&test={test.id}&phase={phase}")
+
+        notes = (request.POST.get('notes') or '').strip()
+
+        obj, _ = TestResult.objects.get_or_create(boxer=boxer, test=test, phase=phase)
+        obj.value1, obj.value2, obj.value3, obj.notes = v1, v2, v3, notes
+        obj.save()
+
+        messages.success(request, "Result saved.")
+        return redirect(f"{reverse_lazy('tests_results')}?boxer={boxer.id}&test={test.id}&phase={phase}")
 
 
 class ResultsCellSaveView(LoginRequiredMixin, View):
@@ -348,51 +425,146 @@ class AttendanceListView(LoginRequiredMixin, TemplateView):
 class MarkAttendanceView(LoginRequiredMixin, TemplateView):
     template_name = 'mark_attendance.html'
 
+    # get() stays the same ...
     def get(self, request, *args, **kwargs):
         boxers = Boxer.objects.filter(coach=request.user).order_by('name')
-        return render(request, self.template_name, {
+        used_fallback = False
+
+        # Helpful fallback for superusers during setup/data-migration
+        if not boxers.exists() and request.user.is_superuser:
+            boxers = Boxer.objects.all().order_by('name')
+            used_fallback = True
+
+        ctx = {
             'boxers': boxers,
             'today': timezone.now().date(),
-        })
+            'used_fallback': used_fallback,
+        }
+        return render(request, self.template_name, ctx)
 
     def post(self, request, *args, **kwargs):
+        from decimal import Decimal, InvalidOperation
+        from datetime import date as _date
+
         # date
         date_str = (request.POST.get('date') or '').strip()
         try:
-            att_date = date.fromisoformat(date_str) if date_str else timezone.now().date()
+            att_date = _date.fromisoformat(date_str) if date_str else timezone.now().date()
         except ValueError:
             att_date = timezone.now().date()
 
-        # how many rows came from the form
+        # number of rows
         try:
             total = int(request.POST.get('total_boxers', '0'))
         except ValueError:
             total = 0
 
         saved = 0
+        errors = 0
+
         for i in range(1, total + 1):
             boxer_id = request.POST.get(f'boxer_id_{i}')
-            attendance = request.POST.get(f'attendance_{i}')  # "Present" or "Absent"
+            attendance_choice = request.POST.get(f'attendance_{i}')  # "Present" / "Absent" / None
             excused = request.POST.get(f'excused_{i}') == 'on'
+            weight_raw = (request.POST.get(f'weight_{i}') or '').strip()
 
-            if not boxer_id or not attendance:
-                continue  # skip incomplete rows
+            if not boxer_id:
+                continue
 
-            # make sure this boxer belongs to the current coach
+            # ✅ NEW: if neither a radio is selected NOR a weight is entered → skip this row
+            if not attendance_choice and not weight_raw:
+                continue
+
             boxer = get_object_or_404(Boxer, id=boxer_id, coach=request.user)
 
-            Attendance.objects.create(
+            # parse optional weight (only if provided)
+            weight_val = None
+            if weight_raw:
+                try:
+                    weight_val = Decimal(weight_raw)
+                except InvalidOperation:
+                    errors += 1
+                    messages.error(request, f"Invalid weight for {boxer.name}. Use a number (e.g. 72.5).")
+                    continue
+
+            # Your earlier logic, kept:
+            # - If Present is ticked OR a weight is given → Present
+            # - Else → Absent (excused if checkbox ticked)
+            if (attendance_choice == 'Present') or (weight_val is not None):
+                is_present = True
+            else:
+                is_present = False
+
+            is_excused = (not is_present) and excused
+
+            Attendance.objects.update_or_create(
                 boxer=boxer,
                 date=att_date,
-                is_present=(attendance == 'Present'),
-                is_excused=(attendance != 'Present' and excused),
+                defaults={
+                    'is_present': is_present,
+                    'is_excused': is_excused,
+                    'weight': weight_val,
+                }
             )
             saved += 1
 
-        messages.success(request, f"Saved {saved} attendance record(s) for {att_date}.")
+        if saved:
+            messages.success(request, f"Saved {saved} attendance record(s) for {att_date}.")
+        if errors:
+            messages.error(request, f"{errors} row(s) had invalid weights and were skipped.")
         return redirect('attendance_list')
+# ========= NEW: Weight progress view =========
 
+class WeightProgressView(LoginRequiredMixin, TemplateView):
+    template_name = 'weight_progress.html'
 
+    def get(self, request, boxer_id):
+        boxer = get_object_or_404(Boxer, id=boxer_id, coach=request.user)
+
+        fw_raw = (request.GET.get('fighting_weight') or '').strip()
+        fighting_weight = None
+        fw_error = None
+        if fw_raw:
+            try:
+                fighting_weight = Decimal(fw_raw)
+            except InvalidOperation:
+                fw_error = "Fighting weight must be a number (e.g. 69.0)."
+
+        # All attendance with a recorded weight, sorted
+        qs = Attendance.objects.filter(boxer=boxer, weight__isnull=False).order_by('date')
+        weights = list(qs.values_list('date', 'weight'))
+
+        # Build rows for table/chart
+        rows = []
+        for d, w in weights:
+            a = Attendance.objects.filter(boxer=boxer, date=d).first()
+            rows.append({
+                'date': d,
+                'weight': w,
+                'present': bool(a and a.is_present),
+                'excused': bool(a and a.is_excused),
+            })
+
+        min_w = max_w = diff = count_above_fw = None
+        if weights:
+            values = [w for _, w in weights]
+            min_w = min(values)
+            max_w = max(values)
+            diff = (max_w - min_w) if (max_w is not None and min_w is not None) else None
+            if fighting_weight is not None:
+                count_above_fw = sum(1 for v in values if v is not None and v > fighting_weight)
+
+        ctx = {
+            'boxer': boxer,
+            'rows': rows,
+            'fighting_weight': fighting_weight,
+            'fw_error': fw_error,
+            'min_w': min_w,
+            'max_w': max_w,
+            'diff': diff,
+            'count_above_fw': count_above_fw,
+        }
+        return render(request, self.template_name, ctx)
 @login_required
 def attendance_by_date(request):
     # read ?date=YYYY-MM-DD; default to today if missing/invalid

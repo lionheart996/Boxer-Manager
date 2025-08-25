@@ -1,56 +1,102 @@
-
 {% extends "base.html" %}
 {% block content %}
 <div class="content-container">
-    <h2 class="page-title">Mark Attendance</h2>
+  <h2 class="page-title">Mark Attendance</h2>
+  <br>
+  <a href="{% url 'home' %}" class="back-button">← Home</a>
+  <br>
+  <a href="{% url 'attendance_by_date' %}">📅 By Date</a>
+
+  <style>
+    /* Compact table spacing + centered utility */
+    .table-compact th, .table-compact td { padding: 6px 8px; }
+    .center { text-align: center; vertical-align: middle; white-space: nowrap; }
+
+    /* Small rounded, cursive-styled button */
+    .btn-weight {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 10px;          /* compact */
+      border-radius: 9999px;      /* pill/round edges */
+      font-size: 0.9rem;
+      line-height: 1;
+      font-style: italic;         /* cursive look */
+      font-family: cursive;       /* cursive family */
+      text-decoration: none;
+    }
+    /* If your global .btn has no visuals, give a light one: */
+    .btn-weight { border: 1px solid #ddd; background: #f7f7f7; }
+    .btn-weight:hover { background: #eee; }
+  </style>
+
+  <form method="post" onsubmit="return confirmSubmit();">
+    {% csrf_token %}
+
+    <label for="date" class="date-label">Date:</label>
+    <input type="date" id="date" name="date" class="date-input" value="{{ today|date:'Y-m-d' }}" required>
+    <br><br>
+
+    <table border="1" class="table-compact">
+      <thead>
+        <tr>
+          <th>Boxer</th>
+          <th>Present</th>
+          <th>Weight</th>
+          <th>Absent</th>
+          <th>Excused Absence?</th>
+          <th style="width:1%;">Progress</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for boxer in boxers %}
+        <tr>
+          <td>{{ boxer.name }}</td>
+
+          <td class="center">
+            <input type="radio" name="attendance_{{ forloop.counter }}" value="Present" aria-label="Present for {{ boxer.name }}">
+          </td>
+
+          <td class="center">
+            <input type="number" step="0.1" min="0" name="weight_{{ forloop.counter }}" style="width:90px;" placeholder="kg" aria-label="Weight for {{ boxer.name }}">
+          </td>
+
+          <td class="center">
+            <input type="radio" name="attendance_{{ forloop.counter }}" value="Absent" aria-label="Absent for {{ boxer.name }}">
+          </td>
+
+          <td class="center">
+            <input type="checkbox" name="excused_{{ forloop.counter }}" aria-label="Excused absence for {{ boxer.name }}">
+          </td>
+
+          <td class="center">
+            <a class="btn btn-weight" style="color: blue" href="{% url 'weight_progress' boxer.id %}">
+              Weight Progress
+            </a>
+          </td>
+
+          <input type="hidden" name="boxer_id_{{ forloop.counter }}" value="{{ boxer.id }}">
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <input type="hidden" name="total_boxers" value="{{ boxers|length }}">
+
     <br>
-    <a href="{% url 'home' %}" class="back-button">← Home</a>
-    <br>
-    <a href="{% url 'attendance_by_date' %}">📅 By Date</a>
+    <button type="submit" class="btn btn-weight">Submit Attendance</button>
+  </form>
 
-    <form method="post" onsubmit="return confirmSubmit();">
-        {% csrf_token %}
-
-        <label for="date" class="date-label">Date:</label>
-        <input type="date" id="date" name="date" class="date-input" value="{{ today|date:'Y-m-d' }}" required>
-        <br><br>
-
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>Boxer</th>
-                    <th>Present</th>
-                    <th>Absent</th>
-                    <th>Excused Absence?</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for boxer in boxers %}
-                <tr>
-                    <td>{{ boxer.name }}</td>
-                    <td><input type="radio" name="attendance_{{ forloop.counter }}" value="Present"></td>
-                    <td><input type="radio" name="attendance_{{ forloop.counter }}" value="Absent"></td>
-                    <td><input type="checkbox" name="excused_{{ forloop.counter }}"></td>
-                    <input type="hidden" name="boxer_id_{{ forloop.counter }}" value="{{ boxer.id }}">
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <input type="hidden" name="total_boxers" value="{{ boxers|length }}">
-
-        <br>
-        <button type="submit">Submit Attendance</button>
-    </form>
-
-    <br>
-    <a href="{% url 'attendance_list' %}">View Attendance Records</a> |
-    <a href="{% url 'boxer_list' %}">Manage Boxers</a>
+  <br>
+  <a href="{% url 'attendance_list' %}">View Attendance Records</a> |
+  <a href="{% url 'boxer_list' %}">Manage Boxers</a>
 </div>
 
 <script>
-    function confirmSubmit() {
-        return confirm("Are you sure you want to submit the attendance?");
-    }
+  function confirmSubmit() {
+    return confirm("Are you sure you want to submit the attendance?");
+  }
 </script>
 {% endblock %}
+
+

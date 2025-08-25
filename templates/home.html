@@ -16,39 +16,7 @@
   </form>
 </div>
 
-<!-- Weight -->
-{% if weight_form %}
-<div class="card" style="background:#111;border:1px solid #00ff66;border-radius:12px;padding:16px; margin-top:16px;">
-  <h3>Record a boxer's weight</h3>
-  <form method="post" action="{% url 'record_weight' %}" style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">
-    {% csrf_token %}
-    <div>
-      <label style="display:block; font-size:12px;">Boxer</label>
-      {{ weight_form.boxer }}
-    </div>
-    <div>
-      <label style="display:block; font-size:12px;">Phase</label>
-      {{ weight_form.phase }}
-    </div>
-    <div>
-      <label style="display:block; font-size:12px;">Weight (kg)</label>
-      {{ weight_form.kg }}
-    </div>
-    <div>
-      <label style="display:block; font-size:12px;">Expected (kg)</label>
-      {{ weight_form.expected_kg }}
-    </div>
-    <div>
-      <label style="display:block; font-size:12px;">Date</label>
-      {{ weight_form.measured_at }}
-    </div>
-    <button class="btn" type="submit">Save</button>
-    <a class="btn" href="{% url 'weight_summary' %}">View Weight Table</a>
-  </form>
-</div>
-{% else %}
-<div style="color:#f66;">weight_form is missing from context</div>
-{% endif %}
+
 
 
 <!-- Heart Rate Form -->

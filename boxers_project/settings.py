@@ -9,8 +9,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-only")
 
-DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
-
+# DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
+DEBUG = False
 
 render_host = os.getenv("RENDER_EXTERNAL_HOSTNAME")
 

@@ -14,10 +14,20 @@ class Boxer(models.Model):
         return self.name
 
 class Attendance(models.Model):
-    boxer = models.ForeignKey(Boxer, on_delete=models.CASCADE)
+    boxer = models.ForeignKey(Boxer,
+                              on_delete=models.CASCADE)
     date = models.DateField()
-    is_present = models.BooleanField(default=False)
-    is_excused = models.BooleanField(default=False)
+    weight = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        null=True,
+        blank=True)
+    is_present = models.BooleanField(
+        default=False,
+    )
+    is_excused = models.BooleanField(
+        default=False,
+    )
 
     def __str__(self):
         status = 'Present' if self.is_present else 'Absent (Excused)' if self.is_excused else 'Absent'

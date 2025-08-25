@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="content-container">
+  <a href="{% url 'attendance_list' %}">← Back to Attendance</a>
+  <h2 class="page-title">Weight Progress — {{ boxer.name }}</h2>
+
+  <form method="get" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+    <label>What is the boxer's Fighting Weight?
+      <input type="number" name="fighting_weight" step="0.1" min="0"
+             value="{{ fighting_weight|default_if_none:'' }}" placeholder="kg">
+    </label>
+    <button class="btn" type="submit">Show</button>
+  </form>
+
+  {% if fw_error %}
+    <p style="color:#c00; margin-top:8px;">{{ fw_error }}</p>
+  {% endif %}
+
+  {% if rows %}
+    <div style="margin-top:16px;">
+      <h3>Summary</h3>
+      <ul>
+        <li>Minimum recorded weight: <strong>{{ min_w }} kg</strong></li>
+        <li>Maximum recorded weight: <strong>{{ max_w }} kg</strong></li>
+        <li>Difference (max - min): <strong>{% if diff is not None %}{{ diff }}{% else %}–{% endif %} kg</strong></li>
+        <li>Times above fighting weight{% if fighting_weight %} ({{ fighting_weight }} kg){% endif %}: <strong>{% if count_above_fw is not None %}{{ count_above_fw }}{% else %}–{% endif %}</strong></li>
+      </ul>
+    </div>
+
+    <div style="margin-top:10px;">
+      <h3>History (table)</h3>
+      <table border="1" style="border-collapse:collapse; width:100%; max-width:720px;">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Weight (kg)</th>
+
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+          <tr>
+            <td>{{ r.date|date:"Y-m-d" }}</td>
+            <td>{{ r.weight }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:16px; max-width:900px;">
+      <h3>History (chart)</h3>
+      <canvas id="weightChart" height="120"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      const labels = [{% for r in rows %}"{{ r.date|date:'Y-m-d' }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+      const data   = [{% for r in rows %}{{ r.weight }}{% if not forloop.last %},{% endif %}{% endfor %}];
+
+      const ctx = document.getElementById('weightChart').getContext('2d');
+      const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Weight (kg)',
+              data: data,
+              tension: 0.25,
+              fill: false,
+              pointRadius: 3
+            }
+            {% if fighting_weight %}
+            ,{
+              label: 'Fighting Weight',
+              data: labels.map(_ => {{ fighting_weight }}),
+              borderDash: [5,5],
+              fill: false,
+              pointRadius: 0
+            }
+            {% endif %}
+          ]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: false } } }
+      });
+    </script>
+  {% else %}
+    <p style="margin-top:12px;">No recorded weights yet for {{ boxer.name }}.</p>
+  {% endif %}
+</div>
+{% endblock %}
