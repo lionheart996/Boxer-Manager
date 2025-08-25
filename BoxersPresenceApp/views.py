@@ -69,15 +69,15 @@ class BoxerListView(LoginRequiredMixin, ListView):
         # If form is invalid, re-render with errors
         return self.render_to_response(self.get_context_data(form=form))
 
-class BoxerCreateView(LoginRequiredMixin, CreateView):
-    model = Boxer
-    form_class = BoxerForm
-    template_name = 'boxer_form.html'
-    success_url = reverse_lazy('boxer_list')
-
-    def form_valid(self, form):
-        form.instance.coach = self.request.user
-        return super().form_valid(form)
+# class BoxerCreateView(LoginRequiredMixin, CreateView):
+#     model = Boxer
+#     form_class = BoxerForm
+#     template_name = 'boxer_form.html'
+#     success_url = reverse_lazy('boxer_list')
+#
+#     def form_valid(self, form):
+#         form.instance.coach = self.request.user
+#         return super().form_valid(form)
 
 class TestsListView(LoginRequiredMixin, TemplateView):
     """List tests for this coach and create a new one."""
@@ -631,17 +631,34 @@ class BoxerReportView(LoginRequiredMixin, DetailView):
         })
         return ctx
 
-@require_POST
+# @require_POST
+# @login_required
+# def add_boxer(request):
+#     name = (request.POST.get("name") or "").strip()
+#     if not name:
+#         messages.error(request, "Please enter a boxer name.")
+#         return redirect(request.META.get("HTTP_REFERER", "boxer_list"))
+#     Boxer.objects.create(name=name, coach=request.user)
+#     messages.success(request, f"Added boxer “{name}”.")
+#     return redirect("boxer_list")
 @login_required
 def add_boxer(request):
-    name = (request.POST.get("name") or "").strip()
-    if not name:
-        messages.error(request, "Please enter a boxer name.")
-        return redirect(request.META.get("HTTP_REFERER", "boxer_list"))
-    Boxer.objects.create(name=name, coach=request.user)
-    messages.success(request, f"Added boxer “{name}”.")
-    return redirect("boxer_list")
+    if request.method == "POST":
+        name = (request.POST.get("name") or "").strip()
+        if not name:
+            messages.error(request, "Please enter a boxer name.")
+            return redirect("home")
 
+        # Create and attach to the current coach (user)
+        boxer = Boxer.objects.create(name=name, coach=request.user)
+
+        messages.success(
+            request,
+            f"You successfully added {boxer.name} to your boxers' list."
+        )
+        return redirect("home")
+
+    return redirect("home")
 
 @login_required
 @require_POST

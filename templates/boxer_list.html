@@ -19,7 +19,6 @@
               <a class="btn" href="{% url 'boxer_report' b.id %}" style="background-color:#000; padding:0px; color: #00ceff">Attendance</a>
                 {% if b.pk %}
                   <a class="btn" href="{% url 'heart_rate_detail' boxer_id=b.pk %}" style="background-color:#000; padding:0px; color: #00ceff">Heart Rate</a>
-                  <a class="btn" href="{% url 'weight_detail' boxer_id=b.pk %}" style="background-color:#000; padding:0px; color: #00ceff">Weight</a>
                 {% endif %}
               <form method="post"
                   action="{% url 'delete_boxer' b.pk %}"
