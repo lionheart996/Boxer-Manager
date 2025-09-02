@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Attendance — {{ boxer.name }}</h2>
+<table border="1" style="border-collapse:collapse; width:100%; max-width:720px;">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Present</th>
+      <th>Excused</th>
+      <th>Weight</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in records %}
+      <tr>
+        <td>{{ r.date|date:"Y-m-d" }}</td>
+        <td>{% if r.is_present %}Yes{% else %}No{% endif %}</td>
+        <td>{% if r.is_excused %}Yes{% else %}No{% endif %}</td>
+        <td>{% if r.weight %}{{ r.weight }} kg{% else %}—{% endif %}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="4">No attendance records yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+<p style="margin-top:12px;"><a class="btn" href="{% url 'parent_home' %}">← Back</a></p>
+{% endblock %}

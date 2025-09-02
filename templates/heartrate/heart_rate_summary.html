@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Heart Rate Summary</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Boxer</th>
+      <th>Latest Heart Rate</th>
+      <th>Measured At</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+      <tr>
+        <td>{{ row.boxer.name }}</td>
+        {% if row.latest %}
+          <td>{{ row.latest.bpm }} bpm</td>
+          <td>{{ row.latest.measured_at|date:"Y-m-d H:i" }}</td>
+        {% else %}
+          <td colspan="2">No data</td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

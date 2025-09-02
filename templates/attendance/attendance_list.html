@@ -1,0 +1,49 @@
+
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Attendance</h2>
+
+<div class="content-container">
+  <form method="get" style="margin-bottom:1rem; display:flex; gap:.5rem; align-items:center;">
+    <input type="date" name="date" value="{{ date }}" />
+    <input type="text" name="q" value="{{ q }}" placeholder="Search boxer…" />
+    <button class="btn" type="submit">Filter</button>
+    <a class="btn" href="{% url 'attendance_list' %}">Clear</a>
+  </form>
+
+  {% if attendances %}
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Boxer</th>
+          <th>Gym</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in attendances %}
+          <tr>
+            <td>{{ a.date|date:"Y-m-d" }}</td>
+            <td>{{ a.boxer.name }}</td>
+            <td>{{ a.boxer.gym.name }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if is_paginated %}
+      <div class="pagination" style="margin-top:1rem;">
+        {% if page_obj.has_previous %}
+          <a class="btn" href="?page={{ page_obj.previous_page_number }}&date={{ date }}&q={{ q }}">Prev</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a class="btn" href="?page={{ page_obj.next_page_number }}&date={{ date }}&q={{ q }}">Next</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  {% else %}
+    <p><em>No attendance records found.</em></p>
+  {% endif %}
+</div>
+{% endblock %}

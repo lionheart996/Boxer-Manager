@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">{{ boxer.name }} — Resting Heart Rate</h2>
+
+<style>
+  .wrap { display:grid; gap:16px; }
+  .toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .card { background:#111; border:1px solid #00ff66; border-radius:12px; padding:16px; }
+  .muted { color:#9aa0a6; font-size:12px; }
+  .line { margin:6px 0; }
+</style>
+
+<div class="content-container wrap">
+
+  <div class="toolbar">
+    <a class="btn" href="{% url 'boxer_list' %}">Back to Boxers</a>
+
+    <form method="get" action="" style="display:flex; gap:8px; align-items:center;">
+      <label>Select date
+        <input type="date" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+      </label>
+      <button class="btn" type="submit">Apply</button>
+    </form>
+  </div>
+
+  <div class="card">
+    {% if selected_date %}
+      <p class="line">
+        Average resting heart rate on <strong>{{ selected_date|date:"Y-m-d" }}</strong>:
+        {% if day_avg %}<strong>{{ day_avg|floatformat:1 }}</strong> bpm
+        {% else %}<span class="muted">no readings</span>{% endif %}
+      </p>
+
+      {% if day_readings %}
+        <p class="line muted">Readings for the day:</p>
+        <ul class="line">
+          {% for hr in day_readings %}
+            <li>{{ hr.bpm }} bpm {% if hr.measured_at %}<span class="muted">({{ hr.measured_at|date:"H:i" }})</span>{% endif %}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% else %}
+      <p class="line"><span class="muted">No heart-rate data yet.</span></p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 8px;">Daily averages over time</h3>
+    {{ labels|json_script:"labels-data" }}
+    {{ values|json_script:"values-data" }}
+    <canvas id="hrChart" width="900" height="320" style="max-width:100%;"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      (function(){
+        const labels = JSON.parse(document.getElementById('labels-data').textContent || "[]");
+        const values = JSON.parse(document.getElementById('values-data').textContent || "[]");
+        const ctx = document.getElementById('hrChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: { labels, datasets: [{ label: 'Average bpm', data: values, tension: 0.3, pointRadius: 3, borderWidth: 2, fill: false }] },
+          options: {
+            responsive: true,
+            scales: { x: { title: { display: true, text: 'Date' } }, y: { title: { display: true, text: 'bpm' } } },
+            plugins: { legend: { display: true } }
+          }
+        });
+      })();
+    </script>
+  </div>
+
+</div>
+{% endblock %}

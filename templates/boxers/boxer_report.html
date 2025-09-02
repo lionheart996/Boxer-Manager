@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">{{ boxer.name }} — Report</h2>
+
+<div class="content-container">
+  <p>
+    <a class="btn" href="{% url 'attendance_list' %}">All Attendance</a>
+    {% if boxer.uuid %}
+      <a class="btn" href="{% url 'boxer_tests' uuid=boxer.uuid %}">Boxer Tests</a>
+    {% else %}
+      <a class="btn" href="{% url 'boxer_tests_pk' pk=boxer.id %}">Boxer Tests</a>
+    {% endif %}
+  </p>
+
+  {# ---------- Summary ---------- #}
+  {% if att_total %}
+    <div class="content-container" style="margin-bottom:1rem;">
+      <p>
+        <strong>{{ boxer.name }}</strong> has been <strong>present {{ att_present }}</strong> times
+        ({{ att_present }} / {{ att_total }} = <strong>{{ att_present_pct }}%</strong>).
+      </p>
+      <p>
+        {{ boxer.name }} has been <strong>absent {{ att_absent }}</strong> times
+        ({{ att_absent }} / {{ att_total }} = <strong>{{ att_absent_pct }}%</strong>),
+        of which <strong>{{ att_excused }}</strong> were excused
+        (<strong>{{ att_excused_pct_of_abs }}%</strong> of all absences).
+      </p>
+    </div>
+  {% else %}
+    <p><em>No attendance recorded yet for {{ boxer.name }}.</em></p>
+  {% endif %}
+
+  <hr>
+
+  {# ---------- Daily Attendance ---------- #}
+  <h3>Daily Attendance</h3>
+  {% if attendance %}
+    <table>
+      <thead>
+        <tr><th>Date</th><th>Status</th><th>Weight (if any)</th></tr>
+      </thead>
+      <tbody>
+        {% for a in attendance %}
+          <tr>
+            <td>{{ a.date|date:"Y-m-d" }}</td>
+            <td>
+              {% if a.is_present %}Present
+              {% elif a.is_excused %}Excused
+              {% else %}Absent
+              {% endif %}
+            </td>
+            <td>
+              {% if a.weight_kg %}{{ a.weight_kg }} kg{% else %}–{% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p><em>No daily attendance for this boxer.</em></p>
+  {% endif %}
+</div>
+{% endblock %}
+

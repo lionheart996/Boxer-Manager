@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Create a Parent Account</h2>
+<form method="post" style="max-width:420px; display:grid; gap:10px;">
+  {% csrf_token %}
+  <label>Username {{ form.username }}</label>
+  <label>Email {{ form.email }}</label>
+  <label>Password {{ form.password1 }}</label>
+  <label>Confirm Password {{ form.password2 }}</label>
+  <label>{{ form.child.label }} {{ form.child }}</label>
+
+  {% if form.errors %}
+    <div style="color:#c00;">
+      {{ form.errors }}
+    </div>
+  {% endif %}
+
+  <button class="btn" type="submit">Create Account</button>
+</form>
+<p style="margin-top:10px;">
+  Already have an account? <a href="{% url 'login' %}">Log in</a>
+</p>
+{% endblock %}

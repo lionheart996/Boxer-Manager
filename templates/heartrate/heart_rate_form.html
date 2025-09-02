@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Add heart rate — {{ boxer.name }}</h2>
+
+<form method="post" class="content-container" style="display:grid; gap:12px; max-width:420px;">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+
+  <label>Date & time {{ form.measured_at }}</label>
+  <label>BPM {{ form.bpm }}</label>
+  <label>Notes {{ form.notes }}</label>
+
+  <div style="display:flex; gap:8px;">
+    <button type="submit" class="btn">Save</button>
+    <a class="btn" href="{% url 'heart_rate_detail' boxer_id=boxer.id %}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-only")
 
 # DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
-DEBUG = False
+DEBUG = True
 
 render_host = os.getenv("RENDER_EXTERNAL_HOSTNAME")
 
@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'BoxersPresenceApp',
+    "BoxersPresenceApp.apps.BoxersPresenceAppConfig",
 ]
 
 MIDDLEWARE = [
@@ -68,20 +68,20 @@ WSGI_APPLICATION = 'boxers_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
-    "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
-        ssl_require=os.getenv("DATABASE_SSL_REQUIRE", "false").lower() == "true",
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
+
+# DATABASES = {
+#     "default": dj_database_url.config(
+#         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+#         conn_max_age=600,
+#         ssl_require=os.getenv("DATABASE_SSL_REQUIRE", "false").lower() == "true",
+#     )
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -120,3 +120,7 @@ LOGIN_REDIRECT_URL = 'home'
 LOGIN_URL = '/login/'
 LOGOUT_REDIRECT_URL = 'login'
 APP_DIRS: True
+
+TEMPLATES[0]["OPTIONS"]["context_processors"] += [
+    "BoxersPresenceApp.context_processors.role_flags",  # <-- use your app path
+]

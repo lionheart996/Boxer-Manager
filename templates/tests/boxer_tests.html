@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">{{ boxer.name }} — Test Results</h2>
+
+<form method="get" action="{% url 'boxer_tests' boxer.uuid %}" class="content-container" style="display:flex; gap:12px; align-items:end; flex-wrap:wrap;">
+  <label>Test
+    <select name="test">
+      {% for t in tests %}
+        <option value="{{ t.id }}" {% if selected_test and t.id == selected_test.id %}selected{% endif %}>
+          {{ t.name }}{% if t.unit %} [{{ t.unit }}]{% endif %}
+        </option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <label style="display:flex; gap:6px; align-items:center;">
+    <input type="checkbox" name="show" value="1" {% if show_text %}checked{% endif %}>
+    Show text summary
+  </label>
+
+  <button class="btn" type="submit">Apply</button>
+</form>
+
+{% if selected_test %}
+  <h3 style="margin-top:1rem;">{{ selected_test.name }} progress {% if unit %}({{ unit }}){% endif %}</h3>
+
+  {# Chart.js #}
+  {{ labels|json_script:"labels-data" }}
+  {{ values|json_script:"values-data" }}
+  <canvas id="progressChart" width="900" height="360" style="max-width:100%;"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    (function(){
+      const labels = JSON.parse(document.getElementById('labels-data').textContent || "[]");
+      const values = JSON.parse(document.getElementById('values-data').textContent || "[]");
+      const ctx = document.getElementById('progressChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: '{{ selected_test.name|escapejs }}{% if unit %} ({{ unit|escapejs }}){% endif %}',
+            data: values,
+            tension: 0.3,
+            pointRadius: 3,
+            borderWidth: 2,
+            fill: false
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: { title: { display: true, text: 'Date' } },
+            y: { title: { display: true, text: '{{ unit|default:"Value"|escapejs }}' }, beginAtZero: false }
+          },
+          plugins: {
+            legend: { display: true }
+          }
+        }
+      });
+    })();
+  </script>
+
+  {% if show_text %}
+  <div style="margin-top:1rem;">
+    <strong>Summary:</strong><br>
+    {% if summary %}
+      Boxer {{ boxer.name }}’s results for test {{ selected_test.name }}{% if unit %} ({{ unit }}){% endif %}:
+      <ul>
+        {% for row in summary %}
+          <li>{{ row.avg|floatformat:2 }}{% if unit %} {{ unit }}{% endif %} on {{ row.date|date:"Y-m-d" }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      No results yet.
+    {% endif %}
+  </div>
+{% endif %}
+
+{% endif %}
+{% endblock %}
+
+
+

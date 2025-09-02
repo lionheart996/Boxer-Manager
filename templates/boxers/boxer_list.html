@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Boxers</h2>
+
+<div class="content-container">
+
+  <!-- Search -->
+  <form method="get" style="display:flex; gap:8px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
+    <input type="search"
+           name="q"
+           value="{{ q }}"
+           placeholder="Search by name or parent"
+           style="padding:6px 10px; min-width:240px;">
+    <button class="btn" type="submit">Search</button>
+    {% if q %}
+      <a class="btn" href="{% url 'boxer_list' %}">Clear</a>
+    {% endif %}
+    <span style="opacity:.7; margin-left:8px;">{{ result_count }} result{{ result_count|pluralize }}</span>
+  </form>
+
+  {% if boxers %}
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in boxers %}
+          <tr>
+            <td>{{ b.name }}</td>
+            <td>
+              <a class="btn" href="{% url 'boxer_report' b.id %}">Report</a>
+              {% if b.pk %}
+                <a class="btn" href="{% url 'heart_rate_detail' boxer_id=b.pk %}">Heart Rate</a>
+              {% endif %}
+              <form method="post"
+                    action="{% url 'delete_boxer' b.pk %}"
+                    style="display:inline"
+                    onsubmit="return confirm('Delete {{ b.name }}?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" style="background:red">Delete</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {# Pagination (only if paginate_by is set) #}
+    {% if is_paginated %}
+      <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+        {% if page_obj.has_previous %}
+          <a class="btn" href="?q={{ q }}&page={{ page_obj.previous_page_number }}">← Prev</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a class="btn" href="?q={{ q }}&page={{ page_obj.next_page_number }}">Next →</a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+  {% else %}
+    {% if q %}
+      <p>No boxers match “{{ q }}”.</p>
+    {% else %}
+      <p>No boxers yet.</p>
+    {% endif %}
+  {% endif %}
+
+</div>
+{% endblock %}

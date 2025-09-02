@@ -7,8 +7,13 @@
     {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
     <button class="btn" type="submit">Sign in</button>
   </form>
-    <p style="margin-top:10px">
-  Don’t have an account?
-  <a class="btn" href="{% url 'register' %}">Register</a>
-</p>
+
+  <p style="margin-top:10px">
+    Don’t have an account?
+    <a class="btn" href="{% url 'register' %}">Register</a>
+  </p>
+
+  <p class="subtle" style="margin-top:8px;">
+    Are you a parent? <a href="{% url 'parent_signup' %}">Create a parent account</a>
+  </p>
 {% endblock %}

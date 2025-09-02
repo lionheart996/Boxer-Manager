@@ -8,38 +8,33 @@
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
+
+{% if user.is_authenticated and is_parent %}
+  <nav>
+    <a href="{% url 'parent_home' %}">Parent Home</a>
+  </nav>
+{% else %}
+  {# coach nav (add your coach links here if you have them) #}
+{% endif %}
+
 <header>
-    <div>
-      {% if user.is_authenticated %}
-        Hi, {{ user.username }} !
-        <form method="post" action="{% url 'logout' %}" style="display:inline; float:right; margin-top:-10px;">
-              {% csrf_token %}
-                <a href="{% url 'home' %}" class="home-top-left">Home</a>
-                    <style>
-                      .home-top-left{
-                        position: fixed;
-                        top: 10px;
-                        left: 12px;
-                        color: #fff;
-                        text-decoration: none;
-                        font-weight: 600;
-                        z-index: 1000;
-                      }
-                      .home-top-left:hover{ text-decoration: underline; }
-                    </style>
-                      <button type="submit" class="btn" style="
-                        background-color:#8B0000;
-                        color:#FFFFFF;
-                        font-size:12px;
-                        padding:4px 8px;
-                        border-radius:6px;"> Logout
-                      </button>
-                </form>
-              {% else %}
-                <a href="{% url 'login' %}">Login</a>
-              {% endif %}
-            </div>
-        </header>
+  <div>
+    {% if user.is_authenticated %}
+      Hi, {{ user.username }}!
+      <form method="post" action="{% url 'logout' %}" style="display:inline;">
+        {% csrf_token %}
+        {% if is_parent %}
+          <a href="{% url 'parent_home' %}" class="home-top-left">Home</a>
+        {% else %}
+          <a href="{% url 'home' %}" class="home-top-left">Home</a>
+        {% endif %}
+        <button type="submit" class="btn logout-btn">Logout</button>
+      </form>
+    {% else %}
+      <a href="{% url 'login' %}">Login</a>
+    {% endif %}
+  </div>
+</header>
 
 <div class="content-container">
   {% block content %}{% endblock %}
@@ -51,7 +46,7 @@
 document.addEventListener('DOMContentLoaded', function () {
   {% for message in messages %}
     Swal.fire({
-      icon: "{{ 'success' }} if 'success' in message.tags else 'info' }}",
+      icon: "{% if 'success' in message.tags %}success{% elif 'error' in message.tags %}error{% elif 'warning' in message.tags %}warning{% else %}info{% endif %}",
       title: "{{ message.tags|capfirst|default:'Notice' }}",
       text: "{{ message|escapejs }}",
       confirmButtonText: 'OK'
@@ -60,5 +55,26 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 {% endif %}
+
+<style>
+  .home-top-left {
+    position: fixed;
+    top: 10px;
+    left: 12px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    z-index: 1000;
+  }
+  .home-top-left:hover { text-decoration: underline; }
+  .logout-btn {
+    background-color:#8B0000;
+    color:#FFFFFF;
+    font-size:12px;
+    padding:4px 8px;
+    border-radius:6px;
+  }
+</style>
+
 </body>
 </html>
