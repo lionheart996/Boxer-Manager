@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Add Multiple Boxers</h2>
+<p>Fill as many rows as you need. Leave a row marked “Delete row” to skip it.</p>
+
+<form method="post">
+  {% csrf_token %}
+  {{ formset.management_form }}
+
+  <table border="1" cellspacing="0" cellpadding="6">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Family name</th>
+        <th>Parent (optional)</th>
+        <th>Birthday (optional)</th>
+        <th>Delete row</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for form in formset %}
+      <tr>
+        <td>{{ form.first_name }}</td>
+        <td>{{ form.last_name }}</td>
+        <td>{{ form.parent_name }}</td>
+        <td>{{ form.date_of_birth }}</td>
+        <td style="text-align:center;">{{ form.DELETE }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if formset.non_form_errors %}
+    <div style="color:#f66; margin-top:8px;">{{ formset.non_form_errors }}</div>
+  {% endif %}
+
+  <br>
+  <button class="btn" type="submit">Save Boxers</button>
+  <a class="btn" href="{% url 'home' %}">Cancel</a>
+</form>
+{% endblock %}

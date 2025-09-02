@@ -33,7 +33,14 @@
         <td>{{ t.display_order }}</td>
         <td>
           <a class="btn" href="{% url 'test_edit' t.pk %}">Edit</a>
-          <a class="btn" href="{% url 'test_delete' t.pk %}">Delete</a>
+          {% if t.pk %}
+            <form method="post" action="{% url 'battery_test_delete' pk=t.pk %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this test?')">
+                Delete
+              </button>
+            </form>
+          {% endif %}
         </td>
       </tr>
     {% empty %}
@@ -41,9 +48,6 @@
     {% endfor %}
     </tbody>
   </table>
-
-  <p>
-    <a class="btn" href="{% url 'tests_results' %}">Open Results Matrix</a>
-  </p>
 </div>
 {% endblock %}
+

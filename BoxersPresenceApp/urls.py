@@ -1,16 +1,20 @@
 from django.urls import path, include
+from django.views.generic import RedirectView
 from rest_framework.routers import DefaultRouter
 
 from . import views
 from .api import BoxerViewSet, TestResultViewSet, TestViewSet, WeightViewSet
 from .async_views import boxers_search
-from .views import export_fixture, health, debug_urls, WeightProgressView
+from .views import  WeightProgressView, ParentHomeView, ParentAttendanceView, \
+    ParentSignupView, GymCreateView, GymListView, BoxerTestsView, TestResultCreateView
 
 router = DefaultRouter()
 router.register(r'boxers', BoxerViewSet, basename='boxer')
 router.register(r'tests', TestViewSet, basename='test')
 router.register(r'results', TestResultViewSet, basename='testresult')
 router.register(r'weights', WeightViewSet, basename='weight')
+
+
 
 urlpatterns = [
     # Health / debug / export
@@ -23,7 +27,8 @@ urlpatterns = [
     path('boxers/', views.BoxerListView.as_view(), name='boxer_list'),
     path('boxers/delete/<int:pk>/', views.delete_boxer, name='delete_boxer'),
     path('boxer/<int:boxer_id>/report/', views.BoxerReportView.as_view(), name='boxer_report'),
-    path('boxer/<int:boxer_id>/tests/', views.BoxerTestsView.as_view(), name='boxer_tests'),
+    path("boxer/<uuid:uuid>/tests/", BoxerTestsView.as_view(), name="boxer_tests"),
+    path("boxers/bulk-add/", views.BulkBoxerCreateView.as_view(), name="boxer_bulk_add"),
 
     # Attendance
     path('attendance/', views.AttendanceListView.as_view(), name='attendance_list'),
@@ -31,29 +36,47 @@ urlpatterns = [
     path('attendance/weight/<int:boxer_id>/', WeightProgressView.as_view(), name='weight_progress'),
     path('attendance/date/', views.attendance_by_date, name='attendance_by_date'),
     path('attendance/delete/<int:attendance_id>/', views.delete_attendance, name='delete_attendance'),
-
+    path('boxers/add/', views.add_boxer, name='add_boxer'),
     # Battery tests
     path('tests/', views.TestsListView.as_view(), name='tests_list'),
     path('tests/<int:pk>/edit/', views.TestUpdateView.as_view(), name='test_edit'),
-    path('tests/<int:pk>/delete/', views.TestDeleteView.as_view(), name='test_delete'),
-    path('tests/results/', views.ResultsMatrixView.as_view(), name='tests_results'),
-    path('tests/results/save/', views.ResultsCellSaveView.as_view(), name='tests_result_save'),
-    path('tests/summary/', views.BoxerResultsSummaryView.as_view(), name='tests_summary'),
-    path('tests/manage-boxers/', views.BoxerPerformanceView.as_view(), name='tests_manage_boxers'),
-    path('boxers/add/', views.add_boxer, name='add_boxer'),
-    path('tests/summary/save/', views.summary_result_save, name='tests_summary_save'),
-    path('tests/summary/delete/', views.summary_result_delete, name='tests_summary_delete'),
-    path('tests/result/edit/', views.TestResultEditView.as_view(), name='tests_result_edit'),
+    path('tests/<int:pk>/delete/', views.BatteryTestDeleteView.as_view(), name='battery_test_delete'),
+    path(
+        "tests/results/",
+        RedirectView.as_view(pattern_name="tests_list", permanent=False),
+        name="tests_results",
+    ),
+    path(
+        "tests/summary/",
+        RedirectView.as_view(pattern_name="tests_record", permanent=False),
+        name="tests_summary",
+    ),
+    path('tests/rankings/', views.TestRankingView.as_view(), name='tests_rankings'),
+    path('tests/rankings/<int:test_id>/', views.TestRankingView.as_view(), name='tests_rankings_for_test'),
+    path("tests/record/", TestResultCreateView.as_view(), name="tests_record"),
+
     path('heart-rate/record/', views.record_heart_rate, name='record_heart_rate'),
     path('heart-rate/summary/', views.HeartRateSummaryView.as_view(), name='heart_rate_summary'),
     path('heart-rate/boxer/<int:boxer_id>/', views.HeartRateDetailView.as_view(), name='heart_rate_detail'),
+    path("heart-rate/boxer/<int:boxer_id>/add/", views.HeartRateCreateView.as_view(), name="heart_rate_add"),
     path('weight/record/', views.record_weight, name='record_weight'),
     path('weight/summary/', views.WeightSummaryView.as_view(), name='weight_summary'),
     path('weight/boxer/<int:boxer_id>/', views.WeightDetailView.as_view(), name='weight_detail'),
-    path('tests/rankings/', views.TestRankingView.as_view(), name='tests_rankings'),
-    path('tests/rankings/<int:test_id>/', views.TestRankingView.as_view(), name='tests_rankings_for_test'),
+
 
     # Async + API
     path('async/boxers-search/', boxers_search, name='boxers_search'),
     path('api/', include(router.urls)),
+    path("api/calendar/sessions/", views.api_calendar_sessions, name="api_calendar_sessions"),
+    path("api/calendar/enroll/", views.api_enroll, name="api_enroll"),
+    path("api/calendar/attendance/", views.api_attendance_upsert, name="api_attendance_upsert"),
+    path('parent/signup/', ParentSignupView.as_view(), name='parent_signup'),
+    path('parent/', ParentHomeView.as_view(), name='parent_home'),
+    path('parent/<int:boxer_id>/attendance/', ParentAttendanceView.as_view(), name='parent_attendance'),
+    path('parent/<int:boxer_id>/weight/', WeightProgressView.as_view(), name='parent_weight'),
+    path('attendance/weight/<int:boxer_id>/', WeightProgressView.as_view(), name='weight_progress'),
+    path("calendar/", views.CalendarView.as_view(), name="calendar"),
+    path("gyms/", GymListView.as_view(), name="gym_list"),
+    path("gyms/add/", GymCreateView.as_view(), name="add_gym"),
+
 ]

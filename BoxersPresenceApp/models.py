@@ -1,110 +1,206 @@
+from typing import Any
+from uuid import uuid4
 from django.conf import settings
-from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils import timezone
 
+# ======================
+# Gyms & Coaches
+# ======================
+class Gym(models.Model):
+    name = models.CharField(max_length=120, unique=True)
+    location = models.CharField(max_length=255, blank=True, null=True)
 
+    def __str__(self) -> str:
+        return self.name
+
+class CoachProfile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="coach_profile")
+    gym = models.ForeignKey(Gym, on_delete=models.SET_NULL, null=True, blank=True, related_name="coaches")
+
+    def __str__(self):
+        return f"{self.user.get_username()} ({self.gym.name if self.gym else 'No gym'})"
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_coach_profile(sender, instance, created, **kwargs):
+    if created:
+        gym, _ = Gym.objects.get_or_create(name="Default Gym")
+        CoachProfile.objects.get_or_create(user=instance, defaults={"gym": gym})
+
+# ======================
+# Boxers
+# ======================
 class Boxer(models.Model):
-    coach = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    name = models.CharField(max_length=100)
+    uuid = models.UUIDField(default=uuid4, editable=False, db_index=True)
+    name = models.CharField(max_length=120)
+    date_of_birth = models.DateField(blank=True, null=True)  # Birthday (optional)
+    parent_name = models.CharField(max_length=120, blank=True, default="")  # NEW (optional)
+
+    gym = models.ForeignKey(Gym, on_delete=models.PROTECT, related_name="boxers")
+    coaches = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name="boxers")
+    shared_with_gyms = models.ManyToManyField(Gym, blank=True, related_name="shared_boxers")
+
+    def __str__(self) -> str:
+        return self.name
+# ======================
+# Tests
+# ======================
+class BatteryTest(models.Model):
+    name = models.CharField(max_length=255)
+    display_order = models.IntegerField(default=0)
+    unit = models.CharField(max_length=50, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    coach = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="battery_tests"
+    )
 
     def __str__(self):
         return self.name
 
-class Attendance(models.Model):
-    boxer = models.ForeignKey(Boxer,
-                              on_delete=models.CASCADE)
-    date = models.DateField()
-    weight = models.DecimalField(
-        max_digits=6,
-        decimal_places=2,
-        null=True,
-        blank=True)
-    is_present = models.BooleanField(
-        default=False,
-    )
-    is_excused = models.BooleanField(
-        default=False,
-    )
-
-    def __str__(self):
-        status = 'Present' if self.is_present else 'Absent (Excused)' if self.is_excused else 'Absent'
-        return f"{self.boxer.name} - {self.date} - {status}"
-
-class BatteryTest(models.Model):
-    coach = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='battery_tests')
-    name = models.CharField(max_length=120)
-    unit = models.CharField(max_length=32)  # REQUIRED (we already enforce)
-    description = models.TextField(blank=True)
-    display_order = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ["display_order", "name"]
-        unique_together = ("coach", "name")
-
-    @property
-    def display_label(self):
-        return f"{self.name} [{self.unit}]" if self.unit else self.name
-
-    def __str__(self): return self.display_label
-
-
 class TestResult(models.Model):
-    __test__ = False
-    PHASE_PRE = "pre"
-    PHASE_MID = "mid"
-    PHASE_BEFORE = "before"
-    PHASE_CHOICES = [
-        (PHASE_PRE, "Pre season"),
-        (PHASE_MID, "Mid season"),
-        (PHASE_BEFORE, "Before Tournament"),
-    ]
+    # Define constants
+    PHASE_PRE = "prep"
+    PHASE_BUILD = "build"
+    PHASE_PEAK = "peak"
+    PHASE_CHOICES = (
+        (PHASE_PRE, "Preparation"),
+        (PHASE_BUILD, "Build"),
+        (PHASE_PEAK, "Peak"),
+    )
+    phase = models.CharField(max_length=16, choices=PHASE_CHOICES, db_index=True)
 
-    boxer = models.ForeignKey("Boxer", on_delete=models.CASCADE, related_name="test_results")
+    boxer = models.ForeignKey(Boxer, on_delete=models.CASCADE, related_name="test_results")
     test = models.ForeignKey(BatteryTest, on_delete=models.CASCADE, related_name="results")
-    phase = models.CharField(max_length=10, choices=PHASE_CHOICES, default=PHASE_PRE)
 
-    value1 = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(0)])
-    value2 = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(0)])
-    value3 = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(0)])
-    notes = models.CharField(max_length=255, blank=True)
+    measured_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+    coach = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="recorded_results")
+
+    value1 = models.FloatField(null=True, blank=True)
+    value2 = models.FloatField(null=True, blank=True)
+    value3 = models.FloatField(null=True, blank=True)
+    notes = models.TextField(blank=True, null=True)
 
     class Meta:
-        unique_together = ("boxer", "test", "phase")  # ← separate row per phase
+        unique_together = ("boxer", "test", "phase", "measured_at")
+        ordering = ["-measured_at"]
 
-    def __str__(self): return f"{self.boxer} – {self.test.display_label} – {self.get_phase_display()}"
+    def __init__(self, *args: Any, **kwargs: Any):
+        super().__init__(*args, **kwargs)  # <-- FIXED
+        self.value = None
+
+    def __str__(self) -> str:
+        return f"{self.boxer.name} – {self.test.name} – {self.value}"
+
+
+# ======================
+# Attendance & Vital signs
+# ======================
+class Attendance(models.Model):
+    boxer = models.ForeignKey(Boxer, on_delete=models.CASCADE, related_name="attendance")
+    date = models.DateField(default=timezone.now)
+    is_present = models.BooleanField(default=False)
+    is_excused = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ("boxer", "date")
+        ordering = ["-date"]
+
+    def __str__(self) -> str:
+        return f"{self.boxer.name} – {self.date} – {'P' if self.is_present else 'A'}"
 
 class HeartRate(models.Model):
-    boxer = models.ForeignKey(Boxer, on_delete=models.CASCADE, related_name="heart_rates")
-    phase = models.CharField(max_length=10, choices=TestResult.PHASE_CHOICES)
-    bpm = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(30), MaxValueValidator(240)]
-    )
-    measured_at = models.DateField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
+    boxer = models.ForeignKey("BoxersPresenceApp.Boxer", on_delete=models.CASCADE, related_name="heart_rates")
+    measured_at = models.DateTimeField(db_index=True)
+    bpm = models.PositiveIntegerField()
+    notes = models.TextField(blank=True, default="")
 
     class Meta:
-        unique_together = ("boxer", "phase")
-        ordering = ["-measured_at", "-updated_at"]
+        ordering = ["-measured_at"]
 
     def __str__(self):
-        return f"{self.boxer.name} – {self.get_phase_display()} – {self.bpm} bpm"
+        return f"{self.boxer} — {self.bpm} bpm @ {self.measured_at:%Y-%m-%d %H:%M}"
 
 class Weight(models.Model):
-    boxer = models.ForeignKey(Boxer, on_delete=models.CASCADE, related_name="weights")
-    phase = models.CharField(max_length=10, choices=TestResult.PHASE_CHOICES)
-    kg = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0)])
-    expected_kg = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
-    measured_at = models.DateField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
+    boxer = models.ForeignKey("Boxer", on_delete=models.CASCADE, related_name="weights")
+    measured_at = models.DateTimeField(default=timezone.now)
+    kg = models.DecimalField(max_digits=6, decimal_places=2)
 
     class Meta:
-        unique_together = ("boxer", "phase")  # one record per boxer+phase
-        ordering = ["-measured_at", "-updated_at"]
+        ordering = ["-measured_at"]
 
     def __str__(self):
-        return f"{self.boxer.name} — {self.get_phase_display()} — {self.kg} kg"
+        return f"{self.boxer.name} – {self.kg} kg on {self.measured_at:%Y-%m-%d}"
+
+# ======================
+# Parents
+# ======================
+class ParentProfile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="parent_profile")
+    children = models.ManyToManyField(Boxer, related_name="parents", blank=True)
+
+    def __str__(self) -> str:
+        return f"ParentProfile({self.user.username})"
+
+# ======================
+# Classes / Sessions
+# ======================
+class ClassTemplate(models.Model):
+
+    class Meta:
+        verbose_name = "Class"
+        verbose_name_plural = "Classes"
+
+    gym = models.ForeignKey(Gym, on_delete=models.PROTECT, related_name="class_templates")
+    title = models.CharField(max_length=100)
+    description = models.TextField(blank=True)  # <- add this
+    coaches = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="class_templates", blank=True)
+
+    def __str__(self):
+        return f"{self.title} ({self.gym.name})"
+
+class ClassSession(models.Model):
+    template = models.ForeignKey(ClassTemplate, on_delete=models.SET_NULL, null=True, blank=True, related_name="sessions")
+    gym = models.ForeignKey(Gym, on_delete=models.PROTECT, related_name="sessions")
+    # title = models.CharField(max_length=100)
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+    location = models.CharField(max_length=120, blank=True)
+    title = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        ordering = ["-start"]
+
+    def __init__(self, *args: Any, **kwargs: Any):
+        super().__init__(args, kwargs)
+        self.starts_at = None
+
+    def __str__(self):
+        return f"{self.title} – {self.start:%Y-%m-%d %H:%M}"
+
+class Enrollment(models.Model):
+    boxer = models.ForeignKey(Boxer, on_delete=models.CASCADE, related_name="enrollments")
+    template = models.ForeignKey(ClassTemplate, on_delete=models.CASCADE, related_name="enrollments")
+
+    class Meta:
+        unique_together = ("boxer", "template")
+
+class SessionAttendance(models.Model):
+    session = models.ForeignKey(ClassSession, on_delete=models.CASCADE, related_name="attendances")
+    boxer = models.ForeignKey(Boxer, on_delete=models.CASCADE, related_name="session_attendance")
+    present = models.BooleanField(default=False)
+    excused = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ("session", "boxer")
+
+

@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="content-container">
+  <h2 class="page-title">Mark Attendance</h2>
+
+  <!-- Class + Date selector (GET) -->
+  <form method="get" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:10px;">
+    <label>Class:</label>
+    <select name="class_id" onchange="this.form.submit()">
+      <option value="">-- Choose a class --</option>
+      {% for c in classes %}
+        <option value="{{ c.id }}" {% if selected_class and selected_class.id == c.id %}selected{% endif %}>
+          {{ c.title }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <label>Date:</label>
+    <input type="date" name="date" value="{{ date|date:'Y-m-d' }}" onchange="this.form.submit()">
+    <noscript><button class="btn" type="submit">Apply</button></noscript>
+  </form>
+
+  <div style="display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); margin-bottom:12px;">
+
+    <!-- Add Class -->
+    <div class="card" style="padding:12px; border:1px solid #00ff66; border-radius:10px;">
+      <h3>Add Class</h3>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="create_class">
+        {{ class_create_form.as_p }}
+        <button class="btn" type="submit">Add</button>
+      </form>
+    </div>
+
+    <!-- Enroll / Remove boxers -->
+    {% if selected_class %}
+    <div class="card" style="padding:12px; border:1px solid #00ff66; border-radius:10px;">
+      <h3>Enroll Boxer to {{ selected_class.title }}</h3>
+      <form method="post" style="margin-bottom:10px;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="enroll">
+        <input type="hidden" name="class_id" value="{{ selected_class.id }}">
+        {{ enroll_form.as_p }}
+        <button class="btn" type="submit">Enroll</button>
+      </form>
+
+      <h4 style="margin-top:10px;">Enrolled</h4>
+      <ul style="list-style:none; padding-left:0;">
+        {% for b in boxers %}
+          <li style="display:flex; align-items:center; gap:8px; margin:4px 0;">
+            <span>{{ b.name }}</span>
+            <form method="post" style="display:inline;">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="unenroll">
+              <input type="hidden" name="class_id" value="{{ selected_class.id }}">
+              <input type="hidden" name="boxer_id" value="{{ b.id }}">
+              <button class="btn" type="submit" onclick="return confirm('Remove {{ b.name }} from this class?')">
+                Remove
+              </button>
+            </form>
+          </li>
+        {% empty %}
+          <li>No boxers enrolled yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- Attendance table -->
+  {% if selected_class %}
+  <form id="mark-form" method="post" onsubmit="return confirm('Submit attendance?');">
+    {% csrf_token %}
+    <input type="hidden" name="class_id" value="{{ selected_class.id }}">
+
+    <span class="muted">Tip: typing a weight will auto-select “Present”.</span>
+    <br><br>
+
+    <table border="1" class="table-compact">
+      <thead>
+        <tr>
+          <th>Boxer</th>
+          <th>Present</th>
+          <th>Weight</th>
+          <th>Absent</th>
+          <th>Excused Absence?</th>
+          <th style="width:1%;">Progress</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for boxer in boxers %}
+        <tr>
+          <td>{{ boxer.name }}</td>
+          <td class="center">
+            <input type="radio" name="attendance_{{ boxer.id }}" value="Present"
+                   {% if boxer.id in attendance_map %}checked{% endif %}>
+          </td>
+          <td class="center">
+            <input type="number" step="0.1" min="0" name="weight_{{ boxer.id }}"
+                   style="width:90px;" placeholder="kg">
+          </td>
+          <td class="center">
+            <input type="radio" name="attendance_{{ boxer.id }}" value="Absent">
+          </td>
+          <td class="center">
+            <input type="checkbox" name="excused_{{ boxer.id }}">
+          </td>
+          <td class="center">
+            <a class="btn btn-weight" style="color: blue" href="{% url 'weight_progress' boxer.id %}">
+              Weight Progress
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <br>
+    <button type="submit" class="btn btn-weight">Submit Attendance</button>
+  </form>
+  {% else %}
+    <p>Select a class above to enroll boxers and mark attendance.</p>
+  {% endif %}
+</div>
+
+<style>
+  .table-compact th, .table-compact td { padding: 6px 8px; }
+  .center { text-align: center; vertical-align: middle; white-space: nowrap; }
+  .btn-weight {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 4px 10px; border-radius: 9999px; font-size: 0.9rem;
+    border: 1px solid #ddd; background: #f7f7f7;
+  }
+  .btn-weight:hover { background: #eee; }
+  .muted { color:#888; font-size:.9rem; }
+</style>
+
+<script>
+  // typing a weight => auto-check Present
+  document.addEventListener('input', function (e) {
+    if (e.target && e.target.name.startsWith('weight_')) {
+      var id = e.target.name.split("_")[1];
+      var presentRadio = document.querySelector('input[name="attendance_' + id + '"][value="Present"]');
+      if (e.target.value && Number(e.target.value) > 0 && presentRadio) {
+        presentRadio.checked = true;
+      }
+    }
+  });
+  // if Absent checked -> clear Present and Weight
+  document.addEventListener('change', function (e) {
+    if (e.target.type === 'radio' && e.target.value === 'Absent') {
+      var id = e.target.name.split("_")[1];
+      var presentRadio = document.querySelector('input[name="attendance_' + id + '"][value="Present"]');
+      var weight = document.querySelector('input[name="weight_' + id + '"]');
+      if (presentRadio) presentRadio.checked = false;
+      if (weight) weight.value = "";
+    }
+  });
+</script>
+{% endblock %}
+
+
+

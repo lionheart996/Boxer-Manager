@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="page-title">Gyms</h2>
+
+<div class="content-container">
+  <a class="btn btn-primary" href="{% url 'add_gym' %}">+ Add Gym</a>
+  <ul>
+    {% for gym in gyms %}
+      <li>{{ gym.name }}{% if gym.location %} – {{ gym.location }}{% endif %}</li>
+    {% empty %}
+      <li>No gyms yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+
+{% endblock %}

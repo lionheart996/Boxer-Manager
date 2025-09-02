@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Record Test Result</h2>
+
+<form method="post" action="{% url 'tests_record' %}" class="content-container" style="display:grid; gap:12px; max-width:520px;">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+
+  <label>Boxer {{ form.boxer }}</label>
+  <label>Test {{ form.test }}</label>
+  <label>Date/Time {{ form.measured_at }}</label>
+
+  <label>Value 1 {{ form.value1 }}</label>
+  <label>Value 2 {{ form.value2 }}</label>
+  <label>Value 3 {{ form.value3 }}</label>
+
+  <label>Notes {{ form.notes }}</label>
+
+  <button type="submit" class="btn">Save</button>
+</form>
+{% endblock %}

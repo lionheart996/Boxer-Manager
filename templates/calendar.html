@@ -1,0 +1,160 @@
+{% load static %}
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Gym Calendar</title>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 16px; }
+    .row { display:flex; gap:8px; align-items:center; margin:8px 0; }
+    .btn { padding:6px 10px; border:1px solid #ccc; border-radius:8px; background:#f8f8f8; cursor:pointer; }
+    .calendar { display:grid; grid-template-columns: 120px repeat(7, 1fr); gap: 6px; }
+    .head { font-weight:700; }
+    .cell { border:1px solid #ddd; border-radius:8px; min-height:100px; padding:6px; }
+    .session { border:1px solid #aaa; border-radius:6px; padding:6px; margin:6px 0; cursor:pointer; }
+    dialog { width: 720px; max-width: 95vw; border: none; border-radius: 12px; padding: 0; }
+    .dlg-head { padding: 12px 16px; border-bottom: 1px solid #eee; display:flex; justify-content:space-between; }
+    .dlg-body { padding: 16px; }
+    .table { width:100%; border-collapse: collapse; margin-top:8px; }
+    .table th, .table td { border-bottom: 1px solid #eee; padding:6px; text-align:left; }
+    input[type="number"] { width: 90px; }
+    .muted { opacity:.7; font-size:12px; }
+  </style>
+</head>
+<body>
+  <h1>Calendar</h1>
+  <div class="row">
+    <button class="btn" id="prev">← Previous week</button>
+    <button class="btn" id="next">Next week →</button>
+    <span id="range" class="muted"></span>
+  </div>
+
+  <div class="calendar" id="cal"></div>
+
+  <dialog id="dlg">
+    <div class="dlg-head">
+      <div>
+        <div id="dlgTitle" style="font-weight:700"></div>
+        <div id="dlgMeta" class="muted"></div>
+      </div>
+      <button class="btn" onclick="dlg.close()">Close</button>
+    </div>
+    <div class="dlg-body">
+      <div style="font-weight:600;margin-bottom:6px">Attendance & Weight</div>
+      <table class="table" id="attTable">
+        <thead><tr><th>Boxer</th><th>Status</th><th>Weight (kg)</th><th>Save</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="muted">Saving a weight will automatically mark as <b>Present</b> for that session.</div>
+    </div>
+  </dialog>
+
+<script>
+const calEl = document.getElementById('cal');
+const rangeEl = document.getElementById('range');
+const dlg = document.getElementById('dlg');
+const dlgTitle = document.getElementById('dlgTitle');
+const dlgMeta = document.getElementById('dlgMeta');
+const attTable = document.getElementById('attTable').querySelector('tbody');
+
+let currentMonday = getMonday(new Date());
+
+function getMonday(d) {
+  const x = new Date(d);
+  const day = x.getDay(); // 0=Sun ... 6=Sat
+  const diff = (day === 0 ? -6 : 1) - day; // move to Monday
+  x.setDate(x.getDate() + diff);
+  x.setHours(0,0,0,0);
+  return x;
+}
+
+function fmt(d) { return d.toISOString().slice(0,10); }
+function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate()+n); return x; }
+
+document.getElementById('prev').onclick = ()=>{ currentMonday = addDays(currentMonday,-7); render(); };
+document.getElementById('next').onclick = ()=>{ currentMonday = addDays(currentMonday,+7); render(); };
+
+function csrftoken() {
+  const m = document.cookie.match(/csrftoken=([^;]+)/);
+  return m ? m[1] : '';
+}
+
+async function fetchSessions(start, end) {
+  const r = await fetch(`/api/calendar/sessions/?start=${start}&end=${end}`);
+  const j = await r.json();
+  return j.sessions || [];
+}
+
+async function render() {
+  const start = fmt(currentMonday);
+  const end = fmt(addDays(currentMonday, 6));
+  rangeEl.textContent = `${start} → ${end}`;
+  const sessions = await fetchSessions(start, end);
+
+  // Build header row
+  const days = ['Time','Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  calEl.innerHTML = '';
+  days.forEach(h => {
+    const div = document.createElement('div');
+    div.className = 'head';
+    div.textContent = h;
+    calEl.appendChild(div);
+  });
+
+  // 12 rows of times (feel free to improve)
+  const times = ['06:00','08:00','10:00','12:00','14:00','16:00','18:00','19:00','20:00','21:00',''];
+  for (let r=0; r<times.length; r++) {
+    // time col
+    const tc = document.createElement('div'); tc.className='cell'; tc.textContent = times[r]; calEl.appendChild(tc);
+    for (let c=0; c<7; c++) {
+      const cell = document.createElement('div'); cell.className='cell';
+      const dayStart = addDays(currentMonday, c).toISOString().slice(0,10);
+      // add sessions that fall on this day
+      sessions.filter(s => s.start.slice(0,10) === dayStart).forEach(s => {
+        const b = document.createElement('div');
+        b.className = 'session';
+        b.textContent = `${s.title} (${s.present_count}/${s.enrolled_count})`;
+        b.onclick = () => openSession(s);
+        cell.appendChild(b);
+      });
+      calEl.appendChild(cell);
+    }
+  }
+}
+
+async function openSession(s) {
+  dlgTitle.textContent = s.title;
+  dlgMeta.textContent = `${s.start.replace('T',' ')}  •  ${s.location || ''}`;
+  // Load enrolled boxers list (simple approach: ask server to give us list).
+  // For now, we’ll build a basic list using a prompt endpoint you can improve later.
+  // Temporary: render empty table (you can wire an endpoint to fetch enrolled boxers + current attendance)
+
+  // Minimal demo rows so you can test POST handler quickly:
+  attTable.innerHTML = `<tr><td colspan="4" class="muted">Hook up an endpoint that returns enrolled boxers for this session,
+  then build rows with a select (Present/Absent/Excused) and a weight input. For now, paste a boxer_id into the code to test.</td></tr>`;
+
+  dlg.showModal();
+}
+
+// Example save helper you’ll call per-row when you build real rows:
+async function saveAttendance(session_id, boxer_id, status, weight) {
+  const fd = new FormData();
+  fd.append('session_id', session_id);
+  fd.append('boxer_id', boxer_id);
+  if (status) fd.append('status', status);
+  if (weight !== undefined && weight !== null && weight !== '') fd.append('weight', weight);
+
+  const r = await fetch('/api/calendar/attendance/', {
+    method: 'POST',
+    headers: {'X-CSRFToken': csrftoken()},
+    body: fd
+  });
+  const j = await r.json();
+  if (!j.ok) alert('Failed to save');
+  return j;
+}
+
+render();
+</script>
+</body>
+</html>

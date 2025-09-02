@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Parent Portal</h2>
+{% if children %}
+  <ul>
+    {% for b in children %}
+      <li>
+        <strong>{{ b.name }}</strong>
+        — <a class="btn" href="{% url 'parent_attendance' b.id %}">Attendance</a>
+        — <a class="btn" href="{% url 'parent_weight' b.id %}">Weight Progress</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No children are linked to your account yet.</p>
+{% endif %}
+{% endblock %}
