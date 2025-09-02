@@ -10,7 +10,7 @@ def create_or_update_coach_profile(sender, instance, created, **kwargs):
         # Create profile once on first user creation
         profile, _ = CoachProfile.objects.get_or_create(user=instance)
         # Optional: attach a default gym only on initial creation
-        default_gym, _ = Gym.get_or_create(name="Default Gym") if hasattr(Gym, "objects") else (None, False)
+        default_gym, _ = Gym.objects.get_or_create(name="Default Gym")
         if default_gym and profile.gym is None:
             profile.gym = default_gym
             profile.save()
