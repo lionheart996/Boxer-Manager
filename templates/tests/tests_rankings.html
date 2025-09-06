@@ -2,7 +2,42 @@
 {% block content %}
 <h2 class="page-title" style="text-align:center;">🚀 Rankings</h2>
 
-<style>
+
+
+{% if not tests %}
+  <p>No tests yet. <a class="btn" href="{% url 'tests_list' %}">Create one</a>.</p>
+{% else %}
+
+  <!-- Test picker -->
+  <div class="tests-chipbar">
+    {% for t in tests %}
+      <a class="chip {% if selected_test and t.id == selected_test.id %}active{% endif %}"
+         href="{% url 'tests_rankings_for_test' t.id %}">
+        {{ t.name }}{% if t.unit %} [{{ t.unit }}]{% endif %}
+      </a>
+    {% endfor %}
+  </div>
+
+  {% if not selected_test %}
+    <p style="text-align:center;">Select a test to see rankings.</p>
+  {% else %}
+    {% if rows %}
+      <ol class="rankings">
+        {% for row in rows %}
+          <li class="rank-card {% if forloop.counter == 1 %}top1{% elif forloop.counter == 2 %}top2{% elif forloop.counter == 3 %}top3{% endif %}">
+            <span class="rankno">{{ forloop.counter }}.</span>
+            <span class="rank-name">{{ row.boxer.name }}</span>
+            <span class="record-number">{{ row.best|floatformat:2 }}</span>
+            {% if selected_test.unit %}<span class="muted">{{ selected_test.unit }}</span>{% endif %}
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <p style="text-align:center;">No results recorded for <strong>{{ selected_test.name }}</strong>.</p>
+    {% endif %}
+  {% endif %}
+{% endif %}
+    <style>
 /* === Chip bar === */
 .tests-chipbar {
   display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
@@ -47,7 +82,7 @@
 }
 .rankno{
   font-weight:800; font-size:18px; min-width:28px;
-  color:var(--muted);
+  color: #4f5b69;
 }
 .rank-card.top1 .rankno{ color:#ffd700; }  /* gold */
 .rank-card.top2 .rankno{ color:#c0c0c0; }  /* silver */
@@ -65,38 +100,4 @@
 .rank-name{ flex:1; }
 .muted{ color:var(--muted); font-size:12px; }
 </style>
-
-{% if not tests %}
-  <p>No tests yet. <a class="btn" href="{% url 'tests_list' %}">Create one</a>.</p>
-{% else %}
-
-  <!-- Test picker -->
-  <div class="tests-chipbar">
-    {% for t in tests %}
-      <a class="chip {% if selected_test and t.id == selected_test.id %}active{% endif %}"
-         href="{% url 'tests_rankings_for_test' t.id %}">
-        {{ t.name }}{% if t.unit %} [{{ t.unit }}]{% endif %}
-      </a>
-    {% endfor %}
-  </div>
-
-  {% if not selected_test %}
-    <p style="text-align:center;">Select a test to see rankings.</p>
-  {% else %}
-    {% if rows %}
-      <ol class="rankings">
-        {% for row in rows %}
-          <li class="rank-card {% if forloop.counter == 1 %}top1{% elif forloop.counter == 2 %}top2{% elif forloop.counter == 3 %}top3{% endif %}">
-            <span class="rankno">{{ forloop.counter }}.</span>
-            <span class="rank-name">{{ row.boxer.name }}</span>
-            <span class="record-number">{{ row.best|floatformat:2 }}</span>
-            {% if selected_test.unit %}<span class="muted">{{ selected_test.unit }}</span>{% endif %}
-          </li>
-        {% endfor %}
-      </ol>
-    {% else %}
-      <p style="text-align:center;">No results recorded for <strong>{{ selected_test.name }}</strong>.</p>
-    {% endif %}
-  {% endif %}
-{% endif %}
 {% endblock %}

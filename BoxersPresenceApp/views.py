@@ -463,14 +463,24 @@ class AttendanceListView(LoginRequiredMixin, ListView):
         ctx["date"] = date_str
         ctx["today"] = timezone.localdate()
 
+        # Add boxer list for dropdown
+        ctx["boxers"] = (
+            self.base_scope()
+            .values("boxer__id", "boxer__name")
+            .distinct()
+            .order_by("boxer__name")
+        )
+
         # Case 4: both date + name → build presence sentence
         if date_str and q:
-            scoped = self.base_scope().filter(date=date_str, boxer__name__icontains=q)
+            scoped = self.base_scope().filter(date=date_str, boxer__id=q)
             was_present = scoped.filter(is_present=True).exists()
             excused = scoped.filter(is_present=False, is_excused=True).exists()
 
             ctx["presence_mode"] = True
-            ctx["presence_name"] = q
+            # fetch actual boxer name
+            boxer_obj = Boxer.objects.filter(id=q).first()
+            ctx["presence_name"] = boxer_obj.name if boxer_obj else q
             ctx["presence_date"] = date_str
 
             if was_present:

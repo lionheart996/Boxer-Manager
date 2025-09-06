@@ -6,14 +6,23 @@
 
   <!-- Filters -->
   <form method="get" class="filter-bar">
-    <div class="date-field">
-      <input type="date" id="date" name="date" value="{{ date }}">
-      <span class="calendar-icon" onclick="document.getElementById('date').showPicker?.()">📅</span>
-    </div>
-    <input type="text" name="q" value="{{ q }}" placeholder="Search boxer…" />
-    <button class="btn btn--primary" type="submit">Filter</button>
-    <a class="btn btn--quiet" href="{% url 'attendance_list' %}">Clear</a>
-  </form>
+  <div class="date-field">
+    <input type="date" id="date" name="date" value="{{ date }}">
+    <span class="calendar-icon" onclick="document.getElementById('date').showPicker?.()">📅</span>
+  </div>
+
+  <select name="q">
+    <option value="">-- Select Boxer --</option>
+    {% for b in boxers %}
+      <option value="{{ b.boxer__id }}" {% if q == b.boxer__id|stringformat:"s" %}selected{% endif %}>
+        {{ b.boxer__name }}
+      </option>
+    {% endfor %}
+  </select>
+
+  <button class="btn btn--primary" type="submit">Filter</button>
+  <a class="btn btn--quiet" href="{% url 'attendance_list' %}">Clear</a>
+</form>
 
   <!-- CASE 4: sentence mode -->
   {% if presence_mode %}
