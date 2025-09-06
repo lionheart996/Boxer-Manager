@@ -5,9 +5,9 @@
 <h1>Boxer Factory</h1>
 
 <!-- Boxer Manager -->
-<div class="form-container" style="border-radius: 10px">
+<div class="card" style="background:#111;border:1px solid #00ff66;border-radius:12px;padding:16px;">
   <h3>Manage Boxers</h3>
-  <div style="display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;">
+  <div style="display:inline-flex;gap:6px;align-items:center; justify-content: center; flex-wrap:wrap;">
     <a class="btn" href="{% url 'boxer_bulk_add' %}">Add Boxer</a>
     <a class="btn" href="{% url 'boxer_list' %}">Manage</a>
   </div>
@@ -29,7 +29,7 @@
 <div class="grid" style="margin-top:16px; border: 1px solid #00ff66; border-radius: 10px">
   <div class="card" style="padding-left: 15px">
     <h3>Mark Attendance</h3>
-    <p>Quickly mark who’s present today.</p>
+    <p style="font-style: italic">Quickly mark who’s present today.</p>
     <p><a class="btn" href="{% url 'mark_attendance' %}">Go</a></p>
   </div>
 </div>

@@ -5,8 +5,8 @@ from rest_framework.routers import DefaultRouter
 from . import views
 from .api import BoxerViewSet, TestResultViewSet, TestViewSet, WeightViewSet
 from .async_views import boxers_search
-from .views import  WeightProgressView, ParentHomeView, ParentAttendanceView, \
-    ParentSignupView, GymCreateView, GymListView, BoxerTestsView, TestResultCreateView
+from .views import WeightProgressView, ParentHomeView, ParentAttendanceView, \
+    ParentSignupView, GymCreateView, GymListView, BoxerTestsView, TestResultCreateView, BoxerClassesView
 
 router = DefaultRouter()
 router.register(r'boxers', BoxerViewSet, basename='boxer')
@@ -27,6 +27,7 @@ urlpatterns = [
     path('boxers/', views.BoxerListView.as_view(), name='boxer_list'),
     path('boxers/delete/<int:pk>/', views.delete_boxer, name='delete_boxer'),
     path('boxer/<int:boxer_id>/report/', views.BoxerReportView.as_view(), name='boxer_report'),
+    path("boxers/<int:boxer_id>/classes/", BoxerClassesView.as_view(), name="boxer_classes"),
     path("boxer/<uuid:uuid>/tests/", BoxerTestsView.as_view(), name="boxer_tests"),
     path("boxers/bulk-add/", views.BulkBoxerCreateView.as_view(), name="boxer_bulk_add"),
 

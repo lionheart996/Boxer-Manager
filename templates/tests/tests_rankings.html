@@ -1,65 +1,101 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="page-title" style="margin-left:75px;">Rankings</h2>
+<h2 class="page-title" style="text-align:center;">🚀 Rankings</h2>
 
 <style>
-  .tests-chipbar { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 16px; }
-  .chip { padding:6px 10px; border:1px solid #00ff66; border-radius:999px; text-decoration:none; }
-  .chip.active { background:#00ff66; color:#000; }
-  .record-number { color:#00ff66; font-weight:700; }
-  .rankline { padding:6px 10px; border-bottom:1px solid #222; }
-  .rankno { width:28px; display:inline-block; }
-  .muted { color:#8a8a8a; font-size:12px; }
-  .filters { display:flex; align-items:center; gap:12px; margin: 6px 0 14px; }
-  .filters select, .filters button { padding:6px 10px; }
+/* === Chip bar === */
+.tests-chipbar {
+  display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
+  margin:16px 0 24px;
+}
+.chip {
+  padding:6px 14px;
+  border:1px solid var(--brand);
+  border-radius:999px;
+  text-decoration:none;
+  font-weight:600;
+  color:var(--brand);
+  transition: all .2s ease;
+}
+.chip:hover { background:rgba(0,255,102,0.1); }
+.chip.active {
+  background:var(--brand);
+  color:#000;
+  box-shadow:0 0 10px var(--brand), 0 0 20px var(--brand);
+}
+
+/* === Rank cards === */
+.rankings {
+  display:grid;
+  gap:12px;
+  max-width:520px;
+  margin:0 auto;
+  padding:0;
+}
+.rank-card{
+  display:flex; align-items:center; gap:12px;
+  padding:12px 16px;
+  border-radius:12px;
+  background:linear-gradient(145deg, #111 0%, #171717 100%);
+  border:1px solid var(--border);
+  box-shadow:inset 0 0 10px rgba(0,255,102,0.1);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.rank-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 12px rgba(0,255,102,0.3);
+}
+.rankno{
+  font-weight:800; font-size:18px; min-width:28px;
+  color:var(--muted);
+}
+.rank-card.top1 .rankno{ color:#ffd700; }  /* gold */
+.rank-card.top2 .rankno{ color:#c0c0c0; }  /* silver */
+.rank-card.top3 .rankno{ color:#cd7f32; }  /* bronze */
+
+.record-number{
+  font-family:monospace;
+  font-size:16px;
+  font-weight:700;
+  color:var(--brand);
+  background:rgba(0,255,102,0.1);
+  padding:2px 6px;
+  border-radius:6px;
+}
+.rank-name{ flex:1; }
+.muted{ color:var(--muted); font-size:12px; }
 </style>
 
 {% if not tests %}
   <p>No tests yet. <a class="btn" href="{% url 'tests_list' %}">Create one</a>.</p>
 {% else %}
 
-  <!-- Test picker (preserve phase in the URL) -->
+  <!-- Test picker -->
   <div class="tests-chipbar">
     {% for t in tests %}
       <a class="chip {% if selected_test and t.id == selected_test.id %}active{% endif %}"
-         href="{% url 'tests_rankings_for_test' t.id %}?phase={{ selected_phase }}">
+         href="{% url 'tests_rankings_for_test' t.id %}">
         {{ t.name }}{% if t.unit %} [{{ t.unit }}]{% endif %}
       </a>
     {% endfor %}
   </div>
 
-  <!-- Phase dropdown -->
-  <form class="filters"
-        method="get"
-        action="{% if selected_test %}{% url 'tests_rankings_for_test' selected_test.id %}{% else %}{% url 'tests_rankings' %}{% endif %}">
-    <label for="phase">Phase:</label>
-    <select id="phase" name="phase">
-      {% for value,label in phase_choices %}
-        <option value="{{ value }}" {% if value == selected_phase %}selected{% endif %}>{{ label }}</option>
-      {% endfor %}
-    </select>
-    <button type="submit">Apply</button>
-  </form>
-
   {% if not selected_test %}
-    <p>Select a test to see rankings.</p>
+    <p style="text-align:center;">Select a test to see rankings.</p>
   {% else %}
     {% if rows %}
-      <ol style="list-style:none; padding-left:0; margin:0;">
+      <ol class="rankings">
         {% for row in rows %}
-          <li class="rankline">
+          <li class="rank-card {% if forloop.counter == 1 %}top1{% elif forloop.counter == 2 %}top2{% elif forloop.counter == 3 %}top3{% endif %}">
             <span class="rankno">{{ forloop.counter }}.</span>
-            {{ row.boxer.name }}’s record is
+            <span class="rank-name">{{ row.boxer.name }}</span>
             <span class="record-number">{{ row.best|floatformat:2 }}</span>
-            {% if selected_test.unit %} {{ selected_test.unit }}{% endif %}
-            {% if selected_phase == "all" %}
-              <span class="muted">({{ row.phase_label }})</span>
-            {% endif %}
+            {% if selected_test.unit %}<span class="muted">{{ selected_test.unit }}</span>{% endif %}
           </li>
         {% endfor %}
       </ol>
     {% else %}
-      <p>No results recorded{% if selected_phase != "all" %} for the selected phase{% endif %} for <strong>{{ selected_test.name }}</strong>.</p>
+      <p style="text-align:center;">No results recorded for <strong>{{ selected_test.name }}</strong>.</p>
     {% endif %}
   {% endif %}
 {% endif %}

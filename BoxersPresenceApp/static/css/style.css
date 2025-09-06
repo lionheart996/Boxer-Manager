@@ -1,186 +1,410 @@
-/* Make table scrollable on small screens */
-@media (max-width: 768px) {
-
-    .back-button {
-        display: inline-block;
-        background-color: #00ff66;
-        color: #000;
-        font-weight: bold;
-        padding: 8px 12px;
-        margin-top: 0;         /* remove top margin */
-        margin-bottom: 0;
-        margin-left: 10px;
-        text-decoration: none;
-        border-radius: 4px;
-    }
-
-    .back-button:hover {
-        background-color: #00cc55;
-    }
-
-    table {
-        display: block;
-        overflow-x: auto;
-        width: 100%;
-    }
-
-    th, td {
-        font-size: 14px;
-        padding: 8px;
-    }
-
-    .date-label, .date-input {
-        display: block;
-        width: 100%;
-        margin-left: 0;
-    }
-
-    /* Only apply full-width style to .btn on mobile */
-    .btn, button {
-        width: 100%;
-        display: block;
-        text-align: center;
-        margin: 10px auto;
-    }
-
-    .back-link {
-        display: inline-block;
-        margin-top: -20px;
-    }
-
-    header img {
-        width: 100%;
-        height: auto;
-    }
-
-    .page-title, h2 {
-        text-align: center;
-        padding: 0;
-    }
+/* ==========================================================================
+   0) THEME TOKENS (colors, radii, spacing)
+   ========================================================================== */
+:root{
+  --bg: #000000;           /* page background */
+  --panel: #111111;        /* content panels */
+  --panel-2: #171717;      /* subtle contrast panel */
+  --border: #1f1f1f;       /* panel borders */
+  --text: #e7e9ee;         /* primary text */
+  --muted: #a9afbd;        /* secondary text */
+  --brand: #00ff66;        /* neon green brand */
+  --brand-600: #00cc55;    /* brand hover */
+  --accent: #0080ff;       /* secondary accent (buttons) */
+  --accent-600: #006ad1;   /* accent hover */
+  --warning: #cc9900;      /* warning hover for old style */
+  --danger: #8B0000;       /* destructive */
+  --radius: 12px;          /* rounded corners */
+  --gap: 16px;             /* layout gap */
+  --container: 960px;      /* central column width */
 }
 
-.page-title {
-    padding-left: 10px;
+/* ==========================================================================
+   1) BASE / RESET
+   ========================================================================== */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body.app{
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.45 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
 }
 
-.date-label,
-.date-input {
-    display: inline-block;
-    margin-top: 20px;
-    margin-left: 10px;
+/* Natural typography rhythm */
+h1, h2, h3, h4, h5, h6 { margin: 0 0 0.6em }
+p { margin: 0 0 1em }
+img { max-width: 100%; height: auto; display: block }
+
+/* ==========================================================================
+   2) LAYOUT (centered app shell)
+   ========================================================================== */
+.container{
+  width: 100%;
+  max-width: var(--container);
+  margin: 24px auto;
+  padding: 16px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-align: center;        /* centralize content by default */
 }
 
-.content-container {
-    width: 90%;
-    margin: 0 auto;
+/* Page titles & simple sections */
+.page-title{ font-size: 22px; font-weight: 800; margin-bottom: 12px; }
+.content-container{ display: grid; gap: 12px; justify-items: center; }
+
+/* ==========================================================================
+   3) TOP BAR (centered header)
+   ========================================================================== */
+.topbar{
+  position: sticky; top: 0; z-index: 10;
+  width: 100%;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px;
+  padding: 14px 16px;
 }
 
-.form-container {
-    background-color: #111;
-    padding: 20px;
-    border: 1px solid #00ff66;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    color: #00ff66;
+.brand-icon{
+  text-decoration: none;
+  color: var(--brand);
+  font-weight: 800;
+  font-size: 20px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+.brand-icon:hover{ color: var(--brand-600); }
+
+.brand{
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 800;
+  letter-spacing: .2px;
 }
 
-body {
-    font-family: Arial, sans-serif;
-    background-color: #000;
-    color: #00ff66;
-    margin: 0;
-    padding: 0;
+.topbar-actions{
+  position: absolute; right: 14px;
+  display: flex; align-items: center; gap: 8px;
 }
 
-header {
-    background-color: #111;
-    padding: 20px;
+/* Header links look like clean text */
+.topbar .link{
+  color: var(--brand);
+  text-decoration: none;
+}
+.topbar .link:hover{ text-decoration: underline; }
+
+/* ==========================================================================
+   4) LINKS (global)
+   ========================================================================== */
+a:link, a:visited { color: var(--brand); }
+a:hover { color: var(--brand-600); }
+a:active { color: var(--brand); }
+
+/* ==========================================================================
+   5) BUTTONS
+   ========================================================================== */
+.btn{
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn:hover{ filter: brightness(1.08);}
+
+.btn--primary{
+  background: var(--brand);
+  color: #000;
+  border-color: transparent;
+}
+.btn--primary:hover{ background: var(--brand-600); }
+
+.btn--accent{
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+}
+.btn--accent:hover{ background: var(--accent-600); }
+
+.btn--danger{
+  background: var(--danger);
+  color: #fff;
+  border-color: transparent;
+}
+
+.btn--quiet{
+  background: transparent;
+  border-color: var(--border);
+}
+
+/* Full-width buttons on small screens only */
+@media (max-width: 768px){
+  .btn, button{
+    width: 100%;
+    display: block;
     text-align: center;
+    margin: 10px auto;
+  }
 }
 
-/* Reset header links to normal text look */
-header a,
-header button {
-    background: transparent;
-    color: #00ff66;
-    border: none;
-    padding: 0;
-    margin: 0 8px;
-    display: inline-block;
-    text-decoration: none;
+/* ==========================================================================
+   6) FORMS
+   ========================================================================== */
+input[type="text"],
+input[type="search"],
+input[type="number"],
+input[type="date"],
+select, textarea{
+  background: #0f0f0f;
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 8px 10px;
+  min-width: 240px;
 }
 
-header a:hover {
-    text-decoration: underline;
+label{ display: inline-block; margin: 6px 8px 6px 0; color: var(--muted); }
+
+.form-row{
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center;
 }
 
-header img {
-    height: 100px;
+.date-label, .date-input{ margin-top: 10px; }
+
+/* Compact inputs used in tests */
+.test-input{
+  width: 60px; padding: 4px; font-size: 12px;
+}
+.test-notes{
+  width: 100%; padding: 4px; font-size: 12px;
+}
+
+/* ==========================================================================
+   7) TABLES (scrollable + centered)
+   ========================================================================== */
+.table-wrap{
+  width: 100%;
+  overflow: auto;          /* horizontal scroll on small screens */
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+table{
+  width: 100%;
+  min-width: 640px;        /* keeps columns readable; scrolls if smaller screen */
+  margin: 12px auto;
+  border-collapse: collapse;
+  background: var(--panel-2);
+  color: var(--text);
+}
+
+th, td{
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+
+th{
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--muted);
+}
+
+table th, table td { padding: 10px; }
+
+/* ==========================================================================
+   8) CARDS (mobile alternative to tables)
+   ========================================================================== */
+.cardlist{ display: none; }
+.card{
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  display: grid; gap: 6px;
+}
+.card__row{ display: flex; justify-content: space-between; gap: 10px; }
+.card__label{ color: var(--muted); font-size: 12px; }
+
+@media (max-width: 520px){
+  /*table{ display: none; }*/
+  .cardlist{ display: grid; gap: 10px; width: 100%; }
+}
+
+/* ==========================================================================
+   9) UTILITIES
+   ========================================================================== */
+.badge{
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: #1d1d1d;
+  color: var(--muted);
+}
+
+.back-button, .back-link{
+  display: inline-block;
+  background-color: var(--brand);
+  color: #000;
+  font-weight: bold;
+  padding: 8px 12px;
+  margin: 10px;
+  text-decoration: none;
+  border-radius: 8px;
+}
+.back-button:hover, .back-link:hover{ background-color: var(--brand-600); }
+
+/* Images in header (if used) */
+header img{
+  height: 100px;
+  margin-bottom: 10px;
+}
+
+/* ==========================================================================
+   10) RESPONSIVE TWEAKS (mobile-first overrides)
+   ========================================================================== */
+@media (max-width: 768px){
+  .container{
+    width: 92%;
+    margin: 16px auto;
+    padding: 12px;
+  }
+  .page-title, h2{ text-align: center; padding: 0; }
+  .content-container{ width: 100%; margin: 0 auto; }
+}
+
+/* ================= MOBILE POLISH: AUTH & BUTTONS ================= */
+
+/* Stop forcing all buttons to full width on mobile */
+@media (max-width: 768px){
+  .btn, button{
+    width: auto;           /* was 100% */
+    display: inline-flex;  /* keep nice alignment */
+    margin: 10px 0;        /* tighten margins */
+  }
+}
+
+/* Small button size utility */
+.btn--sm{ padding: 6px 10px; font-size: 14px; border-radius: 8px; }
+
+/* Centered, tidy auth card */
+.auth-card{
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 18px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-align: center;         /* centers title & button */
+}
+
+/* Narrower form with centered fields */
+.form-narrow{
+  display: grid;
+  gap: 10px;
+  justify-items: center;      /* center each control */
+  margin-top: 8px;
+}
+
+.form-narrow .form-row{
+  width: 100%;
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+}
+
+.form-narrow input[type="text"],
+.form-narrow input[type="password"],
+.form-narrow input[type="email"]{
+  width: 100%;
+  max-width: 320px;           /* neat width on mobile */
+}
+
+/* Optional: keep labels tidy */
+.form-narrow label{
+  width: 100%;
+  max-width: 320px;
+  text-align: left;
+}
+
+/* Keep the main container tighter on mobile overall */
+@media (max-width: 768px){
+  .container{
+    width: 92%;
+    max-width: 640px;
+    padding: 14px;
+  }
+  .page-title{
     margin-bottom: 10px;
+  }
 }
 
-h2 {
-    color: #00ff66;
+/* ================= MOBILE CENTERING WRAPPER ================= */
+@media (max-width: 768px){
+  .center-mobile{
+    display: flex;
+    justify-content: center;   /* center child horizontally */
+  }
+  .center-mobile .btn,
+  .center-mobile button{
+    width: 50%;                /* half width */
+    max-width: 300px;          /* optional cap */
+  }
 }
 
-table {
-    width: 90%;
-    margin: 20px auto;
-    border-collapse: collapse;
-    background-color: #111;
-    color: #00ff66;
-    border: 1px solid #00ff66;
+@media (max-width: 520px){
+  table { display: table !important; }
 }
 
-th, td {
-    padding: 10px;
-    border: 1px solid #00ff66;
-    text-align: center;
+@media (max-width: 520px){
+  table { min-width: 0 !important; width: 100% !important; }
+  th, td { word-break: break-word; }
 }
 
-/* Green button style for .btn class only */
-.btn, button {
-    color: #000;
-    background-color: #0080ff;
-    border: none;
-    padding: 8px 12px;
-    margin: 10px;
-    cursor: pointer;
-    text-decoration: none;
-    font-weight: bold;
-    border-radius: 4px;
+/* Ensure our intended scroll wrapper is touch-friendly */
+.table-wrap{
+  overflow-x: auto;           /* already present; keep it */
+  -webkit-overflow-scrolling: touch; /* smooth iOS scroll */
 }
 
-.btn:hover, button:hover {
-    background-color: #cc9900;
+/* ===== Mobile table visibility & fit ===== */
+@media (max-width: 520px){
+  /* Never hide tables, ever */
+  table {
+    display: table !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed;          /* forces columns to shrink rather than overflow */
+  }
+
+  th, td {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  /* Your .center currently forces nowrap; relax that on small screens */
+  .center { white-space: normal !important; }
 }
 
-a:link,
-a:visited {
-    color: #00ff66; /* your neon green */
+/* Touch-friendly horizontal scroll (iOS) */
+.table-wrap{
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
-
-a:hover {
-    color: #00cc55; /* slightly darker green on hover */
-}
-
-a:active {
-    color: #00ff66;
-}
-
-.test-input {
-    width: 50px;       /* narrow number input */
-    padding: 2px;
-    font-size: 12px;
-}
-
-.test-notes {
-    width: 100%;       /* full width but smaller font */
-    padding: 2px;
-    font-size: 12px;
-}
-
-table th, table td {
-    padding: 4px;
-}
-

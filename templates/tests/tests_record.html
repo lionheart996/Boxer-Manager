@@ -1,21 +1,106 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="page-title">Record Test Result</h2>
+<h2 class="page-title">🚀 Record Test Result</h2>
 
-<form method="post" action="{% url 'tests_record' %}" class="content-container" style="display:grid; gap:12px; max-width:520px;">
+<form method="post" action="{% url 'tests_record' %}" class="content-container test-form">
   {% csrf_token %}
   {{ form.non_field_errors }}
 
-  <label>Boxer {{ form.boxer }}</label>
-  <label>Test {{ form.test }}</label>
-  <label>Date/Time {{ form.measured_at }}</label>
+  <section class="form-card">
+    <label class="form-card__label">Boxer</label>
+    <div class="form-card__field">{{ form.boxer }}</div>
+  </section>
 
-  <label>Value 1 {{ form.value1 }}</label>
-  <label>Value 2 {{ form.value2 }}</label>
-  <label>Value 3 {{ form.value3 }}</label>
+  <section class="form-card">
+    <label class="form-card__label">Test</label>
+    <div class="form-card__field">{{ form.test }}</div>
+  </section>
 
-  <label>Notes {{ form.notes }}</label>
+  <section class="form-card">
+    <label class="form-card__label">Date / Time</label>
+    <div class="form-card__field">{{ form.measured_at }}</div>
+  </section>
 
-  <button type="submit" class="btn">Save</button>
+  <section class="form-card grid-3">
+    <div>
+      <label class="form-card__label">Value 1</label>
+      <div class="form-card__field">{{ form.value1 }}</div>
+    </div>
+    <div>
+      <label class="form-card__label">Value 2</label>
+      <div class="form-card__field">{{ form.value2 }}</div>
+    </div>
+    <div>
+      <label class="form-card__label">Value 3</label>
+      <div class="form-card__field">{{ form.value3 }}</div>
+    </div>
+  </section>
+
+  <section class="form-card">
+    <label class="form-card__label">Notes</label>
+    <div class="form-card__field">{{ form.notes }}</div>
+  </section>
+
+  <button type="submit" class="btn btn--primary save-btn">💾 Save</button>
 </form>
+
+<style>
+/* Futuristic test form */
+.test-form{
+  display:grid;
+  gap:20px;
+  max-width:600px;
+  margin:0 auto;
+}
+
+.form-card{
+  background:linear-gradient(145deg, #0e0e0e, #181818);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px;
+  display:grid;
+  gap:8px;
+  text-align:left;
+  box-shadow:0 0 10px rgba(0,255,102,0.2);
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+.form-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 20px rgba(0,255,102,0.4);
+}
+
+.form-card__label{
+  font-weight:700;
+  font-size:14px;
+  color:var(--brand);
+  letter-spacing:.5px;
+}
+
+.form-card__field select,
+.form-card__field input,
+.form-card__field textarea{
+  width:100%;
+  border-radius:10px;
+  padding:10px 12px;
+  background:#0f0f0f;
+  border:1px solid var(--border);
+  color:var(--text);
+  font-family:monospace;
+}
+.grid-3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+
+.save-btn{
+  width:100%;
+  font-size:18px;
+  font-weight:700;
+  margin-top:8px;
+  border-radius:12px;
+  box-shadow:0 0 12px rgba(0,255,102,0.5);
+  transition:all .2s ease;
+}
+.save-btn:hover{
+  transform:scale(1.02);
+  box-shadow:0 0 20px rgba(0,255,102,0.8);
+}
+</style>
 {% endblock %}

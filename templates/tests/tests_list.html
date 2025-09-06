@@ -3,51 +3,74 @@
 <h2 class="page-title">Battery Tests</h2>
 
 <div class="content-container">
-  <div class="form-container">
+
+  <!-- Create new test -->
+  <div class="card" style="padding:12px; border:1px solid var(--brand); border-radius:10px; margin-bottom:16px;">
     <h3>Create a new test</h3>
     <form method="post">
       {% csrf_token %}
       {{ form.as_p }}
-      <button class="btn" type="submit">Save Test</button>
+      <button class="btn btn--primary" type="submit">Save Test</button>
     </form>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Name</th>
-        <th>Unit</th>
-        <th>Description</th>
-        <th>Order</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for t in tests %}
-      <tr>
-        <td>{{ forloop.counter }}</td>
-        <td>{{ t.name }}</td>
-        <td>[{{ t.unit }}]</td>
-        <td>{{ t.description|default:"—" }}</td>
-        <td>{{ t.display_order }}</td>
-        <td>
-          <a class="btn" href="{% url 'test_edit' t.pk %}">Edit</a>
+  {% if tests %}
+    <div class="test-list">
+      {% for t in tests %}
+      <section class="test-card">
+        <header class="test-card__head">
+          <h3 class="test-card__name">{{ forloop.counter }}. {{ t.name }}</h3>
+          <span class="test-card__unit">[{{ t.unit }}]</span>
+        </header>
+
+        <p class="test-card__desc">{{ t.description|default:"—" }}</p>
+
+        <div class="test-card__meta">
+          <span>Order: {{ t.display_order }}</span>
+        </div>
+
+        <div class="test-card__actions">
+          <a class="btn btn--sm" href="{% url 'test_edit' t.pk %}">Edit</a>
           {% if t.pk %}
-            <form method="post" action="{% url 'battery_test_delete' pk=t.pk %}" style="display:inline;">
+            <form method="post" action="{% url 'battery_test_delete' pk=t.pk %}" style="display:inline;" onsubmit="return confirm('Delete this test?');">
               {% csrf_token %}
-              <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this test?')">
-                Delete
-              </button>
+              <button type="submit" class="btn btn--danger btn--sm">Delete</button>
             </form>
           {% endif %}
-        </td>
-      </tr>
-    {% empty %}
-      <tr><td colspan="6">No tests yet. Create one above.</td></tr>
-    {% endfor %}
-    </tbody>
-  </table>
+        </div>
+      </section>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No tests yet. Create one above.</p>
+  {% endif %}
 </div>
+
+<style>
+/* === Battery test cards === */
+.test-list{ display:grid; gap:12px; margin-top:12px; }
+
+.test-card{
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  display:grid;
+  gap:8px;
+}
+
+.test-card__head{
+  display:flex; justify-content:space-between; align-items:center;
+}
+.test-card__name{ margin:0; font-size:16px; font-weight:700; }
+.test-card__unit{ font-size:14px; color:var(--muted); }
+
+.test-card__desc{ margin:0; font-size:14px; color:var(--text); }
+.test-card__meta{ font-size:13px; color:var(--muted); }
+
+.test-card__actions{
+  display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;
+}
+</style>
 {% endblock %}
 

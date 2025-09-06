@@ -1,41 +1,163 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Add Multiple Boxers</h2>
-<p>Fill as many rows as you need. Leave a row marked “Delete row” to skip it.</p>
+<h2 class="page-title">Add Multiple Boxers</h2>
+<p class="muted" style="margin-bottom:12px;">
+  Add as many as you need. Empty rows are ignored. Use the trash icon to remove a row.
+</p>
 
-<form method="post">
+<form method="post" id="bulk-form" class="bulk-form">
   {% csrf_token %}
   {{ formset.management_form }}
 
-  <table border="1" cellspacing="0" cellpadding="6">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Family name</th>
-        <th>Parent (optional)</th>
-        <th>Birthday (optional)</th>
-        <th>Delete row</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for form in formset %}
-      <tr>
-        <td>{{ form.first_name }}</td>
-        <td>{{ form.last_name }}</td>
-        <td>{{ form.parent_name }}</td>
-        <td>{{ form.date_of_birth }}</td>
-        <td style="text-align:center;">{{ form.DELETE }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div id="rows" class="rows">
+    {% for form in formset %}
+      <article class="row-card" data-index="{{ forloop.counter0 }}">
+        <div class="row-grid">
+          <label>
+            <span class="lbl">First name *</span>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}<span class="err">{{ form.first_name.errors|join:", " }}</span>{% endif %}
+          </label>
+          <label>
+            <span class="lbl">Family name</span>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}<span class="err">{{ form.last_name.errors|join:", " }}</span>{% endif %}
+          </label>
+          <label>
+            <span class="lbl">Parent (optional)</span>
+            {{ form.parent_name }}
+            {% if form.parent_name.errors %}<span class="err">{{ form.parent_name.errors|join:", " }}</span>{% endif %}
+          </label>
+          <label>
+            <span class="lbl">Birthday (optional)</span>
+            {{ form.date_of_birth }}
+            {% if form.date_of_birth.errors %}<span class="err">{{ form.date_of_birth.errors|join:", " }}</span>{% endif %}
+          </label>
+        </div>
 
-  {% if formset.non_form_errors %}
-    <div style="color:#f66; margin-top:8px;">{{ formset.non_form_errors }}</div>
-  {% endif %}
+        {{ form.DELETE }} {# kept for formset; hidden by JS #}
+        {% if form.non_field_errors %}
+          <div class="err">{{ form.non_field_errors|join:", " }}</div>
+        {% endif %}
 
-  <br>
-  <button class="btn" type="submit">Save Boxers</button>
-  <a class="btn" href="{% url 'home' %}">Cancel</a>
+        <button type="button" class="btn btn--quiet btn--sm row-remove" aria-label="Remove row">🗑️ Remove</button>
+      </article>
+    {% endfor %}
+  </div>
+
+  <div class="actions">
+    <button type="button" class="btn btn--accent" id="add-row">+ Add another boxer</button>
+    <div class="spacer"></div>
+    <a class="btn btn--quiet" href="{% url 'home' %}">Cancel</a>
+    <button class="btn btn--primary" type="submit">Save Boxers</button>
+  </div>
 </form>
+
+{# Prototype for JS (uses empty_form with __prefix__) #}
+<template id="row-template">
+  <article class="row-card" data-index="__prefix__">
+    <div class="row-grid">
+      <label>
+        <span class="lbl">First name *</span>
+        {{ formset.empty_form.first_name }}
+      </label>
+      <label>
+        <span class="lbl">Family name</span>
+        {{ formset.empty_form.last_name }}
+      </label>
+      <label>
+        <span class="lbl">Parent (optional)</span>
+        {{ formset.empty_form.parent_name }}
+      </label>
+      <label>
+        <span class="lbl">Birthday (optional)</span>
+        {{ formset.empty_form.date_of_birth }}
+      </label>
+    </div>
+    {{ formset.empty_form.DELETE }}
+    <button type="button" class="btn btn--quiet btn--sm row-remove" aria-label="Remove row">🗑️ Remove</button>
+  </article>
+</template>
+
+<style>
+.bulk-form { display: grid; gap: 12px; }
+.rows { display: grid; gap: 12px; }
+.row-card {
+  background: linear-gradient(145deg, #0f0f0f, #181818);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 0 10px rgba(0,255,102,0.15);
+}
+.row-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+.lbl { display:block; font-size:12px; color:var(--muted); margin-bottom:4px; }
+.err { display:block; color:#ff5a5a; font-size:12px; margin-top:4px; }
+.row-remove { margin-top:10px; }
+.actions {
+  display:flex; align-items:center; gap:10px; margin-top:6px;
+}
+.actions .spacer { flex:1; }
+.row-card input[type="text"],
+.row-card input[type="date"] {
+  width:100%;
+  padding:8px 10px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:#0f0f0f;
+  color:var(--text);
+}
+</style>
+
+<script>
+(function(){
+  const container = document.getElementById('rows');
+  const addBtn = document.getElementById('add-row');
+  const tmpl = document.getElementById('row-template');
+  const totalInput = document.querySelector('[name="{{ formset.prefix }}-TOTAL_FORMS"]') ||
+                     document.querySelector('[name="form-TOTAL_FORMS"]');
+
+  // Hide DELETE checkboxes (we control via Remove button)
+  function hideDeleteBoxes(scope) {
+    (scope || document).querySelectorAll('input[type="checkbox"][name$="-DELETE"]').forEach(cb => {
+      cb.style.display = 'none';
+    });
+  }
+  hideDeleteBoxes();
+
+  function wireRemoveButtons(scope) {
+    (scope || document).querySelectorAll('.row-remove').forEach(btn => {
+      if (btn.dataset.wired) return;
+      btn.dataset.wired = "1";
+      btn.addEventListener('click', () => {
+        const card = btn.closest('.row-card');
+        if (!card) return;
+        const del = card.querySelector('input[name$="-DELETE"]');
+        if (del) { del.checked = true; }
+        card.style.display = 'none';
+      });
+    });
+  }
+  wireRemoveButtons();
+
+  addBtn?.addEventListener('click', () => {
+    const current = parseInt(totalInput.value, 10);
+    const html = tmpl.innerHTML.replaceAll('__prefix__', current);
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = html.trim();
+    const node = wrapper.firstElementChild;
+    container.appendChild(node);
+    totalInput.value = String(current + 1);
+    hideDeleteBoxes(node);
+    wireRemoveButtons(node);
+    // Focus first field
+    const first = node.querySelector('input, select, textarea');
+    if (first) first.focus();
+    node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+})();
+</script>
 {% endblock %}

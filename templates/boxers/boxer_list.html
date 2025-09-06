@@ -19,38 +19,32 @@
   </form>
 
   {% if boxers %}
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for b in boxers %}
-          <tr>
-            <td>{{ b.name }}</td>
-            <td>
-              <a class="btn" href="{% url 'boxer_report' b.id %}">Report</a>
-              {% if b.pk %}
-                <a class="btn" href="{% url 'heart_rate_detail' boxer_id=b.pk %}">Heart Rate</a>
-              {% endif %}
-              <form method="post"
-                    action="{% url 'delete_boxer' b.pk %}"
-                    style="display:inline"
-                    onsubmit="return confirm('Delete {{ b.name }}?');">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger" style="background:red">Delete</button>
-              </form>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="boxer-list">
+      {% for b in boxers %}
+      <section class="boxer-card">
+        <header class="boxer-card__head">
+          <h3 class="boxer-card__name">{{ b.name }}</h3>
+        </header>
 
-    {# Pagination (only if paginate_by is set) #}
+        <div class="boxer-card__actions">
+          <a class="btn btn--sm" href="{% url 'boxer_report' b.id %}">Report</a>
+          {% if b.pk %}
+            <a class="btn btn--sm" href="{% url 'heart_rate_detail' boxer_id=b.pk %}">Heart Rate</a>
+          {% endif %}
+          <form method="post"
+                action="{% url 'delete_boxer' b.pk %}"
+                style="display:inline"
+                onsubmit="return confirm('Delete {{ b.name }}?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn--danger btn--sm">Delete</button>
+          </form>
+        </div>
+      </section>
+      {% endfor %}
+    </div>
+
     {% if is_paginated %}
-      <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+      <div style="margin-top:10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
         {% if page_obj.has_previous %}
           <a class="btn" href="?q={{ q }}&page={{ page_obj.previous_page_number }}">← Prev</a>
         {% endif %}
@@ -70,4 +64,22 @@
   {% endif %}
 
 </div>
+
+<style>
+/* === Boxer list cards === */
+.boxer-list{ display:grid; gap:12px; margin-top:12px; }
+.boxer-card{
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  display: grid; gap: 8px;
+}
+.boxer-card__head{ display:flex; justify-content:space-between; align-items:center; }
+.boxer-card__name{ margin:0; font-size:16px; font-weight:700; }
+.boxer-card__actions{
+  display:flex; flex-wrap:wrap; gap:8px;
+}
+</style>
 {% endblock %}
+

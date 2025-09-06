@@ -1,92 +1,151 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="content-container">
-  <a href="{% url 'attendance_list' %}">← Back to Attendance</a>
+  <a class="back-link" style = "color: blue" href="{% url 'attendance_list' %}">← Back to Attendance</a>
   <h2 class="page-title">Weight Progress — {{ boxer.name }}</h2>
 
-  <form method="get" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-    <label>What is the boxer's Fighting Weight?
+  <!-- Fighting weight input -->
+  <form method="get" class="fw-bar">
+    <label class="fw-label">
+      Fighting Weight (kg)
       <input type="number" name="fighting_weight" step="0.1" min="0"
-             value="{{ fighting_weight|default_if_none:'' }}" placeholder="kg">
+             value="{{ fighting_weight|default_if_none:'' }}" placeholder="e.g. 72.5">
     </label>
-    <button class="btn" type="submit">Show</button>
+    <button class="btn btn--primary" type="submit">Apply</button>
   </form>
 
   {% if fw_error %}
-    <p style="color:#c00; margin-top:8px;">{{ fw_error }}</p>
+    <p class="error-text">{{ fw_error }}</p>
   {% endif %}
 
   {% if rows %}
-    <div style="margin-top:16px;">
-      <h3>Summary</h3>
-      <ul>
-        <li>Minimum recorded weight: <strong>{{ min_w }} kg</strong></li>
-        <li>Maximum recorded weight: <strong>{{ max_w }} kg</strong></li>
-        <li>Difference (max - min): <strong>{% if diff is not None %}{{ diff }}{% else %}–{% endif %} kg</strong></li>
-        <li>Times above fighting weight{% if fighting_weight %} ({{ fighting_weight }} kg){% endif %}: <strong>{% if count_above_fw is not None %}{{ count_above_fw }}{% else %}–{% endif %}</strong></li>
-      </ul>
-    </div>
+    <!-- Summary -->
+    <section class="summary-card">
+      <div class="summary-item">
+        <span class="label">Min</span>
+        <span class="value">{{ min_w }}<span class="unit">kg</span></span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Max</span>
+        <span class="value">{{ max_w }}<span class="unit">kg</span></span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Range</span>
+        <span class="value">{% if diff is not None %}{{ diff }}{% else %}–{% endif %}<span class="unit">kg</span></span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Above FW{% if fighting_weight %} ({{ fighting_weight }}kg){% endif %}</span>
+        <span class="value">{% if count_above_fw is not None %}{{ count_above_fw }}{% else %}–{% endif %}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Average</span>
+        <span class="value">{% if avg_w %}{{ avg_w|floatformat:2 }}<span class="unit">kg</span>{% else %}–{% endif %}</span>
+      </div>
+    </section>
 
-    <div style="margin-top:10px;">
-      <h3>History (table)</h3>
-      <table border="1" style="border-collapse:collapse; width:100%; max-width:720px;">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Weight (kg)</th>
+    <!-- Responsive chart -->
+    <section class="chart-card">
+      <h3 class="chart-title">History</h3>
+      <div class="chart-wrap">
+        <canvas id="weightChart"></canvas>
+      </div>
+    </section>
 
-          </tr>
-        </thead>
-        <tbody>
-          {% for r in rows %}
-          <tr>
-            <td>{{ r.date|date:"Y-m-d" }}</td>
-            <td>{{ r.weight }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+    <!-- History cards -->
+    <section class="history">
+      <h3 class="history-title">All Records</h3>
+      <div class="history-grid">
+        {% for r in rows %}
+          <article class="history-card">
+            <div class="history-date">{{ r.date|date:"d M Y (D)" }}</div>
+            <div class="history-weight">
+              <span class="chip">{{ r.weight }} kg</span>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
 
-    <div style="margin-top:16px; max-width:900px;">
-      <h3>History (chart)</h3>
-      <canvas id="weightChart" height="120"></canvas>
-    </div>
-
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-      const labels = [{% for r in rows %}"{{ r.date|date:'Y-m-d' }}"{% if not forloop.last %},{% endif %}{% endfor %}];
-      const data   = [{% for r in rows %}{{ r.weight }}{% if not forloop.last %},{% endif %}{% endfor %}];
+      (function() {
+        const labels = [{% for r in rows %}"{{ r.date|date:'Y-m-d' }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+        const data   = [{% for r in rows %}{{ r.weight }}{% if not forloop.last %},{% endif %}{% endfor %}];
 
-      const ctx = document.getElementById('weightChart').getContext('2d');
-      const chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: 'Weight (kg)',
-              data: data,
-              tension: 0.25,
-              fill: false,
-              pointRadius: 3
+        const ctx = document.getElementById('weightChart').getContext('2d');
+
+        const datasets = [{
+          label: 'Weight (kg)',
+          data: data,
+          borderColor: 'rgba(0,255,102,0.9)',
+          backgroundColor: 'rgba(0,255,102,0.15)',
+          tension: 0.25,
+          pointRadius: 3,
+          borderWidth: 2,
+          fill: false
+        }];
+
+        {% if fighting_weight %}
+        datasets.push({
+          label: 'Fighting Weight',
+          data: labels.map(_ => {{ fighting_weight }}),
+          borderColor: 'rgba(255,255,255,0.7)',
+          borderDash: [6,6],
+          pointRadius: 0,
+          borderWidth: 1.5,
+          fill: false
+        });
+        {% endif %}
+
+        {% if avg_w %}
+        datasets.push({
+          label: 'Average',
+          data: labels.map(_ => {{ avg_w|floatformat:2 }}),
+          borderColor: 'rgba(0,160,255,0.9)',
+          borderDash: [3,3],
+          pointRadius: 0,
+          borderWidth: 1.5,
+          fill: false
+        });
+        {% endif %}
+
+        new Chart(ctx, {
+          type: 'line',
+          data: { labels, datasets },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#e7e9ee' } } },
+            scales: {
+              x: { ticks: { color: '#a9afbd' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+              y: { ticks: { color: '#a9afbd' }, grid: { color: 'rgba(255,255,255,0.05)' } }
             }
-            {% if fighting_weight %}
-            ,{
-              label: 'Fighting Weight',
-              data: labels.map(_ => {{ fighting_weight }}),
-              borderDash: [5,5],
-              fill: false,
-              pointRadius: 0
-            }
-            {% endif %}
-          ]
-        },
-        options: { responsive: true, scales: { y: { beginAtZero: false } } }
-      });
+          }
+        });
+      })();
     </script>
   {% else %}
-    <p style="margin-top:12px;">No recorded weights yet for {{ boxer.name }}.</p>
+    <p class="muted">No recorded weights yet for {{ boxer.name }}.</p>
   {% endif %}
 </div>
+
+<style>
+.fw-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:12px;}
+.fw-label{display:grid;gap:6px;font-weight:600;color:var(--muted);}
+.fw-label input{width:160px;padding:8px 10px;border-radius:10px;background:#0f0f0f;border:1px solid var(--border);color:var(--text);}
+.error-text{color:#ff4d4d;margin:.3rem 0 .6rem;}
+.summary-card{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;padding:14px;border-radius:12px;background:linear-gradient(145deg,#0e0e0e,#181818);border:1px solid var(--border);box-shadow:0 0 12px rgba(0,255,102,0.2);}
+.summary-item{display:grid;gap:6px;}
+.summary-item .label{color:var(--muted);font-size:13px;}
+.summary-item .value{font-weight:800;font-size:18px;color:var(--text);white-space:nowrap;}
+.summary-item .unit{color:var(--muted);margin-left:4px;}
+.chart-card{margin-top:14px;padding:14px;border-radius:12px;background:var(--panel-2);border:1px solid var(--border);}
+.chart-wrap{position:relative;width:100%;height:260px;}@media(min-width:768px){.chart-wrap{height:360px;}}
+.history{margin-top:16px;}
+.history-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
+.history-card{background:linear-gradient(145deg,#0f0f0f,#1b1b1b);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;justify-content:space-between;align-items:center;box-shadow:inset 0 0 8px rgba(0,255,102,0.1);}
+.history-date{font-weight:700;color:var(--brand);}
+.chip{padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:#121212;color:var(--text);font-weight:700;}
+</style>
 {% endblock %}

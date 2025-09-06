@@ -10,7 +10,7 @@ from .models import (
     TestResult,
     HeartRate,
     CoachProfile,
-    Gym, Weight, Enrollment, ClassTemplate,
+    Gym, Weight, Enrollment, ClassTemplate, ParentProfile,
 )
 
 # --- Simple registrations ---
@@ -120,3 +120,12 @@ class ClassTemplateAdmin(admin.ModelAdmin):
     def enrolled_count(self, obj):
         return obj.enrollments.count()
     enrolled_count.short_description = "Boxers"
+
+@admin.register(ParentProfile)
+class ParentProfileAdmin(admin.ModelAdmin):
+    list_display = ("user", "children_list")
+    search_fields = ("user__username", "user__email")
+
+    def children_list(self, obj):
+        return ", ".join(b.name for b in obj.children.all())
+    children_list.short_description = "Children"

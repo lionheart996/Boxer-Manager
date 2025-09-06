@@ -1,64 +1,98 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="page-title">{{ boxer.name }} — Report</h2>
+<h2 class="page-title">📊 {{ boxer.name }} — Report</h2>
 
 <div class="content-container">
-  <p>
-    <a class="btn" href="{% url 'attendance_list' %}">All Attendance</a>
-    {% if boxer.uuid %}
-      <a class="btn" href="{% url 'boxer_tests' uuid=boxer.uuid %}">Boxer Tests</a>
-    {% else %}
-      <a class="btn" href="{% url 'boxer_tests_pk' pk=boxer.id %}">Boxer Tests</a>
-    {% endif %}
-  </p>
 
-  {# ---------- Summary ---------- #}
+  <!-- Navigation buttons -->
+  <div class="nav-buttons" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:1rem;">
+    {% if boxer.uuid %}
+      <a class="btn" href="{% url 'boxer_tests' uuid=boxer.uuid %}">Tests</a>
+    {% else %}
+      <a class="btn" href="{% url 'boxer_tests_pk' pk=boxer.id %}">Tests</a>
+    {% endif %}
+    <a class="btn" href="{% url 'boxer_classes' boxer.id %}">Classes</a>
+    <a class="btn" href="{% url 'weight_progress' boxer.id %}">Weight Progress</a>
+  </div>
+
+  <!-- Summary -->
   {% if att_total %}
-    <div class="content-container" style="margin-bottom:1rem;">
-      <p>
-        <strong>{{ boxer.name }}</strong> has been <strong>present {{ att_present }}</strong> times
-        ({{ att_present }} / {{ att_total }} = <strong>{{ att_present_pct }}%</strong>).
+    <div class="report-summary">
+      <p><strong>{{ boxer.name }}</strong> has been
+        <span class="highlight">{{ att_present }}</span> times present
+        ({{ att_present }} / {{ att_total }} = <span class="highlight">{{ att_present_pct }}%</span>).
       </p>
       <p>
-        {{ boxer.name }} has been <strong>absent {{ att_absent }}</strong> times
-        ({{ att_absent }} / {{ att_total }} = <strong>{{ att_absent_pct }}%</strong>),
-        of which <strong>{{ att_excused }}</strong> were excused
-        (<strong>{{ att_excused_pct_of_abs }}%</strong> of all absences).
+        Absent: <span class="highlight">{{ att_absent }}</span>
+        ({{ att_absent_pct }}%). Of these,
+        <span class="highlight">{{ att_excused }}</span> were excused
+        ({{ att_excused_pct_of_abs }}%).
       </p>
     </div>
   {% else %}
     <p><em>No attendance recorded yet for {{ boxer.name }}.</em></p>
   {% endif %}
 
-  <hr>
-
-  {# ---------- Daily Attendance ---------- #}
-  <h3>Daily Attendance</h3>
+  <!-- Daily Attendance -->
+  <h3 style="margin-top:1.5rem;">Daily Attendance</h3>
   {% if attendance %}
-    <table>
-      <thead>
-        <tr><th>Date</th><th>Status</th><th>Weight (if any)</th></tr>
-      </thead>
-      <tbody>
-        {% for a in attendance %}
-          <tr>
-            <td>{{ a.date|date:"Y-m-d" }}</td>
-            <td>
-              {% if a.is_present %}Present
-              {% elif a.is_excused %}Excused
-              {% else %}Absent
-              {% endif %}
-            </td>
-            <td>
-              {% if a.weight_kg %}{{ a.weight_kg }} kg{% else %}–{% endif %}
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="attendance-cards">
+      {% for a in attendance %}
+      <div class="att-card">
+        <div class="att-date">{{ a.date|date:"Y-m-d" }}</div>
+        <div class="att-status
+          {% if a.is_present %}present
+          {% elif a.is_excused %}excused
+          {% else %}absent{% endif %}">
+          {% if a.is_present %}✅ Present
+          {% elif a.is_excused %}🟡 Excused
+          {% else %}❌ Absent
+          {% endif %}
+        </div>
+        <div class="att-weight">
+          {% if a.weight_kg %}
+            ⚖️ {{ a.weight_kg|floatformat:2 }} kg
+          {% else %}
+            –
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
   {% else %}
     <p><em>No daily attendance for this boxer.</em></p>
   {% endif %}
 </div>
+
+<style>
+/* Summary block */
+.report-summary {
+  background: linear-gradient(145deg, #0e0e0e, #181818);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 10px rgba(0,255,102,0.2);
+}
+.report-summary p { margin: .3rem 0; }
+.report-summary .highlight { color: var(--brand); font-weight: 700; }
+
+/* Attendance cards */
+.attendance-cards { display:grid; gap:12px; margin-top:12px; }
+.att-card {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  display:flex; justify-content:space-between; align-items:center;
+  box-shadow: inset 0 0 8px rgba(0,255,102,0.1);
+}
+.att-date { font-weight:700; }
+.att-status { font-weight:600; }
+.att-status.present { color: #00ff66; }
+.att-status.excused { color: #ffcc00; }
+.att-status.absent { color: #ff3333; }
+.att-weight { font-size:14px; color: var(--muted); }
+</style>
 {% endblock %}
 

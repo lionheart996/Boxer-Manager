@@ -1,22 +1,21 @@
-
 import os
 from pathlib import Path
-
 import dj_database_url
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-only")
 
-# DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
+# DEBUG = True
 
 render_host = os.getenv("RENDER_EXTERNAL_HOSTNAME")
 
 ALLOWED_HOSTS = ["*"]
+# ALLOWED_HOSTS = ["127.0.0.1", "localhost", RENDER_HOST]
 RENDER_HOST = os.getenv("RENDER_EXTERNAL_HOSTNAME", "boxer-manager.onrender.com")
-CSRF_TRUSTED_ORIGINS = [f"https://{RENDER_HOST}"]
+CSRF_TRUSTED_ORIGINS = [f"https://{RENDER_HOST}", "https://*.onrender.com"]
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # CSRF_TRUSTED_ORIGINS = [
@@ -53,10 +52,11 @@ TEMPLATES = [
         'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+                "BoxersPresenceApp.context_processors.role_flags",
             ],
         },
     },
@@ -68,25 +68,24 @@ WSGI_APPLICATION = 'boxers_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL:
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,     # keep-alive connections
+            ssl_require=True,     # Render Postgres requires SSL
+        )
     }
-}
-
-# DATABASES = {
-#     "default": dj_database_url.config(
-#         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-#         conn_max_age=600,
-#         ssl_require=os.getenv("DATABASE_SSL_REQUIRE", "false").lower() == "true",
-#     )
-# }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
@@ -99,19 +98,13 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 STATIC_URL = '/static/'
-
 STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
-
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -121,6 +114,6 @@ LOGIN_URL = '/login/'
 LOGOUT_REDIRECT_URL = 'login'
 APP_DIRS: True
 
-TEMPLATES[0]["OPTIONS"]["context_processors"] += [
-    "BoxersPresenceApp.context_processors.role_flags",  # <-- use your app path
-]
+# TEMPLATES[0]["OPTIONS"]["context_processors"] += [
+#     "BoxersPresenceApp.context_processors.role_flags",  # <-- use your app path
+# ]

@@ -1,80 +1,118 @@
 {% load static %}
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Factory for Boxers</title>
+  <title>Boxer Factory</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2025-09-05-1">
+
+  <!-- Futuristic toast styles -->
+  <style>
+    #toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: grid;
+      gap: 10px;
+      z-index: 9999;
+    }
+    .toast {
+      min-width: 260px;
+      max-width: 340px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      color: #fff;
+      box-shadow: 0 0 12px rgba(0,255,102,0.3);
+      opacity: 0;
+      transform: translateX(120%);
+      transition: all 0.5s ease;
+      backdrop-filter: blur(6px);
+    }
+    .toast.show { opacity: 1; transform: translateX(0); }
+
+    /* Variants */
+    .toast-success {
+      background: linear-gradient(135deg, rgba(0,255,102,0.9), rgba(0,180,72,0.85));
+      border: 1px solid #00ff66;
+      color: #000;
+    }
+    .toast-error {
+      background: linear-gradient(135deg, rgba(255,60,60,0.9), rgba(180,20,20,0.85));
+      border: 1px solid #ff4444;
+    }
+    .toast-warning {
+      background: linear-gradient(135deg, rgba(255,165,0.9,0.9), rgba(180,120,0,0.85));
+      border: 1px solid #ffa500;
+      color: #000;
+    }
+    .toast-info {
+      background: linear-gradient(135deg, rgba(0,160,255,0.9), rgba(0,100,180,0.85));
+      border: 1px solid #00a0ff;
+    }
+  </style>
 </head>
-<body>
+<body class="app">
 
-{% if user.is_authenticated and is_parent %}
-  <nav>
-    <a href="{% url 'parent_home' %}">Parent Home</a>
-  </nav>
-{% else %}
-  {# coach nav (add your coach links here if you have them) #}
-{% endif %}
+<header class="topbar">
+  <!-- LEFT: brand -->
+  <div class="topbar-brand">
+    <a class="brand-icon" href="{% url 'home' %}" aria-label="Home">☰</a>
+    <a class="brand" href="{% url 'home' %}">Boxer Factory</a>
+  </div>
 
-<header>
-  <div>
+  <!-- CENTER: greeting -->
+  <div class="topbar-center">
     {% if user.is_authenticated %}
-      Hi, {{ user.username }}!
-      <form method="post" action="{% url 'logout' %}" style="display:inline;">
-        {% csrf_token %}
-        {% if is_parent %}
-          <a href="{% url 'parent_home' %}" class="home-top-left">Home</a>
-        {% else %}
-          <a href="{% url 'home' %}" class="home-top-left">Home</a>
-        {% endif %}
-        <button type="submit" class="btn logout-btn">Logout</button>
-      </form>
+      <span class="greeting" style="color: Yellow">
+        🔨🔥Enjoy the forging, {{ user.first_name|default:user.username }}
+      </span>
     {% else %}
-      <a href="{% url 'login' %}">Login</a>
+      <span class="greeting">Enjoy the forging, guest</span>
     {% endif %}
   </div>
 </header>
 
-<div class="content-container">
+<main class="container">
   {% block content %}{% endblock %}
-</div>
+</main>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 {% if messages %}
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  {% for message in messages %}
-    Swal.fire({
-      icon: "{% if 'success' in message.tags %}success{% elif 'error' in message.tags %}error{% elif 'warning' in message.tags %}warning{% else %}info{% endif %}",
-      title: "{{ message.tags|capfirst|default:'Notice' }}",
-      text: "{{ message|escapejs }}",
-      confirmButtonText: 'OK'
-    });
-  {% endfor %}
-});
-</script>
+  <div id="toast-container"></div>
+  <script>
+    (function(){
+      const container = document.getElementById("toast-container");
+      {% for message in messages %}
+        const toast = document.createElement("div");
+        toast.className = "toast toast-{{ message.tags }}";
+        toast.innerText = "{{ message|escapejs }}";
+        container.appendChild(toast);
+
+        // Animate in
+        setTimeout(()=> toast.classList.add("show"), 100);
+
+        // Auto remove after 5s
+        setTimeout(()=>{
+          toast.classList.remove("show");
+          setTimeout(()=> toast.remove(), 500);
+        }, 5000);
+      {% endfor %}
+    })();
+  </script>
 {% endif %}
 
-<style>
-  .home-top-left {
-    position: fixed;
-    top: 10px;
-    left: 12px;
-    color: #fff;
-    text-decoration: none;
-    font-weight: 600;
-    z-index: 1000;
-  }
-  .home-top-left:hover { text-decoration: underline; }
-  .logout-btn {
-    background-color:#8B0000;
-    color:#FFFFFF;
-    font-size:12px;
-    padding:4px 8px;
-    border-radius:6px;
-  }
-</style>
+<footer>
+  {% if user.is_authenticated %}
+    <nav class="topbar-actions">
+      <form method="post" action="{% url 'logout' %}" style="margin:0;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn--quiet btn--sm">Log out</button>
+      </form>
+    </nav>
+  {% endif %}
+</footer>
 
 </body>
 </html>

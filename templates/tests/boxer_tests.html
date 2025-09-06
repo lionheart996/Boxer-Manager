@@ -12,19 +12,34 @@
       {% endfor %}
     </select>
   </label>
-
-  <label style="display:flex; gap:6px; align-items:center;">
-    <input type="checkbox" name="show" value="1" {% if show_text %}checked{% endif %}>
-    Show text summary
-  </label>
-
   <button class="btn" type="submit">Apply</button>
 </form>
 
 {% if selected_test %}
   <h3 style="margin-top:1rem;">{{ selected_test.name }} progress {% if unit %}({{ unit }}){% endif %}</h3>
 
-  {# Chart.js #}
+  <!-- Always show summary above chart -->
+  <div class="summary-block">
+    <strong>Summary:</strong><br>
+    {% if summary %}
+      Boxer {{ boxer.name }}’s results for test {{ selected_test.name }}{% if unit %} ({{ unit }}){% endif %}:
+      <ul>
+        {% for row in summary %}
+          <li>
+            {% if row.avg %}{{ row.avg|floatformat:2 }}{% if unit %} {{ unit }}{% endif %}{% endif %}
+            on {{ row.date|date:"Y-m-d" }}
+            {% if row.notes %}
+              <br><span class="muted">Notes: {{ row.notes|join:", " }}</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      No results yet.
+    {% endif %}
+  </div>
+
+  <!-- Chart.js -->
   {{ labels|json_script:"labels-data" }}
   {{ values|json_script:"values-data" }}
   <canvas id="progressChart" width="900" height="360" style="max-width:100%;"></canvas>
@@ -61,24 +76,25 @@
       });
     })();
   </script>
-
-  {% if show_text %}
-  <div style="margin-top:1rem;">
-    <strong>Summary:</strong><br>
-    {% if summary %}
-      Boxer {{ boxer.name }}’s results for test {{ selected_test.name }}{% if unit %} ({{ unit }}){% endif %}:
-      <ul>
-        {% for row in summary %}
-          <li>{{ row.avg|floatformat:2 }}{% if unit %} {{ unit }}{% endif %} on {{ row.date|date:"Y-m-d" }}</li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      No results yet.
-    {% endif %}
-  </div>
 {% endif %}
 
-{% endif %}
+<style>
+.summary-block {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  margin: 1rem 0;
+}
+.summary-block ul {
+  margin: .5rem 0 0;
+  padding-left: 18px;
+}
+.summary-block .muted {
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
 {% endblock %}
 
 

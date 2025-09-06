@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">{{ boxer.name }} — Classes</h2>
+
+<div class="content-container">
+  {% if classes %}
+    <ul>
+      {% for c in classes %}
+        <li>{{ c.title }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p><em>Not enrolled in any classes.</em></p>
+  {% endif %}
+
+  <p style="margin-top:10px;">
+    <a class="btn" href="{% url 'boxer_report' boxer.id %}">Back to report</a>
+  </p>
+</div>
+{% endblock %}

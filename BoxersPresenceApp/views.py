@@ -1,9 +1,10 @@
 # ===== BATTERY TESTS =====
 import io
-from datetime import datetime
+from collections import defaultdict
+from datetime import datetime, timedelta
 from datetime import date, time as dt_time
 from datetime import date as Date
-from decimal import InvalidOperation, Decimal
+from decimal import InvalidOperation
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
@@ -11,7 +12,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.db import transaction, IntegrityError
-from django.db.models import Max, Q, Subquery, OuterRef, ProtectedError, Exists, Avg
+from django.db.models import Max,  ProtectedError
 from django.db.models.functions import TruncDate
 from django.forms import formset_factory
 from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse, HttpResponseForbidden, Http404
@@ -21,14 +22,14 @@ from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView, UpdateView, FormView, ListView, DetailView, CreateView
 from django.views import View
 from django.urls import reverse_lazy, reverse, get_resolver
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from rest_framework.exceptions import PermissionDenied
 
 from . import models
 from .models import Boxer, BatteryTest, Attendance, HeartRate, Weight, ParentProfile, ClassTemplate, \
-    ClassSession, SessionAttendance, Enrollment, Gym
+    ClassSession, Enrollment, Gym
 from .forms import BatteryTestForm, BoxerAndTestSelectForm, BoxerForm, HeartRateQuickForm, \
     WeightQuickForm, ParentSignupForm, GymForm, TestResultForm, EnrollBoxerForm, ClassCreateForm, UnenrollForm, \
     BulkBoxerForm
@@ -409,67 +410,116 @@ class AttendanceListView(LoginRequiredMixin, ListView):
     context_object_name = "attendances"
     paginate_by = 50
 
-    def get_queryset(self):
-        qs = (Attendance.objects
-              .select_related("boxer", "boxer__gym")
-              .order_by("-date", "boxer__name"))
+    def base_scope(self):
+        """Scope queryset by user role (parent/staff/coaches)."""
+        qs = (
+            Attendance.objects
+            .select_related("boxer", "session", "session__template")
+            .order_by("-date", "boxer__name")
+        )
+        user = self.request.user
 
-        # Superusers see all
-        if self.request.user.is_superuser:
-            pass
-        else:
+        if ParentProfile.objects.filter(user=user).exists():
+            # Parent → only their children
+            qs = qs.filter(boxer__parent_profiles__user=user)
+        elif not user.is_superuser:
             gym = user_gym(self.request)
             if gym:
                 qs = qs.filter(
                     Q(boxer__gym=gym) |
                     Q(boxer__shared_with_gyms=gym) |
-                    Q(boxer__coaches=self.request.user)
+                    Q(boxer__coaches=user)
                 )
             else:
-                # If user has no gym, still show boxers they coach
-                qs = qs.filter(boxer__coaches=self.request.user)
+                qs = qs.filter(boxer__coaches=user)
+        return qs
 
-        # Optional filters
-        date_str = self.request.GET.get("date")
-        if date_str:
-            qs = qs.filter(date=date_str)  # DateField expects YYYY-MM-DD
+    def get_queryset(self):
+        qs = self.base_scope()
+        date_str = self.request.GET.get("date", "").strip()
+        q = self.request.GET.get("q", "").strip()
 
-        q = self.request.GET.get("q")
-        if q:
-            qs = qs.filter(boxer__name__icontains=q)
+        if date_str and not q:
+            # Case 3: only present attendances for the given date
+            qs = qs.filter(date=date_str, is_present=True)
 
+        elif not date_str and q:
+            # Case 2: only present attendances for that boxer across all days
+            qs = qs.filter(boxer__name__icontains=q, is_present=True)
+
+        elif date_str and q:
+            # Case 4: sentence mode → no list
+            qs = qs.none()
+
+        # Case 1 (no date, no q): return all attendances
         return qs.distinct()
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx.setdefault("today", timezone.localdate())
-        ctx["q"] = self.request.GET.get("q", "")
-        ctx["date"] = self.request.GET.get("date", "")
+        date_str = self.request.GET.get("date", "").strip()
+        q = self.request.GET.get("q", "").strip()
+
+        ctx["q"] = q
+        ctx["date"] = date_str
+        ctx["today"] = timezone.localdate()
+
+        # Case 4: both date + name → build presence sentence
+        if date_str and q:
+            scoped = self.base_scope().filter(date=date_str, boxer__name__icontains=q)
+            was_present = scoped.filter(is_present=True).exists()
+            excused = scoped.filter(is_present=False, is_excused=True).exists()
+
+            ctx["presence_mode"] = True
+            ctx["presence_name"] = q
+            ctx["presence_date"] = date_str
+
+            if was_present:
+                ctx["presence_status"] = "present"
+            elif excused:
+                ctx["presence_status"] = "excused"
+            else:
+                ctx["presence_status"] = "absent"
+        else:
+            ctx["presence_mode"] = False
+
         return ctx
 
+
+
+def parse_iso_date_or_today(s: str | None) -> date:
+    try:
+        if s:
+            return date.fromisoformat(s)  # expects 'YYYY-MM-DD'
+    except Exception:
+        pass
+    return timezone.localdate()
 class MarkAttendanceView(LoginRequiredMixin, TemplateView):
     template_name = "attendance/mark_attendance.html"
 
     # ---------- helpers ----------
     def _target_date(self):
-        d = parse_date(self.request.GET.get("date") or self.request.POST.get("date") or "")
-        return d or date.today()
+        """Return the target date as a date object, fallback to today."""
+        raw = self.request.GET.get("date") or self.request.POST.get("date")
+        parsed = parse_date(raw) if raw else None
+        return parsed or timezone.localdate()
 
     def _selected_class(self, gym):
-        # use class_id (NOT "class")
+        """Return the selected ClassTemplate object or None."""
         cid = self.request.GET.get("class_id") or self.request.POST.get("class_id")
         if not cid:
             return None
         try:
             return ClassTemplate.objects.get(id=int(cid), gym=gym)
-        except Exception:
+        except (ClassTemplate.DoesNotExist, ValueError, TypeError):
             return None
 
     def _scoped_boxers_qs(self, gym, class_obj=None):
+        """Restrict boxers to the gym or all if superuser; optionally filter by class enrollment."""
         qs = Boxer.objects.all() if self.request.user.is_superuser else Boxer.objects.filter(gym=gym)
         return qs.filter(enrollments__template=class_obj) if class_obj else qs
 
     def _preserve_redirect(self, class_obj, target_date):
+        """Redirect back to mark_attendance with current filters preserved."""
         url = reverse("mark_attendance")
         params = []
         if class_obj:
@@ -477,6 +527,16 @@ class MarkAttendanceView(LoginRequiredMixin, TemplateView):
         if target_date:
             params.append(f"date={target_date.isoformat()}")
         return url + ("?" + "&".join(params) if params else "")
+
+    def _day_bounds(self, d: date):
+        """Return timezone-aware [start, end) datetimes for day d."""
+        tz = timezone.get_current_timezone()
+        start = datetime.combine(d, dt_time.min)
+        end = start + timedelta(days=1)
+        if timezone.is_naive(start):
+            start = timezone.make_aware(start, tz)
+            end = timezone.make_aware(end, tz)
+        return start, end
 
     # ---------- GET ----------
     def get_context_data(self, **kwargs):
@@ -502,7 +562,7 @@ class MarkAttendanceView(LoginRequiredMixin, TemplateView):
             "attendance_map": present_ids,
             "class_create_form": ClassCreateForm(request=self.request),
             "enroll_form": EnrollBoxerForm(request=self.request, template=selected_class) if selected_class else None,
-            "unenroll_form": UnenrollForm(),  # convenience instance if you render one
+            "unenroll_form": UnenrollForm(),
         })
         return ctx
 
@@ -528,7 +588,7 @@ class MarkAttendanceView(LoginRequiredMixin, TemplateView):
                 Enrollment.objects.get_or_create(template=selected_class, boxer=form.cleaned_data["boxer"])
             return redirect(self._preserve_redirect(selected_class, target_date))
 
-        # C) Unenroll boxer  <-- REMOVE button handlers land here
+        # C) Unenroll boxer
         if action == "unenroll" and selected_class:
             try:
                 boxer_id = int(request.POST.get("boxer_id"))
@@ -538,11 +598,15 @@ class MarkAttendanceView(LoginRequiredMixin, TemplateView):
             return redirect(self._preserve_redirect(selected_class, target_date))
 
         # D) Save attendance
+        # For new/updated weights, we use midday as the measured_at time.
         measured_dt = datetime.combine(target_date, dt_time(hour=12, minute=0))
         if timezone.is_naive(measured_dt):
             measured_dt = timezone.make_aware(measured_dt, timezone.get_current_timezone())
 
-        # detect excused field
+        # Day bounds for safe range queries (avoid __date on SQLite)
+        day_start, day_end = self._day_bounds(target_date)
+
+        # Detect excused field dynamically
         excused_field = None
         for fname in ("is_excused", "excused", "excused_absence"):
             try:
@@ -559,16 +623,15 @@ class MarkAttendanceView(LoginRequiredMixin, TemplateView):
             has_weight_input = bool(raw_weight)
             excused_flag = f"excused_{boxer.id}" in request.POST
 
-            mark_row = False
-            is_present = False
+            mark_row, is_present = False, False
             if status == "Present":
-                is_present = True; mark_row = True
+                is_present, mark_row = True, True
             elif status == "Absent":
-                is_present = False; mark_row = True
+                is_present, mark_row = False, True
             elif status is None and has_weight_input:
                 try:
                     if float(raw_weight) > 0:
-                        is_present = True; mark_row = True
+                        is_present, mark_row = True, True
                 except (TypeError, ValueError):
                     pass
             if not mark_row:
@@ -577,13 +640,14 @@ class MarkAttendanceView(LoginRequiredMixin, TemplateView):
             defaults = {"is_present": is_present}
             if excused_field:
                 defaults[excused_field] = bool(excused_flag) and not is_present
+
             Attendance.objects.update_or_create(
                 boxer=boxer, date=target_date, defaults=defaults
             )
 
-            # weight handling
+            # Weight handling (using day range instead of __date)
             if (status == "Absent") or (is_present and not has_weight_input):
-                Weight.objects.filter(boxer=boxer, measured_at__date=target_date).delete()
+                Weight.objects.filter(boxer=boxer, measured_at__gte=day_start, measured_at__lt=day_end).delete()
                 continue
 
             if is_present and has_weight_input:
@@ -594,14 +658,14 @@ class MarkAttendanceView(LoginRequiredMixin, TemplateView):
                 if kg is not None:
                     with transaction.atomic():
                         existing = Weight.objects.filter(
-                            boxer=boxer, measured_at__date=target_date
+                            boxer=boxer, measured_at__gte=day_start, measured_at__lt=day_end
                         ).order_by("-measured_at").first()
                         if existing:
                             existing.kg = kg
                             existing.measured_at = measured_dt
                             existing.save(update_fields=["kg", "measured_at"])
                             Weight.objects.filter(
-                                boxer=boxer, measured_at__date=target_date
+                                boxer=boxer, measured_at__gte=day_start, measured_at__lt=day_end
                             ).exclude(pk=existing.pk).delete()
                         else:
                             Weight.objects.create(
@@ -653,55 +717,96 @@ def delete_attendance(request, attendance_id):
     messages.success(request, "Attendance record deleted.")
     return redirect('attendance_list')
 
-class BoxerReportView(LoginRequiredMixin, DetailView):
-    model = Boxer
-    template_name = "boxers/boxer_report.html"
-    context_object_name = "boxer"
-    pk_url_kwarg = "boxer_id"
+class BoxerReportView(LoginRequiredMixin, TemplateView):
+    template_name = "boxers/boxer_report.html"  # adjust to your path
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        boxer = self.get_object()
 
-        # latest weight for the same calendar date as Attendance.date
-        latest_weight_qs = (
-            Weight.objects
-            .filter(boxer=boxer, measured_at__date=OuterRef("date"))
-            .order_by("-measured_at")
-            .values("kg")[:1]
-        )
+        # 1) Load boxer (pk or uuid as you use it)
+        boxer_id = self.kwargs.get("boxer_id")
+        boxer = get_object_or_404(Boxer, pk=boxer_id)
+        # (If you use uuid route, adapt accordingly:
+        # boxer = get_object_or_404(Boxer, uuid=self.kwargs["uuid"]))
 
-        attendance_qs = (
-            Attendance.objects
-            .filter(boxer=boxer)
-            .annotate(weight_kg=Subquery(latest_weight_qs))
-            .order_by("date")
-        )
+        # 2) Attendance queryset (no date casts/annotates)
+        att_qs = Attendance.objects.filter(boxer=boxer).order_by("-date")
 
-        total = attendance_qs.count()
-        present = attendance_qs.filter(is_present=True).count()
-        excused = attendance_qs.filter(is_present=False, is_excused=True).count()
-        absent_unexcused = attendance_qs.filter(is_present=False, is_excused=False).count()
-        absent = excused + absent_unexcused
+        # 3) Detect excused field name once (supports legacy schemas)
+        excused_field = None
+        for fname in ("is_excused", "excused", "excused_absence"):
+            if hasattr(Attendance, fname):
+                excused_field = fname
+                break
 
-        present_pct = round((present / total) * 100, 1) if total else 0
-        absent_pct = round((absent / total) * 100, 1) if total else 0
-        excused_pct_of_abs = round((excused / absent) * 100, 1) if absent else 0
-        excused_triplets = excused // 3
-        score = present - absent_unexcused - excused_triplets
+        # 4) Summary counts (plain filters; no DB functions)
+        att_total = att_qs.count()
+        att_present = att_qs.filter(is_present=True).count()
+        att_absent = att_qs.filter(is_present=False).count()
+        att_excused = att_qs.filter(**{excused_field: True}).count() if excused_field else 0
+
+        def pct(n, d):
+            return round((n * 100.0) / d, 1) if d else 0.0
+
+        att_present_pct = pct(att_present, att_total)
+        att_absent_pct = pct(att_absent, att_total)
+        att_excused_pct_of_abs = pct(att_excused, att_absent)
+
+        # 5) Build a safe "latest weight per day" map in Python (no __date lookups)
+        #    We iterate ordered by measured_at so later entries overwrite earlier ones.
+        weight_by_day = {}
+        for w in Weight.objects.filter(boxer=boxer).order_by("measured_at"):
+            try:
+                # guard in case any legacy row has a bad measured_at
+                day = w.measured_at.date()
+            except Exception:
+                continue
+            weight_by_day[day] = w.kg
+
+        # 6) Compose rows for the template (join by date in Python)
+        rows = []
+        for a in att_qs:
+            rows.append({
+                "date": a.date,
+                "is_present": a.is_present,
+                "is_excused": (getattr(a, excused_field, False) if excused_field else False),
+                "weight_kg": weight_by_day.get(a.date),  # None if none recorded that day
+            })
 
         ctx.update({
-            "attendance": attendance_qs,
-            "att_total": total,
-            "att_present": present,
-            "att_absent": absent,
-            "att_excused": excused,
-            "att_present_pct": present_pct,
-            "att_absent_pct": absent_pct,
-            "att_excused_pct_of_abs": excused_pct_of_abs,
-            "att_excused_triplets": excused_triplets,
-            "att_score": score,
+            "boxer": boxer,
+            "attendance": rows,              # you can keep your template variable name
+            "att_total": att_total,
+            "att_present": att_present,
+            "att_absent": att_absent,
+            "att_excused": att_excused,
+            "att_present_pct": att_present_pct,
+            "att_absent_pct": att_absent_pct,
+            "att_excused_pct_of_abs": att_excused_pct_of_abs,
         })
+        return ctx
+
+class BoxerClassesView(LoginRequiredMixin, DetailView):
+    template_name = "boxers/boxer_classes.html"
+    model = Boxer
+    context_object_name = "boxer"
+    pk_url_kwarg = "boxer_id"
+
+    def get_queryset(self):
+        # keep gym scoping similar to the rest of your app
+        if self.request.user.is_superuser:
+            return Boxer.objects.all()
+        gym = user_gym(self.request)
+        return Boxer.objects.filter(gym=gym)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        boxer = self.object
+        ctx["classes"] = (
+            ClassTemplate.objects
+            .filter(enrollments__boxer=boxer)
+            .order_by("title")
+        )
         return ctx
 
 @login_required
@@ -1017,6 +1122,12 @@ class WeightDetailView(LoginRequiredMixin, TemplateView):
 from .models import TestResult
 from .utils import user_gym, resolve_boxer
 
+from decimal import Decimal
+from django.db.models import Exists, OuterRef, Q
+from django.shortcuts import get_object_or_404
+from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 class TestRankingView(LoginRequiredMixin, TemplateView):
     template_name = "tests/tests_rankings.html"
 
@@ -1033,7 +1144,6 @@ class TestRankingView(LoginRequiredMixin, TemplateView):
     def _lower_is_better(self, test):
         """Return True if lower values should rank higher for this test."""
         u = (getattr(test, "unit", "") or "").strip().lower()
-        # Treat seconds/time units as lower-is-better
         time_units = {
             "s", "sec", "secs", "second", "seconds",
             "ms", "millisecond", "milliseconds",
@@ -1042,11 +1152,10 @@ class TestRankingView(LoginRequiredMixin, TemplateView):
         }
         if u in time_units:
             return True
-        # Distances like m, cm -> higher is better (descending)
-        if u in {"m", "meter", "meters", "metre", "metres", "cm", "centimeter", "centimeters", "centimetre", "centimetres"}:
+        if u in {"m", "meter", "meters", "metre", "metres", "cm", "centimeter",
+                 "centimeters", "centimetre", "centimetres"}:
             return False
-        # Default: higher is better
-        return False
+        return False  # default: higher is better
 
     def get(self, request, *args, **kwargs):
         gym = user_gym(request)
@@ -1054,25 +1163,13 @@ class TestRankingView(LoginRequiredMixin, TemplateView):
 
         tests = BatteryTest.objects.all().order_by("display_order", "name")
 
-        raw_phase = (request.GET.get("phase") or "").strip().lower() or "all"
-        legacy = {"pre": "prep", "mid": "build", "before": "peak"}
-        raw_phase = legacy.get(raw_phase, raw_phase)
-
-        base_phase_choices = getattr(
-            TestResult, "PHASE_CHOICES",
-            (("prep", "Preparation"), ("build", "Build"), ("peak", "Peak"))
-        )
-        valid_phases = {v for v, _ in base_phase_choices} | {"all"}
-        selected_phase = raw_phase if raw_phase in valid_phases else "all"
-
+        # Pick selected test (by URL kwarg or ?test=) or first test that has results
         selected_test = None
         test_id = kwargs.get("test_id") or request.GET.get("test")
         if test_id:
             selected_test = get_object_or_404(BatteryTest, pk=int(test_id))
         else:
             exists_qs = TestResult.objects.filter(test=OuterRef("pk"), boxer__in=boxers_qs)
-            if selected_phase != "all":
-                exists_qs = exists_qs.filter(phase=selected_phase)
             selected_test = (
                 tests.annotate(has_results=Exists(exists_qs))
                      .filter(has_results=True)
@@ -1082,8 +1179,6 @@ class TestRankingView(LoginRequiredMixin, TemplateView):
         rows = []
         if selected_test:
             res_qs = TestResult.objects.filter(test=selected_test, boxer__in=boxers_qs)
-            if selected_phase != "all":
-                res_qs = res_qs.filter(phase=selected_phase)
 
             lower_is_better = self._lower_is_better(selected_test)
 
@@ -1101,24 +1196,14 @@ class TestRankingView(LoginRequiredMixin, TemplateView):
 
                 best = min(vals) if lower_is_better else max(vals)
                 cur = by_boxer.get(r.boxer_id)
-                if cur is None:
-                    by_boxer[r.boxer_id] = {"boxer": r.boxer, "best": best, "phase": r.phase}
-                else:
-                    # keep the better result per boxer according to the rule
-                    if (lower_is_better and best < cur["best"]) or (not lower_is_better and best > cur["best"]):
-                        cur.update({"best": best, "phase": r.phase})
+                if cur is None or (lower_is_better and best < cur["best"]) or (not lower_is_better and best > cur["best"]):
+                    by_boxer[r.boxer_id] = {"boxer": r.boxer, "best": best}
 
             rows = sorted(by_boxer.values(), key=lambda d: d["best"], reverse=not lower_is_better)
-
-        phase_map = dict(base_phase_choices)
-        for d in rows:
-            d["phase_label"] = phase_map.get(d["phase"], d["phase"])
 
         ctx = {
             "tests": tests,
             "selected_test": selected_test,
-            "selected_phase": selected_phase,
-            "phase_choices": tuple(list(base_phase_choices) + [("all", "All phases")]),
             "rows": rows,
         }
         return self.render_to_response(ctx)
@@ -1169,17 +1254,23 @@ def user_can_view_boxer(user, boxer):
 
 
 class ParentHomeView(LoginRequiredMixin, TemplateView):
-    template_name = 'parent/home.html'
+    template_name = "parent/home.html"
 
-    def get(self, request, *args, **kwargs):
-        children = []
-        try:
-            profile = request.user.parent_profile  # safe: wrapped in try/except
-            children = profile.children.select_related('coach').order_by('name')
-        except ParentProfile.DoesNotExist:
-            pass
-        return render(request, self.template_name, {'children': children})
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
 
+        # Example scope: all boxers in the user's gym (adjust to your needs)
+        gym = user_gym(self.request)
+
+        qs = Boxer.objects.all()
+        if not self.request.user.is_superuser and gym:
+            qs = qs.filter(gym=gym)
+
+        # ✅ Valid relational loading:
+        qs = qs.select_related("gym").prefetch_related("coaches")  # or "gym__coaches" if coaches are on Gym
+
+        ctx["boxers"] = qs.order_by("name")
+        return ctx
 
 class ParentAttendanceView(LoginRequiredMixin, TemplateView):
     template_name = 'parent/attendance.html'
@@ -1205,6 +1296,7 @@ class WeightProgressView(LoginRequiredMixin, TemplateView):
             or (gym and boxer.gym_id == getattr(gym, "id", None))
             or (gym and boxer.shared_with_gyms.filter(id=gym.id).exists())
             or boxer.coaches.filter(id=self.request.user.id).exists()
+            or ParentProfile.objects.filter(user=self.request.user, children=boxer).exists()
         )
         if not allowed:
             ctx.update({"boxer": boxer, "rows": [], "fw_error": "Not allowed"})
@@ -1214,16 +1306,16 @@ class WeightProgressView(LoginRequiredMixin, TemplateView):
         by_day = {}
         for w in Weight.objects.filter(boxer=boxer).order_by("measured_at"):
             day = w.measured_at.date()
-            by_day[day] = w.kg  # later entries overwrite earlier ones
+            by_day[day] = w.kg
 
         rows = [{"date": d, "weight": by_day[d]} for d in sorted(by_day)]
 
         vals = [r["weight"] for r in rows if r["weight"] is not None]
         min_w = min(vals) if vals else None
         max_w = max(vals) if vals else None
-        diff  = (max_w - min_w) if (min_w is not None and max_w is not None) else None
+        diff = (max_w - min_w) if (min_w is not None and max_w is not None) else None
+        avg_w = (sum(vals) / len(vals)) if vals else None  # ✅ average
 
-        # fighting weight unchanged...
         fw_raw = (self.request.GET.get("fighting_weight") or "").strip()
         fighting_weight, fw_error, count_above_fw = None, None, None
         if fw_raw:
@@ -1239,6 +1331,7 @@ class WeightProgressView(LoginRequiredMixin, TemplateView):
             "min_w": min_w,
             "max_w": max_w,
             "diff": diff,
+            "avg_w": avg_w,                     # ✅ send average
             "fighting_weight": fighting_weight,
             "count_above_fw": count_above_fw,
             "fw_error": fw_error,
@@ -1305,33 +1398,32 @@ def api_calendar_sessions(request):
     if not start or not end:
         return HttpResponseBadRequest("start and end (YYYY-MM-DD) required")
 
-    _ensure_sessions_for_range(gym, start, end)
-    sessions = (ClassSession.objects
-                .filter(gym=gym, is_cancelled=False,
-                        starts_at__date__gte=start, starts_at__date__lte=end)
-                .select_related("template")
-                .order_by("starts_at"))
+    # sessions in date range
+    sessions = (
+        ClassSession.objects
+        .filter(gym=gym, start__date__gte=start, start__date__lte=end)
+        .select_related("template")
+        .order_by("start")
+    )
 
     payload = []
     for s in sessions:
-        present = SessionAttendance.objects.filter(session=s, status="present").count()
-        # enrolled at that session date
-        sess_day = s.starts_at.date()
-        enrolled = (Enrollment.objects
-                    .filter(template=s.template,
-                            active_from__lte=sess_day)
-                    .filter(models.Q(active_until__isnull=True) |
-                            models.Q(active_until__gte=sess_day))
-                    .count())
+        # count present boxers for this session
+        present = Attendance.objects.filter(session=s, is_present=True).count()
+
+        # enrolled boxers for that template (simplified — you may add active_from/active_until later)
+        enrolled = Enrollment.objects.filter(template=s.template).count()
+
         payload.append({
             "id": s.id,
-            "title": s.template.title,
-            "start": s.starts_at.isoformat(),
-            "end": s.ends_at.isoformat(),
-            "location": s.template.location,
+            "title": s.title or s.template.title,
+            "start": s.start.isoformat(),
+            "end": s.end.isoformat(),
+            "location": s.location or s.template.gym.location,
             "present_count": present,
             "enrolled_count": enrolled,
         })
+
     return JsonResponse({"sessions": payload})
 
 
@@ -1374,52 +1466,48 @@ def api_attendance_upsert(request):
 
     session_id = request.POST.get("session_id")
     boxer_id   = request.POST.get("boxer_id")
-    status     = request.POST.get("status")    # 'present' | 'absent' | 'excused' | None
+    status     = request.POST.get("status")    # 'present' | 'absent' | 'excused'
     weight_raw = request.POST.get("weight")    # optional decimal
 
     session = get_object_or_404(ClassSession, id=session_id, gym=gym)
     boxer   = get_object_or_404(Boxer, id=boxer_id, gym=gym)
 
-    # Upsert per-session attendance (shared across coaches)
-    sa, _ = SessionAttendance.objects.get_or_create(
+    # Upsert attendance for this session
+    att, _ = Attendance.objects.get_or_create(
         session=session,
         boxer=boxer,
-        defaults={"status": "present", "marked_by": request.user},
+        defaults={"is_present": False, "is_excused": False},
     )
 
-    if status:
-        sa.status = status
+    # Map status to fields
+    if status == "present":
+        att.is_present = True
+        att.is_excused = False
+    elif status == "excused":
+        att.is_present = False
+        att.is_excused = True
+    elif status == "absent":
+        att.is_present = False
+        att.is_excused = False
 
-    # “weight = presence” rule + mirror into legacy daily Attendance
+    # Handle weight input → force presence
     if weight_raw not in (None, ""):
         try:
             weight_val = Decimal(weight_raw)
         except Exception:
             return HttpResponseBadRequest("Invalid weight")
 
-        sa.weight = weight_val
-        sa.status = "present"
-        sa.marked_by = request.user
-
-        att_date = session.starts_at.date()
-        att, _ = Attendance.objects.get_or_create(
-            boxer=boxer,
-            date=att_date,
-            defaults={"weight": weight_val, "is_present": True, "is_excused": False},
-        )
-        # Update existing daily record too
-        att.weight = weight_val
+        att.weight = weight_val  # if you have a weight field on Attendance
         att.is_present = True
         att.is_excused = False
-        att.save()
 
-    sa.marked_by = request.user
-    sa.save()
+    att.save()
 
     return JsonResponse({
         "ok": True,
-        "status": sa.status,
-        "weight": str(sa.weight) if sa.weight is not None else None,
+        "is_present": att.is_present,
+        "is_excused": att.is_excused,
+        "weight": str(getattr(att, "weight", None)) if hasattr(att, "weight") else None,
     })
 
 class GymCreateView(LoginRequiredMixin, CreateView):
@@ -1509,31 +1597,40 @@ class BoxerTestsView(LoginRequiredMixin, TemplateView):
         sel_test_id = self.request.GET.get("test")
         selected_test = get_object_or_404(tests, pk=sel_test_id) if sel_test_id else tests.first()
 
-        labels, values = [], []
-        summary = []  # <-- per-date averaged rows for the text block
+        labels, values, summary = [], [], []
 
         if selected_test:
             qs = (
                 TestResult.objects
                 .filter(boxer=boxer, test=selected_test)
                 .annotate(day=TruncDate("measured_at"))
-                .values("day")
-                .annotate(
-                    avg1=Avg("value1"),
-                    avg2=Avg("value2"),
-                    avg3=Avg("value3"),
-                )
+                .values("day", "value1", "value2", "value3", "notes")
                 .order_by("day")
             )
+
+            grouped = defaultdict(list)
             for row in qs:
-                nums = [x for x in (row["avg1"], row["avg2"], row["avg3"]) if x is not None]
-                if not nums:
-                    continue
-                avg = sum(nums) / len(nums)
-                d = row["day"]  # a date object
-                labels.append(d.strftime("%Y-%m-%d"))
-                values.append(float(avg))
-                summary.append({"date": d, "avg": avg})  # <-- add for text
+                grouped[row["day"]].append(row)
+
+            for d, items in grouped.items():
+                nums, notes = [], []
+                for item in items:
+                    for v in (item["value1"], item["value2"], item["value3"]):
+                        if v is not None:
+                            nums.append(v)
+                    if item["notes"]:
+                        notes.append(item["notes"])
+
+                avg = sum(nums) / len(nums) if nums else None
+                if avg is not None:
+                    labels.append(d.strftime("%Y-%m-%d"))
+                    values.append(float(avg))
+
+                summary.append({
+                    "date": d,
+                    "avg": avg,
+                    "notes": notes,
+                })
 
         ctx.update({
             "boxer": boxer,
@@ -1542,48 +1639,110 @@ class BoxerTestsView(LoginRequiredMixin, TemplateView):
             "unit": (selected_test.unit if selected_test else ""),
             "labels": labels,
             "values": values,
-            "summary": summary,  # <-- expose to template
-            "show_text": self.request.GET.get("show") == "1",
+            "summary": summary,
         })
         return ctx
+
 
 class BulkBoxerCreateView(LoginRequiredMixin, View):
     template_name = "boxers/bulk_add.html"
 
     def get(self, request):
-        # show 10 empty rows
-        FormSet = formset_factory(BulkBoxerForm, extra=10, can_delete=True)
+        # Start with 8 empty rows
+        FormSet = formset_factory(BulkBoxerForm, extra=8, can_delete=True)
         formset = FormSet()
         return render(request, self.template_name, {"formset": formset})
 
     def post(self, request):
+        # Use can_delete=True; JS toggles the hidden DELETE field on remove
         FormSet = formset_factory(BulkBoxerForm, extra=0, can_delete=True)
         formset = FormSet(request.POST)
+
+        gym = user_gym(request)
         if not formset.is_valid():
             return render(request, self.template_name, {"formset": formset})
 
-        gym = user_gym(request)
-        created = 0
+        existing_qs = Boxer.objects.filter(gym=gym)
+
+        seen_keys = set()
+        had_errors = False
+        rows_to_create = []
 
         for form in formset:
-            if form.cleaned_data.get("DELETE"):
-                continue
-            if form.cleaned_data.get("_empty_row"):
+            cd = form.cleaned_data or {}
+
+            # UI remove → hidden DELETE
+            if cd.get("DELETE"):
                 continue
 
-            fn = (form.cleaned_data.get("first_name") or "").strip()
-            ln = (form.cleaned_data.get("last_name") or "").strip()
-            parent = (form.cleaned_data.get("parent_name") or "").strip()
-            dob = form.cleaned_data.get("date_of_birth")
+            fn = (cd.get("first_name") or "").strip()
+            ln = (cd.get("last_name") or "").strip()
+            parent = (cd.get("parent_name") or "").strip()
+            dob = cd.get("date_of_birth")
 
-            name = (fn + " " + ln).strip()
+            # Skip truly empty rows
+            if not any([fn, ln, parent, dob]):
+                continue
+
+            # Require first name if anything filled
+            if not fn:
+                form.add_error("first_name", "First name is required.")
+                had_errors = True
+                continue
+
+            full_name = (fn + " " + ln).strip()
+
+            # Only first name & ambiguous → require more info
+            if not ln and not parent and not dob:
+                ambiguous = existing_qs.filter(Q(name__iexact=fn) | Q(name__istartswith=fn + " ")).exists()
+                if ambiguous:
+                    form.add_error("last_name", "Add last name, parent or birth date to differentiate from existing boxers.")
+                    had_errors = True
+                    continue
+
+            # Full name exists → require parent or DOB; block exact duplicate
+            if ln:
+                same_name_qs = existing_qs.filter(name__iexact=full_name)
+                if same_name_qs.exists():
+                    exact_parent = parent and same_name_qs.filter(parent_name__iexact=parent).exists()
+                    exact_dob = dob and same_name_qs.filter(date_of_birth=dob).exists()
+
+                    if (parent and exact_parent) or (dob and exact_dob):
+                        form.add_error(None, f"A boxer named “{full_name}” with these details already exists.")
+                        had_errors = True
+                        continue
+
+                    if not parent and not dob:
+                        form.add_error("parent_name", "Add parent or birth date to differentiate from an existing boxer with the same name.")
+                        had_errors = True
+                        continue
+
+            # Block duplicates within this submission
+            key = (fn.lower(), ln.lower(), parent.lower(), dob.isoformat() if dob else None)
+            if key in seen_keys:
+                form.add_error(None, "Duplicate of another row in this submission.")
+                had_errors = True
+                continue
+            seen_keys.add(key)
+
+            rows_to_create.append((full_name, parent, dob))
+
+        if had_errors:
+            return render(request, self.template_name, {"formset": formset})
+
+        created = 0
+        for full_name, parent, dob in rows_to_create:
             Boxer.objects.create(
-                name=name,
-                parent_name=parent,
+                name=full_name,
+                parent_name=parent or "",
                 date_of_birth=dob,
                 gym=gym,
             )
             created += 1
 
-        messages.success(request, f"Added {created} boxer(s).")
-        return redirect("mark_attendance")  # or 'boxer_list' if you prefer
+        # ✅ Your exact message format
+        messages.success(
+            request,
+             f"{created} boxer{'s were' if created != 1 else ' was'} added to {gym}."
+        )
+        return redirect("mark_attendance")
