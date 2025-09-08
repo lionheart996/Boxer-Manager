@@ -39,7 +39,12 @@ class Boxer(models.Model):
     date_of_birth = models.DateField(blank=True, null=True)  # Birthday (optional)
     parent_name = models.CharField(max_length=120, blank=True, default="")  # Display only
 
-    gym = models.ForeignKey("Gym", on_delete=models.PROTECT, related_name="boxers")
+    gym = models.ForeignKey("Gym",
+                            on_delete=models.PROTECT,
+                            null=True,
+                            blank=True,
+                            related_name="boxers"
+                            )
     coaches = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name="coached_boxers")
     shared_with_gyms = models.ManyToManyField("Gym", blank=True, related_name="shared_boxers")
 
@@ -53,10 +58,10 @@ class Boxer(models.Model):
     def __str__(self) -> str:
         return self.name
 
-
 # ======================
 # Tests
 # ======================
+
 class BatteryTest(models.Model):
     name = models.CharField(max_length=255)
     display_order = models.IntegerField(default=0)
@@ -110,35 +115,6 @@ class TestResult(models.Model):
     def __str__(self) -> str:
         return f"{self.boxer.name} – {self.test.name} – {self.value}"
 
-
-# ======================
-# Attendance & Vital signs
-# ======================
-
-
-class HeartRate(models.Model):
-    boxer = models.ForeignKey("BoxersPresenceApp.Boxer", on_delete=models.CASCADE, related_name="heart_rates")
-    measured_at = models.DateTimeField(db_index=True)
-    bpm = models.PositiveIntegerField()
-    notes = models.TextField(blank=True, default="")
-
-    class Meta:
-        ordering = ["-measured_at"]
-
-    def __str__(self):
-        return f"{self.boxer} — {self.bpm} bpm @ {self.measured_at:%Y-%m-%d %H:%M}"
-
-class Weight(models.Model):
-    boxer = models.ForeignKey("Boxer", on_delete=models.CASCADE, related_name="weights")
-    measured_at = models.DateTimeField(default=timezone.now)
-    kg = models.DecimalField(max_digits=6, decimal_places=2)
-
-    class Meta:
-        ordering = ["-measured_at"]
-
-    def __str__(self):
-        return f"{self.boxer.name} – {self.kg} kg on {self.measured_at:%Y-%m-%d}"
-
 # ======================
 # Parents
 # ======================
@@ -153,7 +129,6 @@ class ParentProfile(models.Model):
 
     def __str__(self):
         return f"Parent: {self.user.get_username()}"
-
 
 # ======================
 # Classes / Sessions
@@ -191,6 +166,32 @@ class ClassSession(models.Model):
     def __str__(self):
         return f"{self.title} – {self.start:%Y-%m-%d %H:%M}"
 
+# ======================
+# Attendance & Vital signs
+# ======================
+
+class HeartRate(models.Model):
+    boxer = models.ForeignKey("BoxersPresenceApp.Boxer", on_delete=models.CASCADE, related_name="heart_rates")
+    measured_at = models.DateTimeField(db_index=True)
+    bpm = models.PositiveIntegerField()
+    notes = models.TextField(blank=True, default="")
+
+    class Meta:
+        ordering = ["-measured_at"]
+
+    def __str__(self):
+        return f"{self.boxer} — {self.bpm} bpm @ {self.measured_at:%Y-%m-%d %H:%M}"
+
+class Weight(models.Model):
+    boxer = models.ForeignKey("Boxer", on_delete=models.CASCADE, related_name="weights")
+    measured_at = models.DateTimeField(default=timezone.now)
+    kg = models.DecimalField(max_digits=6, decimal_places=2)
+
+    class Meta:
+        ordering = ["-measured_at"]
+
+    def __str__(self):
+        return f"{self.boxer.name} – {self.kg} kg on {self.measured_at:%Y-%m-%d}"
 class Attendance(models.Model):
     boxer = models.ForeignKey(Boxer, on_delete=models.CASCADE, related_name="attendance")
     date = models.DateField(default=timezone.now)
@@ -213,21 +214,9 @@ class Attendance(models.Model):
     def __str__(self) -> str:
         return f"{self.boxer.name} – {self.date} – {self.session} – {'P' if self.is_present else 'A'}"
 
-
 class Enrollment(models.Model):
     boxer = models.ForeignKey(Boxer, on_delete=models.CASCADE, related_name="enrollments")
     template = models.ForeignKey(ClassTemplate, on_delete=models.CASCADE, related_name="enrollments")
 
     class Meta:
         unique_together = ("boxer", "template")
-
-# class SessionAttendance(models.Model):
-#     session = models.ForeignKey(ClassSession, on_delete=models.CASCADE, related_name="attendances")
-#     boxer = models.ForeignKey(Boxer, on_delete=models.CASCADE, related_name="session_attendance")
-#     present = models.BooleanField(default=False)
-#     excused = models.BooleanField(default=False)
-#
-#     class Meta:
-#         unique_together = ("session", "boxer")
-
-
