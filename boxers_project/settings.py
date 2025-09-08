@@ -43,6 +43,24 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+                "BoxersPresenceApp.context_processors.role_flags",
+            ],
+        },
+    },
+]
+
+
 ROOT_URLCONF = 'boxers_project.urls'
 WSGI_APPLICATION = 'boxers_project.wsgi.application'
 ASGI_APPLICATION = 'boxers_project.asgi.application'  # harmless; good if you ever use ASGI features
