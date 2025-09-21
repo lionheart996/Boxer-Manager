@@ -1,0 +1,8 @@
+Django>=5.0,<6.0
+djangorestframework
+uvicorn
+gunicorn
+whitenoise
+dj-database-url
+psycopg2-binary
+python-dotenv
