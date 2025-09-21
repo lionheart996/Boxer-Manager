@@ -74,12 +74,21 @@ WSGI_APPLICATION = 'boxers_project.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-if DATABASE_URL:
+
+if DATABASE_URL and "render.com" in DATABASE_URL:
     DATABASES = {
         "default": dj_database_url.config(
             default=DATABASE_URL,
-            conn_max_age=600,     # keep-alive connections
-            ssl_require=True,     # Render Postgres requires SSL
+            conn_max_age=600,
+            ssl_require=True,
+        )
+    }
+elif DATABASE_URL:
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=False,
         )
     }
 else:
