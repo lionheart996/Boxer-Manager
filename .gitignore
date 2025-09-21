@@ -22,3 +22,18 @@ Thumbs.db
 # Static build outputs
 staticfiles/
 media/
+
+# Virtual environments
+.venv/
+env/
+
+# Environment files
+.env
+
+# Archives / dumps
+*.zip
+*.dump
+*.json
+
+# Render / deploy artifacts
+*.bak
