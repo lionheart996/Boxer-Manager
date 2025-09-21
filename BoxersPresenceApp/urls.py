@@ -27,6 +27,8 @@ urlpatterns = [
     path('boxers/', views.BoxerListView.as_view(), name='boxer_list'),
     path('boxers/delete/<int:pk>/', views.delete_boxer, name='delete_boxer'),
     path('boxer/<int:boxer_id>/report/', views.BoxerReportView.as_view(), name='boxer_report'),
+    path('boxer/<int:boxer_id>/resume/', views.BoxerResumeView.as_view(), name='boxer_resume'),
+
     path("boxers/<int:boxer_id>/classes/", BoxerClassesView.as_view(), name="boxer_classes"),
     path("boxer/<uuid:uuid>/tests/", BoxerTestsView.as_view(), name="boxer_tests"),
     path("boxers/bulk-add/", views.BulkBoxerCreateView.as_view(), name="boxer_bulk_add"),
@@ -68,7 +70,7 @@ urlpatterns = [
     # Async + API
     path('async/boxers-search/', boxers_search, name='boxers_search'),
     path('api/', include(router.urls)),
-    path("api/calendar/sessions/", views.api_calendar_sessions, name="api_calendar_sessions"),
+    path("api/class/attendance/", views.api_class_attendance, name="api_class_attendance"),
     path("api/calendar/enroll/", views.api_enroll, name="api_enroll"),
     path("api/calendar/attendance/", views.api_attendance_upsert, name="api_attendance_upsert"),
     path('parent/signup/', ParentSignupView.as_view(), name='parent_signup'),

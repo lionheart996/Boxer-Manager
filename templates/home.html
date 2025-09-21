@@ -27,10 +27,13 @@
 
 <!-- Attendance -->
 <div class="grid" style="margin-top:16px; border: 1px solid #00ff66; border-radius: 10px">
-  <div class="card" style="padding-left: 15px">
+  <div class="card" style="padding: 15px; text-align: center;">
     <h3>Mark Attendance</h3>
     <p style="font-style: italic">Quickly mark who’s present today.</p>
-    <p><a class="btn" href="{% url 'mark_attendance' %}">Go</a></p>
+    <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 10px;">
+      <a class="btn" href="{% url 'mark_attendance' %}">Mark</a>
+      <a class="btn " href="{% url 'attendance_list' %}">All Attendance</a>
+    </div>
   </div>
 </div>
 

@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="content-container">
-  <a class="back-link" style = "color: blue" href="{% url 'attendance_list' %}">← Back to Attendance</a>
+     <a class="back-link" style="color: blue"
+   href="{{ request.META.HTTP_REFERER|default:attendance_fallback }}">
+    ← Back
+</a>
   <h2 class="page-title">Weight Progress — {{ boxer.name }}</h2>
 
   <!-- Fighting weight input -->

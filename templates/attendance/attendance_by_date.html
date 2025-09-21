@@ -22,7 +22,7 @@
       <tbody>
         {% for rec in records %}
           <tr>
-            <td>{{ rec.boxer.name }}</td>
+            <td>{{ rec.boxer.first_name }} {{ rec.boxer.last_name }}</td>
             <td>
               {% if rec.is_present %}Present{% else %}Absent{% endif %}
             </td>

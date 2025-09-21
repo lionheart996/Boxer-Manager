@@ -1,0 +1,3434 @@
+[
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 283,
+    "fields": {
+      "boxer": 21,
+      "date": "2025-08-17",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 285,
+    "fields": {
+      "boxer": 21,
+      "date": "2025-08-31",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 292,
+    "fields": {
+      "boxer": 51,
+      "date": "2025-09-01",
+      "is_present": true,
+      "is_excused": false,
+      "session": 21
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 293,
+    "fields": {
+      "boxer": 47,
+      "date": "2025-09-01",
+      "is_present": true,
+      "is_excused": false,
+      "session": 21
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 294,
+    "fields": {
+      "boxer": 39,
+      "date": "2025-09-01",
+      "is_present": true,
+      "is_excused": false,
+      "session": 21
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 295,
+    "fields": {
+      "boxer": 46,
+      "date": "2025-09-01",
+      "is_present": true,
+      "is_excused": false,
+      "session": 21
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 296,
+    "fields": {
+      "boxer": 44,
+      "date": "2025-09-01",
+      "is_present": true,
+      "is_excused": false,
+      "session": 21
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 297,
+    "fields": {
+      "boxer": 48,
+      "date": "2025-09-01",
+      "is_present": true,
+      "is_excused": false,
+      "session": 21
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 298,
+    "fields": {
+      "boxer": 45,
+      "date": "2025-09-01",
+      "is_present": true,
+      "is_excused": false,
+      "session": 21
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 299,
+    "fields": {
+      "boxer": 13,
+      "date": "2025-09-01",
+      "is_present": true,
+      "is_excused": false,
+      "session": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 300,
+    "fields": {
+      "boxer": 5,
+      "date": "2025-09-01",
+      "is_present": true,
+      "is_excused": false,
+      "session": 21
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 301,
+    "fields": {
+      "boxer": 50,
+      "date": "2025-09-01",
+      "is_present": true,
+      "is_excused": false,
+      "session": 21
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 302,
+    "fields": {
+      "boxer": 49,
+      "date": "2025-09-01",
+      "is_present": true,
+      "is_excused": false,
+      "session": 21
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 303,
+    "fields": {
+      "boxer": 4,
+      "date": "2025-09-01",
+      "is_present": true,
+      "is_excused": false,
+      "session": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 304,
+    "fields": {
+      "boxer": 6,
+      "date": "2025-09-01",
+      "is_present": true,
+      "is_excused": false,
+      "session": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 305,
+    "fields": {
+      "boxer": 2,
+      "date": "2025-09-01",
+      "is_present": true,
+      "is_excused": false,
+      "session": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 306,
+    "fields": {
+      "boxer": 9,
+      "date": "2025-09-01",
+      "is_present": false,
+      "is_excused": false,
+      "session": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 307,
+    "fields": {
+      "boxer": 12,
+      "date": "2025-09-01",
+      "is_present": false,
+      "is_excused": false,
+      "session": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 308,
+    "fields": {
+      "boxer": 37,
+      "date": "2025-09-01",
+      "is_present": false,
+      "is_excused": false,
+      "session": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 309,
+    "fields": {
+      "boxer": 31,
+      "date": "2025-09-01",
+      "is_present": true,
+      "is_excused": false,
+      "session": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 310,
+    "fields": {
+      "boxer": 30,
+      "date": "2025-09-01",
+      "is_present": false,
+      "is_excused": false,
+      "session": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 311,
+    "fields": {
+      "boxer": 32,
+      "date": "2025-09-01",
+      "is_present": true,
+      "is_excused": false,
+      "session": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 312,
+    "fields": {
+      "boxer": 35,
+      "date": "2025-09-01",
+      "is_present": true,
+      "is_excused": false,
+      "session": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 313,
+    "fields": {
+      "boxer": 42,
+      "date": "2025-09-01",
+      "is_present": true,
+      "is_excused": false,
+      "session": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 314,
+    "fields": {
+      "boxer": 41,
+      "date": "2025-09-01",
+      "is_present": true,
+      "is_excused": false,
+      "session": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 315,
+    "fields": {
+      "boxer": 4,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 4
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 316,
+    "fields": {
+      "boxer": 6,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 4
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 317,
+    "fields": {
+      "boxer": 2,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 4
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 318,
+    "fields": {
+      "boxer": 9,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 4
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 319,
+    "fields": {
+      "boxer": 12,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 4
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 320,
+    "fields": {
+      "boxer": 37,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 4
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 321,
+    "fields": {
+      "boxer": 31,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 4
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 322,
+    "fields": {
+      "boxer": 30,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 4
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 323,
+    "fields": {
+      "boxer": 32,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 4
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 324,
+    "fields": {
+      "boxer": 35,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 4
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 325,
+    "fields": {
+      "boxer": 42,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 4
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 326,
+    "fields": {
+      "boxer": 41,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 4
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 327,
+    "fields": {
+      "boxer": 13,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 4
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 328,
+    "fields": {
+      "boxer": 80,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 4
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 329,
+    "fields": {
+      "boxer": 79,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 4
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 330,
+    "fields": {
+      "boxer": 51,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 19
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 331,
+    "fields": {
+      "boxer": 47,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 19
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 332,
+    "fields": {
+      "boxer": 39,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 19
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 333,
+    "fields": {
+      "boxer": 46,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 19
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 334,
+    "fields": {
+      "boxer": 44,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 19
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 335,
+    "fields": {
+      "boxer": 48,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 19
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 336,
+    "fields": {
+      "boxer": 45,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 19
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 337,
+    "fields": {
+      "boxer": 5,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 19
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 338,
+    "fields": {
+      "boxer": 50,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 19
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 339,
+    "fields": {
+      "boxer": 49,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 19
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 340,
+    "fields": {
+      "boxer": 81,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 19
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 341,
+    "fields": {
+      "boxer": 15,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 342,
+    "fields": {
+      "boxer": 77,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 343,
+    "fields": {
+      "boxer": 59,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 344,
+    "fields": {
+      "boxer": 78,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 345,
+    "fields": {
+      "boxer": 55,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 346,
+    "fields": {
+      "boxer": 68,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 347,
+    "fields": {
+      "boxer": 10,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 348,
+    "fields": {
+      "boxer": 65,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 349,
+    "fields": {
+      "boxer": 64,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 350,
+    "fields": {
+      "boxer": 8,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 351,
+    "fields": {
+      "boxer": 56,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 352,
+    "fields": {
+      "boxer": 62,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 353,
+    "fields": {
+      "boxer": 71,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 354,
+    "fields": {
+      "boxer": 70,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 355,
+    "fields": {
+      "boxer": 60,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 356,
+    "fields": {
+      "boxer": 58,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 357,
+    "fields": {
+      "boxer": 73,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 358,
+    "fields": {
+      "boxer": 67,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 359,
+    "fields": {
+      "boxer": 16,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 360,
+    "fields": {
+      "boxer": 76,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 361,
+    "fields": {
+      "boxer": 72,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 362,
+    "fields": {
+      "boxer": 11,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 363,
+    "fields": {
+      "boxer": 53,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 364,
+    "fields": {
+      "boxer": 14,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 365,
+    "fields": {
+      "boxer": 54,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 366,
+    "fields": {
+      "boxer": 57,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 367,
+    "fields": {
+      "boxer": 63,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 368,
+    "fields": {
+      "boxer": 75,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 369,
+    "fields": {
+      "boxer": 66,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 370,
+    "fields": {
+      "boxer": 52,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 371,
+    "fields": {
+      "boxer": 7,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 372,
+    "fields": {
+      "boxer": 3,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 373,
+    "fields": {
+      "boxer": 74,
+      "date": "2025-09-02",
+      "is_present": false,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 374,
+    "fields": {
+      "boxer": 61,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 375,
+    "fields": {
+      "boxer": 82,
+      "date": "2025-09-02",
+      "is_present": true,
+      "is_excused": false,
+      "session": 20
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 376,
+    "fields": {
+      "boxer": 4,
+      "date": "2025-09-03",
+      "is_present": true,
+      "is_excused": false,
+      "session": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 377,
+    "fields": {
+      "boxer": 6,
+      "date": "2025-09-03",
+      "is_present": true,
+      "is_excused": false,
+      "session": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 378,
+    "fields": {
+      "boxer": 2,
+      "date": "2025-09-03",
+      "is_present": true,
+      "is_excused": false,
+      "session": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 379,
+    "fields": {
+      "boxer": 9,
+      "date": "2025-09-03",
+      "is_present": false,
+      "is_excused": false,
+      "session": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 380,
+    "fields": {
+      "boxer": 12,
+      "date": "2025-09-03",
+      "is_present": false,
+      "is_excused": false,
+      "session": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 381,
+    "fields": {
+      "boxer": 37,
+      "date": "2025-09-03",
+      "is_present": false,
+      "is_excused": false,
+      "session": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 382,
+    "fields": {
+      "boxer": 31,
+      "date": "2025-09-03",
+      "is_present": false,
+      "is_excused": false,
+      "session": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 383,
+    "fields": {
+      "boxer": 30,
+      "date": "2025-09-03",
+      "is_present": false,
+      "is_excused": false,
+      "session": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 384,
+    "fields": {
+      "boxer": 32,
+      "date": "2025-09-03",
+      "is_present": true,
+      "is_excused": false,
+      "session": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 385,
+    "fields": {
+      "boxer": 35,
+      "date": "2025-09-03",
+      "is_present": false,
+      "is_excused": false,
+      "session": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 386,
+    "fields": {
+      "boxer": 42,
+      "date": "2025-09-03",
+      "is_present": false,
+      "is_excused": false,
+      "session": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 387,
+    "fields": {
+      "boxer": 41,
+      "date": "2025-09-03",
+      "is_present": true,
+      "is_excused": false,
+      "session": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 388,
+    "fields": {
+      "boxer": 13,
+      "date": "2025-09-03",
+      "is_present": true,
+      "is_excused": false,
+      "session": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 389,
+    "fields": {
+      "boxer": 80,
+      "date": "2025-09-03",
+      "is_present": false,
+      "is_excused": false,
+      "session": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 390,
+    "fields": {
+      "boxer": 79,
+      "date": "2025-09-03",
+      "is_present": true,
+      "is_excused": false,
+      "session": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 391,
+    "fields": {
+      "boxer": 4,
+      "date": "2025-09-04",
+      "is_present": false,
+      "is_excused": true,
+      "session": 6
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 392,
+    "fields": {
+      "boxer": 6,
+      "date": "2025-09-04",
+      "is_present": true,
+      "is_excused": false,
+      "session": 6
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 393,
+    "fields": {
+      "boxer": 2,
+      "date": "2025-09-04",
+      "is_present": true,
+      "is_excused": false,
+      "session": 6
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 394,
+    "fields": {
+      "boxer": 9,
+      "date": "2025-09-04",
+      "is_present": false,
+      "is_excused": false,
+      "session": 6
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 395,
+    "fields": {
+      "boxer": 12,
+      "date": "2025-09-04",
+      "is_present": false,
+      "is_excused": false,
+      "session": 6
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 396,
+    "fields": {
+      "boxer": 37,
+      "date": "2025-09-04",
+      "is_present": false,
+      "is_excused": false,
+      "session": 6
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 397,
+    "fields": {
+      "boxer": 31,
+      "date": "2025-09-04",
+      "is_present": true,
+      "is_excused": false,
+      "session": 6
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 398,
+    "fields": {
+      "boxer": 30,
+      "date": "2025-09-04",
+      "is_present": false,
+      "is_excused": false,
+      "session": 6
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 399,
+    "fields": {
+      "boxer": 32,
+      "date": "2025-09-04",
+      "is_present": false,
+      "is_excused": false,
+      "session": 6
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 400,
+    "fields": {
+      "boxer": 35,
+      "date": "2025-09-04",
+      "is_present": true,
+      "is_excused": false,
+      "session": 6
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 401,
+    "fields": {
+      "boxer": 42,
+      "date": "2025-09-04",
+      "is_present": true,
+      "is_excused": false,
+      "session": 6
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 402,
+    "fields": {
+      "boxer": 41,
+      "date": "2025-09-04",
+      "is_present": true,
+      "is_excused": false,
+      "session": 6
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 403,
+    "fields": {
+      "boxer": 13,
+      "date": "2025-09-04",
+      "is_present": true,
+      "is_excused": false,
+      "session": 6
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 404,
+    "fields": {
+      "boxer": 80,
+      "date": "2025-09-04",
+      "is_present": false,
+      "is_excused": false,
+      "session": 6
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 405,
+    "fields": {
+      "boxer": 79,
+      "date": "2025-09-04",
+      "is_present": false,
+      "is_excused": false,
+      "session": 6
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 406,
+    "fields": {
+      "boxer": 55,
+      "date": "2025-09-04",
+      "is_present": true,
+      "is_excused": false,
+      "session": 18
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 407,
+    "fields": {
+      "boxer": 64,
+      "date": "2025-09-04",
+      "is_present": true,
+      "is_excused": false,
+      "session": 18
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 408,
+    "fields": {
+      "boxer": 56,
+      "date": "2025-09-04",
+      "is_present": true,
+      "is_excused": false,
+      "session": 18
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 409,
+    "fields": {
+      "boxer": 7,
+      "date": "2025-09-04",
+      "is_present": true,
+      "is_excused": false,
+      "session": 18
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 410,
+    "fields": {
+      "boxer": 20,
+      "date": "2025-09-05",
+      "is_present": true,
+      "is_excused": false,
+      "session": 17
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 411,
+    "fields": {
+      "boxer": 20,
+      "date": "2025-09-06",
+      "is_present": true,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 412,
+    "fields": {
+      "boxer": 20,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": 13
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 413,
+    "fields": {
+      "boxer": 20,
+      "date": "2025-09-09",
+      "is_present": true,
+      "is_excused": false,
+      "session": 12
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 414,
+    "fields": {
+      "boxer": 51,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 15
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 415,
+    "fields": {
+      "boxer": 47,
+      "date": "2025-09-06",
+      "is_present": true,
+      "is_excused": false,
+      "session": 15
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 416,
+    "fields": {
+      "boxer": 39,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 15
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 417,
+    "fields": {
+      "boxer": 46,
+      "date": "2025-09-06",
+      "is_present": true,
+      "is_excused": false,
+      "session": 15
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 418,
+    "fields": {
+      "boxer": 44,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 15
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 419,
+    "fields": {
+      "boxer": 48,
+      "date": "2025-09-06",
+      "is_present": true,
+      "is_excused": false,
+      "session": 15
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 420,
+    "fields": {
+      "boxer": 45,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 15
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 421,
+    "fields": {
+      "boxer": 50,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 15
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 422,
+    "fields": {
+      "boxer": 49,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 15
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 423,
+    "fields": {
+      "boxer": 81,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 15
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 424,
+    "fields": {
+      "boxer": 119,
+      "date": "2025-09-06",
+      "is_present": true,
+      "is_excused": false,
+      "session": 16
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 425,
+    "fields": {
+      "boxer": 118,
+      "date": "2025-09-06",
+      "is_present": true,
+      "is_excused": false,
+      "session": 16
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 426,
+    "fields": {
+      "boxer": 117,
+      "date": "2025-09-06",
+      "is_present": true,
+      "is_excused": false,
+      "session": 16
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 427,
+    "fields": {
+      "boxer": 116,
+      "date": "2025-09-06",
+      "is_present": true,
+      "is_excused": false,
+      "session": 16
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 428,
+    "fields": {
+      "boxer": 115,
+      "date": "2025-09-06",
+      "is_present": true,
+      "is_excused": false,
+      "session": 16
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 429,
+    "fields": {
+      "boxer": 4,
+      "date": "2025-09-06",
+      "is_present": true,
+      "is_excused": false,
+      "session": 8
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 430,
+    "fields": {
+      "boxer": 6,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 8
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 431,
+    "fields": {
+      "boxer": 2,
+      "date": "2025-09-06",
+      "is_present": true,
+      "is_excused": false,
+      "session": 8
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 432,
+    "fields": {
+      "boxer": 9,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 8
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 433,
+    "fields": {
+      "boxer": 12,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 8
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 434,
+    "fields": {
+      "boxer": 37,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 8
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 435,
+    "fields": {
+      "boxer": 31,
+      "date": "2025-09-06",
+      "is_present": true,
+      "is_excused": false,
+      "session": 8
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 436,
+    "fields": {
+      "boxer": 30,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 8
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 437,
+    "fields": {
+      "boxer": 32,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 8
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 438,
+    "fields": {
+      "boxer": 35,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 8
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 439,
+    "fields": {
+      "boxer": 42,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 8
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 440,
+    "fields": {
+      "boxer": 41,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 8
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 441,
+    "fields": {
+      "boxer": 13,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": true,
+      "session": 8
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 442,
+    "fields": {
+      "boxer": 80,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 8
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 443,
+    "fields": {
+      "boxer": 79,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 8
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 444,
+    "fields": {
+      "boxer": 15,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 445,
+    "fields": {
+      "boxer": 77,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 446,
+    "fields": {
+      "boxer": 59,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 447,
+    "fields": {
+      "boxer": 78,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 448,
+    "fields": {
+      "boxer": 55,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 449,
+    "fields": {
+      "boxer": 68,
+      "date": "2025-09-06",
+      "is_present": true,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 450,
+    "fields": {
+      "boxer": 10,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 451,
+    "fields": {
+      "boxer": 65,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 452,
+    "fields": {
+      "boxer": 64,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 453,
+    "fields": {
+      "boxer": 8,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 454,
+    "fields": {
+      "boxer": 56,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 455,
+    "fields": {
+      "boxer": 62,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 456,
+    "fields": {
+      "boxer": 71,
+      "date": "2025-09-06",
+      "is_present": true,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 457,
+    "fields": {
+      "boxer": 70,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 458,
+    "fields": {
+      "boxer": 60,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 459,
+    "fields": {
+      "boxer": 58,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 460,
+    "fields": {
+      "boxer": 73,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 461,
+    "fields": {
+      "boxer": 67,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 462,
+    "fields": {
+      "boxer": 16,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 463,
+    "fields": {
+      "boxer": 76,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 464,
+    "fields": {
+      "boxer": 72,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 465,
+    "fields": {
+      "boxer": 11,
+      "date": "2025-09-06",
+      "is_present": true,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 466,
+    "fields": {
+      "boxer": 53,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 467,
+    "fields": {
+      "boxer": 14,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 468,
+    "fields": {
+      "boxer": 54,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 469,
+    "fields": {
+      "boxer": 57,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 470,
+    "fields": {
+      "boxer": 63,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 471,
+    "fields": {
+      "boxer": 75,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 472,
+    "fields": {
+      "boxer": 66,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 473,
+    "fields": {
+      "boxer": 52,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 474,
+    "fields": {
+      "boxer": 7,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 475,
+    "fields": {
+      "boxer": 3,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 476,
+    "fields": {
+      "boxer": 74,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 477,
+    "fields": {
+      "boxer": 61,
+      "date": "2025-09-06",
+      "is_present": true,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 478,
+    "fields": {
+      "boxer": 82,
+      "date": "2025-09-06",
+      "is_present": false,
+      "is_excused": false,
+      "session": 14
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 479,
+    "fields": {
+      "boxer": 20,
+      "date": "2025-09-12",
+      "is_present": true,
+      "is_excused": false,
+      "session": 11
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 480,
+    "fields": {
+      "boxer": 4,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": true,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 481,
+    "fields": {
+      "boxer": 6,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 482,
+    "fields": {
+      "boxer": 2,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 483,
+    "fields": {
+      "boxer": 9,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 484,
+    "fields": {
+      "boxer": 12,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 485,
+    "fields": {
+      "boxer": 37,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 486,
+    "fields": {
+      "boxer": 31,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 487,
+    "fields": {
+      "boxer": 30,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 488,
+    "fields": {
+      "boxer": 32,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 489,
+    "fields": {
+      "boxer": 35,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 490,
+    "fields": {
+      "boxer": 42,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 491,
+    "fields": {
+      "boxer": 41,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 492,
+    "fields": {
+      "boxer": 13,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 493,
+    "fields": {
+      "boxer": 80,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 494,
+    "fields": {
+      "boxer": 79,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 495,
+    "fields": {
+      "boxer": 51,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 496,
+    "fields": {
+      "boxer": 47,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 497,
+    "fields": {
+      "boxer": 39,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 498,
+    "fields": {
+      "boxer": 46,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 499,
+    "fields": {
+      "boxer": 44,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 500,
+    "fields": {
+      "boxer": 48,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 501,
+    "fields": {
+      "boxer": 45,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 502,
+    "fields": {
+      "boxer": 5,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 503,
+    "fields": {
+      "boxer": 50,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 504,
+    "fields": {
+      "boxer": 49,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 505,
+    "fields": {
+      "boxer": 81,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 506,
+    "fields": {
+      "boxer": 69,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 507,
+    "fields": {
+      "boxer": 120,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 508,
+    "fields": {
+      "boxer": 33,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 509,
+    "fields": {
+      "boxer": 3,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 510,
+    "fields": {
+      "boxer": 7,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 511,
+    "fields": {
+      "boxer": 8,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 512,
+    "fields": {
+      "boxer": 10,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 513,
+    "fields": {
+      "boxer": 11,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 514,
+    "fields": {
+      "boxer": 14,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 515,
+    "fields": {
+      "boxer": 15,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 516,
+    "fields": {
+      "boxer": 16,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 517,
+    "fields": {
+      "boxer": 52,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 518,
+    "fields": {
+      "boxer": 53,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 519,
+    "fields": {
+      "boxer": 54,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 520,
+    "fields": {
+      "boxer": 55,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 521,
+    "fields": {
+      "boxer": 56,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 522,
+    "fields": {
+      "boxer": 57,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 523,
+    "fields": {
+      "boxer": 58,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 524,
+    "fields": {
+      "boxer": 59,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 525,
+    "fields": {
+      "boxer": 60,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 526,
+    "fields": {
+      "boxer": 61,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 527,
+    "fields": {
+      "boxer": 62,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 528,
+    "fields": {
+      "boxer": 63,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 529,
+    "fields": {
+      "boxer": 64,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 530,
+    "fields": {
+      "boxer": 65,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 531,
+    "fields": {
+      "boxer": 66,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 532,
+    "fields": {
+      "boxer": 67,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 533,
+    "fields": {
+      "boxer": 68,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 534,
+    "fields": {
+      "boxer": 70,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 535,
+    "fields": {
+      "boxer": 71,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 536,
+    "fields": {
+      "boxer": 72,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 537,
+    "fields": {
+      "boxer": 73,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 538,
+    "fields": {
+      "boxer": 74,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 539,
+    "fields": {
+      "boxer": 75,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 540,
+    "fields": {
+      "boxer": 76,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 541,
+    "fields": {
+      "boxer": 77,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 542,
+    "fields": {
+      "boxer": 78,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 543,
+    "fields": {
+      "boxer": 82,
+      "date": "2025-09-08",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 544,
+    "fields": {
+      "boxer": 121,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 545,
+    "fields": {
+      "boxer": 123,
+      "date": "2025-09-08",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 546,
+    "fields": {
+      "boxer": 125,
+      "date": "2025-09-09",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 547,
+    "fields": {
+      "boxer": 124,
+      "date": "2025-09-09",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 548,
+    "fields": {
+      "boxer": 126,
+      "date": "2025-09-09",
+      "is_present": false,
+      "is_excused": true,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 549,
+    "fields": {
+      "boxer": 2,
+      "date": "2025-09-09",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 550,
+    "fields": {
+      "boxer": 4,
+      "date": "2025-09-09",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 551,
+    "fields": {
+      "boxer": 6,
+      "date": "2025-09-09",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 552,
+    "fields": {
+      "boxer": 9,
+      "date": "2025-09-09",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 553,
+    "fields": {
+      "boxer": 12,
+      "date": "2025-09-09",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 554,
+    "fields": {
+      "boxer": 13,
+      "date": "2025-09-09",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 555,
+    "fields": {
+      "boxer": 30,
+      "date": "2025-09-09",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 556,
+    "fields": {
+      "boxer": 31,
+      "date": "2025-09-09",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 557,
+    "fields": {
+      "boxer": 32,
+      "date": "2025-09-09",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 558,
+    "fields": {
+      "boxer": 35,
+      "date": "2025-09-09",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 559,
+    "fields": {
+      "boxer": 37,
+      "date": "2025-09-09",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 560,
+    "fields": {
+      "boxer": 41,
+      "date": "2025-09-09",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 561,
+    "fields": {
+      "boxer": 42,
+      "date": "2025-09-09",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 562,
+    "fields": {
+      "boxer": 69,
+      "date": "2025-09-09",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 563,
+    "fields": {
+      "boxer": 79,
+      "date": "2025-09-09",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 564,
+    "fields": {
+      "boxer": 80,
+      "date": "2025-09-09",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 565,
+    "fields": {
+      "boxer": 20,
+      "date": "2025-09-10",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 566,
+    "fields": {
+      "boxer": 2,
+      "date": "2025-09-10",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 567,
+    "fields": {
+      "boxer": 4,
+      "date": "2025-09-10",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 568,
+    "fields": {
+      "boxer": 6,
+      "date": "2025-09-10",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 569,
+    "fields": {
+      "boxer": 9,
+      "date": "2025-09-10",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 570,
+    "fields": {
+      "boxer": 12,
+      "date": "2025-09-10",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 571,
+    "fields": {
+      "boxer": 13,
+      "date": "2025-09-10",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 572,
+    "fields": {
+      "boxer": 30,
+      "date": "2025-09-10",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 573,
+    "fields": {
+      "boxer": 31,
+      "date": "2025-09-10",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 574,
+    "fields": {
+      "boxer": 32,
+      "date": "2025-09-10",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 575,
+    "fields": {
+      "boxer": 35,
+      "date": "2025-09-10",
+      "is_present": false,
+      "is_excused": true,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 576,
+    "fields": {
+      "boxer": 37,
+      "date": "2025-09-10",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 577,
+    "fields": {
+      "boxer": 41,
+      "date": "2025-09-10",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 578,
+    "fields": {
+      "boxer": 42,
+      "date": "2025-09-10",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 579,
+    "fields": {
+      "boxer": 69,
+      "date": "2025-09-10",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 580,
+    "fields": {
+      "boxer": 79,
+      "date": "2025-09-10",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 581,
+    "fields": {
+      "boxer": 80,
+      "date": "2025-09-10",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 582,
+    "fields": {
+      "boxer": 127,
+      "date": "2025-09-10",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 583,
+    "fields": {
+      "boxer": 2,
+      "date": "2025-09-11",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 584,
+    "fields": {
+      "boxer": 4,
+      "date": "2025-09-11",
+      "is_present": false,
+      "is_excused": true,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 585,
+    "fields": {
+      "boxer": 6,
+      "date": "2025-09-11",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 586,
+    "fields": {
+      "boxer": 9,
+      "date": "2025-09-11",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 587,
+    "fields": {
+      "boxer": 12,
+      "date": "2025-09-11",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 588,
+    "fields": {
+      "boxer": 13,
+      "date": "2025-09-11",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 589,
+    "fields": {
+      "boxer": 20,
+      "date": "2025-09-11",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 590,
+    "fields": {
+      "boxer": 30,
+      "date": "2025-09-11",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 591,
+    "fields": {
+      "boxer": 31,
+      "date": "2025-09-11",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 592,
+    "fields": {
+      "boxer": 32,
+      "date": "2025-09-11",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 593,
+    "fields": {
+      "boxer": 35,
+      "date": "2025-09-11",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 594,
+    "fields": {
+      "boxer": 37,
+      "date": "2025-09-11",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 595,
+    "fields": {
+      "boxer": 41,
+      "date": "2025-09-11",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 596,
+    "fields": {
+      "boxer": 42,
+      "date": "2025-09-11",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 597,
+    "fields": {
+      "boxer": 69,
+      "date": "2025-09-11",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 598,
+    "fields": {
+      "boxer": 79,
+      "date": "2025-09-11",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 599,
+    "fields": {
+      "boxer": 80,
+      "date": "2025-09-11",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 600,
+    "fields": {
+      "boxer": 127,
+      "date": "2025-09-11",
+      "is_present": false,
+      "is_excused": false,
+      "session": null
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.attendance",
+    "pk": 601,
+    "fields": {
+      "boxer": 128,
+      "date": "2025-09-11",
+      "is_present": true,
+      "is_excused": false,
+      "session": null
+    }
+  }
+]

@@ -1,0 +1,22 @@
+[
+{
+  "model": "BoxersPresenceApp.heartrate",
+  "pk": 1,
+  "fields": {
+    "boxer": 4,
+    "measured_at": "2025-08-28T18:18:00Z",
+    "bpm": 57,
+    "notes": "Resting heart rate"
+  }
+},
+{
+  "model": "BoxersPresenceApp.heartrate",
+  "pk": 2,
+  "fields": {
+    "boxer": 29,
+    "measured_at": "2025-08-31T18:43:00Z",
+    "bpm": 90,
+    "notes": ""
+  }
+}
+]

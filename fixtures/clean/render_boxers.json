@@ -1,0 +1,1220 @@
+[
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 2,
+    "fields": {
+      "uuid": "fc87ce34-38de-44c1-888b-64c1e4b57eb2",
+      "name": "Ognyan Danielov",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 3,
+    "fields": {
+      "uuid": "a385ec93-ee4a-4a24-a488-5db274f66123",
+      "name": "Yesin Andries",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 4,
+    "fields": {
+      "uuid": "42b70c2d-c35f-4574-af1d-1870e9f40a06",
+      "name": "Ayman Moudian",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 5,
+    "fields": {
+      "uuid": "5f8b728a-9079-4155-b154-b1447c76bd15",
+      "name": "Anas Karim",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 6,
+    "fields": {
+      "uuid": "257341fc-a935-4131-87b0-ee16812e6597",
+      "name": "Malik Yangulbaev",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 7,
+    "fields": {
+      "uuid": "6fbcbe78-ad94-45c2-bf19-4feb622710e4",
+      "name": "Yelde Olcas",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 8,
+    "fields": {
+      "uuid": "839f7c40-3ba1-43f6-82b5-2037108c41bf",
+      "name": "Elliot Clough",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 9,
+    "fields": {
+      "uuid": "2a20902f-822c-412f-8a9f-b03f83618cb3",
+      "name": "Ryan Amarthi",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 10,
+    "fields": {
+      "uuid": "28471e3d-0940-4a4a-8a91-b718c9de095e",
+      "name": "Daniel Zulfigarov",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 11,
+    "fields": {
+      "uuid": "23312224-5eb2-4061-814f-410fdaa26705",
+      "name": "Randy Penda",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 12,
+    "fields": {
+      "uuid": "d072a13f-8a2e-4b93-b6d4-222cddd6f7d4",
+      "name": "Yahya Amghar",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 13,
+    "fields": {
+      "uuid": "9ac01504-79cb-4985-9943-b8cdbddcbca3",
+      "name": "Maysae Kerkour",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 14,
+    "fields": {
+      "uuid": "9b74b19c-27c1-4128-8de8-ba0bce0086c0",
+      "name": "Sajjad Alteai",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 15,
+    "fields": {
+      "uuid": "63d6a814-e64d-4bc4-bcd9-30dbe84829dd",
+      "name": "Adam Filali",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 16,
+    "fields": {
+      "uuid": "e8e0e3af-2e7f-4c19-8995-1a4afc4895b1",
+      "name": "Mykola",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 20,
+    "fields": {
+      "uuid": "881e48f9-e80e-4287-8655-ca551999b1e6",
+      "name": "Zefir Kulev",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 21,
+    "fields": {
+      "uuid": "fff1276d-e8c5-453b-b1ce-9d60fa8297f4",
+      "name": "Liam",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 22,
+    "fields": {
+      "uuid": "2f63bba8-6891-4872-bfdd-acd481149672",
+      "name": "Kasper",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 27,
+    "fields": {
+      "uuid": "061951aa-df67-4139-b5b1-6144b54e9f89",
+      "name": "Jitse",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 29,
+    "fields": {
+      "uuid": "6ba91e6c-8f82-4711-96ad-f80a20bb06b8",
+      "name": "Evy Wuyts",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 30,
+    "fields": {
+      "uuid": "6bf44f18-80aa-40cc-9792-d8d0cf6e7e0a",
+      "name": "Rik Leybaert",
+      "date_of_birth": "2009-12-11",
+      "parent_name": "Daphne Meeuwes",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 31,
+    "fields": {
+      "uuid": "85a15673-cd23-42e2-adaf-212961db66fd",
+      "name": "Mohamed Ouchbab",
+      "date_of_birth": "2009-10-17",
+      "parent_name": "Ikram Ouchbab",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 32,
+    "fields": {
+      "uuid": "bfedeeb5-7058-4142-8cd4-ee9eb5363048",
+      "name": "River Beeckmans",
+      "date_of_birth": "2010-03-26",
+      "parent_name": "Jo Schollaert",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 33,
+    "fields": {
+      "uuid": "02801d63-ecc5-4c04-918b-a493da1479a8",
+      "name": "Bilal Aghddoui",
+      "date_of_birth": "2011-11-14",
+      "parent_name": "Majid Aghddoui",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 34,
+    "fields": {
+      "uuid": "468e65e6-a610-4801-8f19-80c24caf89a5",
+      "name": "Dylan Icho",
+      "date_of_birth": "2010-07-02",
+      "parent_name": "Gurgis Icho",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 35,
+    "fields": {
+      "uuid": "04f0df63-16a4-4afe-8546-cb4903efd7ce",
+      "name": "Vic Moens",
+      "date_of_birth": "2010-09-28",
+      "parent_name": "Bart Moens",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 36,
+    "fields": {
+      "uuid": "ecaf0c2f-1b4b-4a3c-b92c-4f5fd734c84e",
+      "name": "Ayman Van den Ackerbroeck",
+      "date_of_birth": "2010-08-07",
+      "parent_name": "Chtouki Laila",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 37,
+    "fields": {
+      "uuid": "bb1449dd-6ce1-473b-a634-a6b14b263b01",
+      "name": "Jirihane Barka",
+      "date_of_birth": "2009-12-06",
+      "parent_name": "Latifa Mahyo",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 38,
+    "fields": {
+      "uuid": "306b3016-f523-41d7-a873-cc826b92db39",
+      "name": "Mohamed Qasem",
+      "date_of_birth": "2011-03-06",
+      "parent_name": "Mohamed Qasem",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 39,
+    "fields": {
+      "uuid": "102c9a59-2911-4a81-aecd-a2cad3eeb927",
+      "name": "Massin Kachaf",
+      "date_of_birth": "2011-10-27",
+      "parent_name": "Fatima Siraj",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 41,
+    "fields": {
+      "uuid": "17939d8d-3e49-4307-b24c-780d512ccef8",
+      "name": "Zayd El Mesri",
+      "date_of_birth": "2009-08-15",
+      "parent_name": "Nouhad El Bazi",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 42,
+    "fields": {
+      "uuid": "d4d425c9-57ad-4e3d-8cc1-963d90d5496c",
+      "name": "Ebbe Vercammen",
+      "date_of_birth": "2010-08-22",
+      "parent_name": "Isa Beeckmans",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 43,
+    "fields": {
+      "uuid": "1e3bd983-4d77-4a71-859c-94a448e838d5",
+      "name": "Ilyas Sabri",
+      "date_of_birth": "2010-08-10",
+      "parent_name": "Tine Herremans",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 44,
+    "fields": {
+      "uuid": "ff7a2afc-2ab4-4dc5-8863-9aa722696d98",
+      "name": "Eiman Bouzerda",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 45,
+    "fields": {
+      "uuid": "0230b6bb-32e5-4c97-9b2b-327311d258ce",
+      "name": "Abdel Aissati",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 46,
+    "fields": {
+      "uuid": "e194c8c2-caec-4b3c-acb8-2a2e6ef6d8d0",
+      "name": "Stef Rizzo",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 47,
+    "fields": {
+      "uuid": "b3e65684-a0cf-4136-a699-2c0b0d23e1dd",
+      "name": "Can Ivanov",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 48,
+    "fields": {
+      "uuid": "c521f647-93a8-4415-a7fd-2510edd27b40",
+      "name": "Mahmut Ucar",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 49,
+    "fields": {
+      "uuid": "be08b783-304a-4eb8-acc2-0d8b12a55255",
+      "name": "Sebastiaan van Menxsel",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 50,
+    "fields": {
+      "uuid": "3374d25a-10b7-4990-999a-ce19a5034171",
+      "name": "Seth Theys",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 51,
+    "fields": {
+      "uuid": "6a464e6f-3761-4348-a741-c84fc2bf4bc0",
+      "name": "Aaron Thiam",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 52,
+    "fields": {
+      "uuid": "8fc7e15d-9046-4f54-a662-36df08c4b8a3",
+      "name": "Yarne Wegge",
+      "date_of_birth": "2007-10-10",
+      "parent_name": "Vanessa  Levens",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 53,
+    "fields": {
+      "uuid": "12669571-20af-4767-a3d7-2190bb7d9397",
+      "name": "Robbe Rijmenants",
+      "date_of_birth": "2007-11-09",
+      "parent_name": "Sarah Selleslagh",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 54,
+    "fields": {
+      "uuid": "e73bf48e-9093-497b-bf13-79ec6283c644",
+      "name": "Saliem Ouchen",
+      "date_of_birth": "2008-08-11",
+      "parent_name": "Hanane Bouchauni",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 55,
+    "fields": {
+      "uuid": "7c780062-52f4-425a-bff7-a2fb58eb13bb",
+      "name": "Aymane Chahboun",
+      "date_of_birth": "2008-01-11",
+      "parent_name": "Ilhame Azouzat",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 56,
+    "fields": {
+      "uuid": "cd0d9a32-6ef1-4455-af91-6c3e5898b83b",
+      "name": "Ihsan Tarek",
+      "date_of_birth": "2007-03-02",
+      "parent_name": "Ihsan Tarek",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 57,
+    "fields": {
+      "uuid": "a617bd0c-3873-4e13-a558-f85ca9830af0",
+      "name": "Skay Geens",
+      "date_of_birth": "2005-03-20",
+      "parent_name": "Geens Skay",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 58,
+    "fields": {
+      "uuid": "009d7d78-a921-4fb7-ba88-66e6ccbe8ce7",
+      "name": "Matteus Tuypens",
+      "date_of_birth": "2008-10-22",
+      "parent_name": "Caroline De Wachter",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 59,
+    "fields": {
+      "uuid": "9dbdf512-df6b-4f3b-abdb-00eb50da34cd",
+      "name": "Arthur Manantsoa",
+      "date_of_birth": "2008-07-11",
+      "parent_name": "Sofie Manantsoa",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 60,
+    "fields": {
+      "uuid": "6c0768fb-02f6-4676-ab19-dad835da7656",
+      "name": "Mansur Magomayev",
+      "date_of_birth": "2009-02-16",
+      "parent_name": "Mansur Magomayev",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 61,
+    "fields": {
+      "uuid": "32e6b5dc-6275-483f-9628-08664c5a6880",
+      "name": "Ayoub Aharoun",
+      "date_of_birth": "2006-05-24",
+      "parent_name": "Ayoub Aharoun",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 62,
+    "fields": {
+      "uuid": "d3e1c4fc-359b-4fe2-9bed-6fe7a8622e61",
+      "name": "Iliyan Reyniers",
+      "date_of_birth": "2007-10-31",
+      "parent_name": "Kim Thys",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 63,
+    "fields": {
+      "uuid": "aad946e3-c966-4cdb-a6c9-85c49ceaaec2",
+      "name": "Sorrouhk Samy",
+      "date_of_birth": "2007-10-27",
+      "parent_name": "Sorrouhk\tSamy",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 64,
+    "fields": {
+      "uuid": "154507d2-8389-4b64-bd15-9e82d0e445a6",
+      "name": "Dylan Dirlik",
+      "date_of_birth": "2006-12-04",
+      "parent_name": "Cemil Dirlik",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 65,
+    "fields": {
+      "uuid": "ed37b288-1e84-427a-b277-b167ecce92dc",
+      "name": "David Indenge",
+      "date_of_birth": "2007-01-20",
+      "parent_name": "David Indenge",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 66,
+    "fields": {
+      "uuid": "8b9b72dc-eb99-4d09-b631-0eab139feded",
+      "name": "Tshughuryanm Gegha",
+      "date_of_birth": "2008-08-30",
+      "parent_name": "Hovhannisyan\tMarianna",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 67,
+    "fields": {
+      "uuid": "9998b014-4425-4cd2-ad73-6a556508a93d",
+      "name": "Mohamed Kamara",
+      "date_of_birth": "2008-04-19",
+      "parent_name": "Umar Kamara",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 68,
+    "fields": {
+      "uuid": "db8612fc-6509-4b84-b203-9db1cfb013bf",
+      "name": "Bulhakov Petro",
+      "date_of_birth": "2005-12-02",
+      "parent_name": "Bulhakov\tPetro",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 69,
+    "fields": {
+      "uuid": "13311489-e8e9-43cd-91df-d87d5f5667d1",
+      "name": "Mats Vandermosten",
+      "date_of_birth": "2008-03-24",
+      "parent_name": "Boon Mus",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 70,
+    "fields": {
+      "uuid": "369514fe-cfdd-4396-923e-15da5c30fa4a",
+      "name": "Jaroslav Chevtsov",
+      "date_of_birth": "2008-07-28",
+      "parent_name": "Chevtsov\tJaroslav",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 71,
+    "fields": {
+      "uuid": "38ae3696-b8ad-44f9-9925-df56bac2fb4a",
+      "name": "Jad Awwad",
+      "date_of_birth": "2007-02-02",
+      "parent_name": "Jad Awwad",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 72,
+    "fields": {
+      "uuid": "26575c21-27de-4790-9a38-7fb5b07be6c5",
+      "name": "Osman Kula",
+      "date_of_birth": "2008-05-12",
+      "parent_name": "Kula\tOsman",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 73,
+    "fields": {
+      "uuid": "03600460-87d9-4e42-9278-4c6ba7d1d3f4",
+      "name": "Mauro Dominguez",
+      "date_of_birth": "2008-03-11",
+      "parent_name": "Heidi De Boelpaep",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 74,
+    "fields": {
+      "uuid": "e05e37ab-79ab-4914-adda-82263ef0bedd",
+      "name": "Zakeel Khan",
+      "date_of_birth": "2004-02-12",
+      "parent_name": "Khan Zakeel",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 75,
+    "fields": {
+      "uuid": "227e7a69-fccb-441d-ad64-c8bce0fe1d04",
+      "name": "Tomas Bikhan",
+      "date_of_birth": "2007-10-02",
+      "parent_name": "Bikhan Fuat",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 76,
+    "fields": {
+      "uuid": "a111da3e-5d02-47a1-a266-7add5ed5977e",
+      "name": "Oscar Pardon",
+      "date_of_birth": "2007-12-24",
+      "parent_name": "Gloria Vasquez",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 77,
+    "fields": {
+      "uuid": "51703f6c-1273-49f8-88e0-ef2f2097c25c",
+      "name": "Ali Rahhaoui",
+      "date_of_birth": "2006-06-21",
+      "parent_name": "Ali Rahhaoui",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 78,
+    "fields": {
+      "uuid": "8f7afbbf-a428-4af8-9d98-bc1a2d5b3fe5",
+      "name": "Ayanle Hayir",
+      "date_of_birth": "2008-02-03",
+      "parent_name": "Ayanle Hayir",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 79,
+    "fields": {
+      "uuid": "787a911d-1421-4f1c-b946-060138dbe8a7",
+      "name": "Jelle van Casteren",
+      "date_of_birth": "2010-04-26",
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 80,
+    "fields": {
+      "uuid": "5780d7a6-30bd-47f0-bc97-8b22fde058cf",
+      "name": "Julia Manantsoa",
+      "date_of_birth": "2011-07-13",
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 81,
+    "fields": {
+      "uuid": "4bc5129e-9773-4a54-9e83-c99364b171d3",
+      "name": "Nesrine Ibrahim",
+      "date_of_birth": "2011-01-17",
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 82,
+    "fields": {
+      "uuid": "18d5904e-235e-420f-8735-2c1a723a1cf1",
+      "name": "Elias Erchouk",
+      "date_of_birth": "2005-03-14",
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 83,
+    "fields": {
+      "uuid": "6bf73b6b-b27f-431c-96ef-b933b229ce38",
+      "name": "Saleh Amghar",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 115,
+    "fields": {
+      "uuid": "5be43942-05fa-40b9-8e4d-3a4ac67e50a2",
+      "name": "Rouan Snoussi",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 116,
+    "fields": {
+      "uuid": "efc1e698-fdf4-4ab0-9295-28a0c4c99833",
+      "name": "Jef Sermeus",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 117,
+    "fields": {
+      "uuid": "10c3adc5-687b-4fb0-9b23-7ef4b9dab4a3",
+      "name": "Elliot Van den Eynden",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 118,
+    "fields": {
+      "uuid": "8469ab2f-2234-47e1-93d0-b6eafa4555e5",
+      "name": "Kerim Akdag",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 119,
+    "fields": {
+      "uuid": "5635afc6-b880-49a0-9228-5324c70d1f84",
+      "name": "David Mamasakhlisi",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 120,
+    "fields": {
+      "uuid": "e786466d-205f-4afe-b13c-20f810022454",
+      "name": "Addam Aananou",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 121,
+    "fields": {
+      "uuid": "57be47d7-0087-4d7c-8196-0e6da3b8a7b0",
+      "name": "Sam Vallons",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 122,
+    "fields": {
+      "uuid": "5ed889e1-8cea-4f7a-92ce-0b5380ac3034",
+      "name": "Mats Vendermosten",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 123,
+    "fields": {
+      "uuid": "740a141b-d02c-4afd-8e65-5c4e7cfbea41",
+      "name": "Vlad Repta",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 124,
+    "fields": {
+      "uuid": "57df69b3-e255-4fc2-87c0-27eb9df47647",
+      "name": "Jean",
+      "date_of_birth": "2011-08-15",
+      "parent_name": "",
+      "gym": 1,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 125,
+    "fields": {
+      "uuid": "34919d52-2a91-47d9-986d-c79f7201a07d",
+      "name": "Danny",
+      "date_of_birth": "2019-04-22",
+      "parent_name": "",
+      "gym": 1,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 126,
+    "fields": {
+      "uuid": "596f7e48-cef7-463e-8fb1-9554a5651717",
+      "name": "Linda",
+      "date_of_birth": "2012-12-10",
+      "parent_name": "",
+      "gym": 1,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 127,
+    "fields": {
+      "uuid": "4b0122f4-d4ae-4293-9ca4-5c448d74c48b",
+      "name": "Alex Markosyan",
+      "date_of_birth": "2010-10-15",
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.boxer",
+    "pk": 128,
+    "fields": {
+      "uuid": "a8eae250-4aaa-4772-b672-30cc3e203744",
+      "name": "Matei Ile",
+      "date_of_birth": null,
+      "parent_name": "",
+      "gym": 2,
+      "coaches": [],
+      "shared_with_gyms": [],
+      "parents": []
+    }
+  }
+]

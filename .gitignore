@@ -21,12 +21,4 @@ Thumbs.db
 
 # Static build outputs
 staticfiles/
-media/# virtualenvs & local stuff
-.venv/
-env/
-*.pyc
-__pycache__/
-staticfiles/
-*.sqlite3
-*.log
-*.zip
+media/

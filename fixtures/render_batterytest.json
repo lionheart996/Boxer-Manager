@@ -1,0 +1,69 @@
+[
+{
+  "model": "BoxersPresenceApp.batterytest",
+  "pk": 1,
+  "fields": {
+    "name": "Agility - Illinois",
+    "display_order": 1,
+    "unit": "s",
+    "description": "Cone sprint agility test - \r\nMeasures boxers' agility\r\n\r\nUse a 10m x 5m rectangle.\r\n\r\nPlace 4 cones at the corners to mark the rectangle.\r\n\r\nPlace 4 cones down the center line, each spaced 3.3m apart.\r\n\r\nBoxer goes around all cones as fast as possible.",
+    "created_at": "2025-08-11T11:26:54.302Z",
+    "coach": null
+  }
+},
+{
+  "model": "BoxersPresenceApp.batterytest",
+  "pk": 2,
+  "fields": {
+    "name": "Power - Ball",
+    "display_order": 2,
+    "unit": "cm",
+    "description": "Chest pass power test -\r\nMeasures upper body explosivity",
+    "created_at": "2025-08-11T11:53:38.168Z",
+    "coach": null
+  }
+},
+{
+  "model": "BoxersPresenceApp.batterytest",
+  "pk": 3,
+  "fields": {
+    "name": "Power - Jump",
+    "display_order": 3,
+    "unit": "cm",
+    "description": "Jump distance power test -\r\nMeasures explosive leg power",
+    "created_at": "2025-08-11T13:13:36.315Z",
+    "coach": null
+  }
+},
+{
+  "model": "BoxersPresenceApp.batterytest",
+  "pk": 4,
+  "fields": {
+    "name": "Sprint",
+    "display_order": 4,
+    "unit": "s",
+    "description": "Sprinting - 10m",
+    "created_at": "2025-08-11T13:15:31.715Z",
+    "coach": null
+  }
+},
+{
+  "model": "BoxersPresenceApp.batterytest",
+  "pk": 5,
+  "fields": {
+    "name": "Beep test",
+    "display_order": 5,
+    "unit": "m",
+    "description": "Shuttle run endurance test - \r\nMeasures boxers' aerobic system",
+    "created_at": "2025-08-11T13:16:13.516Z",
+    "coach": null
+  }
+},
+{
+  "model": "BoxersPresenceApp.batterytest",
+  "pk": 10,
+  "fields": {
+    "name": "Heart Rate Recovery after Agility Drill (HRR-Agility)",
+    "display_order": 6,
+    "unit": "s",
+    "description": 

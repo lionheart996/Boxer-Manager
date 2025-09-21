@@ -1,0 +1,18 @@
+[
+{
+  "model": "BoxersPresenceApp.gym",
+  "pk": 1,
+  "fields": {
+    "name": "Default Gym",
+    "location": null
+  }
+},
+{
+  "model": "BoxersPresenceApp.gym",
+  "pk": 2,
+  "fields": {
+    "name": "BoxingGym2800",
+    "location": "Mechelen, Belgium"
+  }
+}
+]

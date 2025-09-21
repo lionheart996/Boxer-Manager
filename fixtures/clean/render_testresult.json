@@ -1,0 +1,802 @@
+[
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 1,
+    "fields": {
+      "phase": "prep",
+      "boxer": 15,
+      "test": 1,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:30:18.991Z",
+      "coach": null,
+      "value1": 18.46,
+      "value2": 17.66,
+      "value3": 17.26,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 2,
+    "fields": {
+      "phase": "prep",
+      "boxer": 2,
+      "test": 1,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:30:18.822Z",
+      "coach": null,
+      "value1": 19.68,
+      "value2": 19.16,
+      "value3": 19.1,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 3,
+    "fields": {
+      "phase": "prep",
+      "boxer": 11,
+      "test": 2,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:36:48.010Z",
+      "coach": null,
+      "value1": 478.0,
+      "value2": 539.0,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 5,
+    "fields": {
+      "phase": "prep",
+      "boxer": 15,
+      "test": 2,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:36:48.026Z",
+      "coach": null,
+      "value1": 462.0,
+      "value2": 525.0,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 6,
+    "fields": {
+      "phase": "prep",
+      "boxer": 2,
+      "test": 2,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:36:47.861Z",
+      "coach": null,
+      "value1": 330.0,
+      "value2": 363.0,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 7,
+    "fields": {
+      "phase": "prep",
+      "boxer": 2,
+      "test": 3,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:33:29.571Z",
+      "coach": null,
+      "value1": 206.0,
+      "value2": 200.5,
+      "value3": 216.0,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 8,
+    "fields": {
+      "phase": "prep",
+      "boxer": 2,
+      "test": 4,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:40:38.911Z",
+      "coach": null,
+      "value1": 2.19,
+      "value2": 2.36,
+      "value3": 2.5,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 9,
+    "fields": {
+      "phase": "prep",
+      "boxer": 2,
+      "test": 5,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:38:32.336Z",
+      "coach": null,
+      "value1": 680.0,
+      "value2": null,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 20,
+    "fields": {
+      "phase": "build",
+      "boxer": 2,
+      "test": 1,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:24:54.171Z",
+      "coach": null,
+      "value1": 19.68,
+      "value2": 19.16,
+      "value3": 19.1,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 21,
+    "fields": {
+      "phase": "build",
+      "boxer": 5,
+      "test": 1,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-25T10:38:58.399Z",
+      "coach": null,
+      "value1": null,
+      "value2": null,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 22,
+    "fields": {
+      "phase": "build",
+      "boxer": 6,
+      "test": 1,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:24:54.230Z",
+      "coach": null,
+      "value1": 17.56,
+      "value2": 17.31,
+      "value3": 17.2,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 23,
+    "fields": {
+      "phase": "build",
+      "boxer": 7,
+      "test": 1,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:24:54.258Z",
+      "coach": null,
+      "value1": 18.97,
+      "value2": 18.52,
+      "value3": 18.22,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 24,
+    "fields": {
+      "phase": "build",
+      "boxer": 8,
+      "test": 1,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:24:54.289Z",
+      "coach": null,
+      "value1": 17.5,
+      "value2": 17.12,
+      "value3": 16.8,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 25,
+    "fields": {
+      "phase": "build",
+      "boxer": 11,
+      "test": 1,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:24:54.320Z",
+      "coach": null,
+      "value1": 17.38,
+      "value2": 16.79,
+      "value3": 16.73,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 26,
+    "fields": {
+      "phase": "build",
+      "boxer": 15,
+      "test": 1,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:24:54.361Z",
+      "coach": null,
+      "value1": 18.46,
+      "value2": 17.66,
+      "value3": 17.26,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 27,
+    "fields": {
+      "phase": "prep",
+      "boxer": 5,
+      "test": 1,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:30:18.855Z",
+      "coach": null,
+      "value1": 18.7,
+      "value2": 17.78,
+      "value3": 17.86,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 28,
+    "fields": {
+      "phase": "prep",
+      "boxer": 6,
+      "test": 1,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:30:18.888Z",
+      "coach": null,
+      "value1": 17.56,
+      "value2": 17.31,
+      "value3": 17.2,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 29,
+    "fields": {
+      "phase": "prep",
+      "boxer": 7,
+      "test": 1,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:30:18.920Z",
+      "coach": null,
+      "value1": 18.97,
+      "value2": 18.52,
+      "value3": 18.22,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 30,
+    "fields": {
+      "phase": "prep",
+      "boxer": 8,
+      "test": 1,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:30:18.949Z",
+      "coach": null,
+      "value1": 17.5,
+      "value2": 17.12,
+      "value3": 16.8,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 31,
+    "fields": {
+      "phase": "prep",
+      "boxer": 11,
+      "test": 1,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:30:18.976Z",
+      "coach": null,
+      "value1": 17.38,
+      "value2": 16.79,
+      "value3": 16.73,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 32,
+    "fields": {
+      "phase": "prep",
+      "boxer": 5,
+      "test": 3,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:33:29.625Z",
+      "coach": null,
+      "value1": 184.5,
+      "value2": 177.0,
+      "value3": 178.0,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 33,
+    "fields": {
+      "phase": "prep",
+      "boxer": 6,
+      "test": 3,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:33:29.653Z",
+      "coach": null,
+      "value1": 235.0,
+      "value2": 242.5,
+      "value3": 236.0,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 34,
+    "fields": {
+      "phase": "prep",
+      "boxer": 7,
+      "test": 3,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:33:29.679Z",
+      "coach": null,
+      "value1": 195.0,
+      "value2": 190.0,
+      "value3": 197.0,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 35,
+    "fields": {
+      "phase": "prep",
+      "boxer": 8,
+      "test": 3,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:33:29.705Z",
+      "coach": null,
+      "value1": 231.0,
+      "value2": 228.5,
+      "value3": 237.0,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 36,
+    "fields": {
+      "phase": "prep",
+      "boxer": 11,
+      "test": 3,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:33:29.734Z",
+      "coach": null,
+      "value1": 262.0,
+      "value2": 273.0,
+      "value3": 266.0,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 37,
+    "fields": {
+      "phase": "prep",
+      "boxer": 15,
+      "test": 3,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:33:29.761Z",
+      "coach": null,
+      "value1": 228.5,
+      "value2": 231.0,
+      "value3": 230.0,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 38,
+    "fields": {
+      "phase": "prep",
+      "boxer": 5,
+      "test": 2,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:36:47.894Z",
+      "coach": null,
+      "value1": 322.0,
+      "value2": 386.0,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 39,
+    "fields": {
+      "phase": "prep",
+      "boxer": 6,
+      "test": 2,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:36:47.926Z",
+      "coach": null,
+      "value1": 480.0,
+      "value2": 453.0,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 40,
+    "fields": {
+      "phase": "prep",
+      "boxer": 7,
+      "test": 2,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:36:47.957Z",
+      "coach": null,
+      "value1": 432.0,
+      "value2": 468.0,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 41,
+    "fields": {
+      "phase": "prep",
+      "boxer": 8,
+      "test": 2,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:36:47.989Z",
+      "coach": null,
+      "value1": 438.0,
+      "value2": 504.0,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 42,
+    "fields": {
+      "phase": "prep",
+      "boxer": 5,
+      "test": 5,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:38:32.395Z",
+      "coach": null,
+      "value1": 920.0,
+      "value2": null,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 43,
+    "fields": {
+      "phase": "prep",
+      "boxer": 6,
+      "test": 5,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:38:32.424Z",
+      "coach": null,
+      "value1": 1340.0,
+      "value2": null,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 44,
+    "fields": {
+      "phase": "prep",
+      "boxer": 7,
+      "test": 5,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:38:32.450Z",
+      "coach": null,
+      "value1": 660.0,
+      "value2": null,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 45,
+    "fields": {
+      "phase": "prep",
+      "boxer": 8,
+      "test": 5,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:38:32.479Z",
+      "coach": null,
+      "value1": 1740.0,
+      "value2": null,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 46,
+    "fields": {
+      "phase": "prep",
+      "boxer": 11,
+      "test": 5,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:38:32.512Z",
+      "coach": null,
+      "value1": 1620.0,
+      "value2": null,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 47,
+    "fields": {
+      "phase": "prep",
+      "boxer": 15,
+      "test": 5,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:38:32.538Z",
+      "coach": null,
+      "value1": 1740.0,
+      "value2": null,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 48,
+    "fields": {
+      "phase": "prep",
+      "boxer": 5,
+      "test": 4,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:40:38.965Z",
+      "coach": null,
+      "value1": 2.26,
+      "value2": 2.24,
+      "value3": 2.25,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 49,
+    "fields": {
+      "phase": "prep",
+      "boxer": 6,
+      "test": 4,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:40:38.993Z",
+      "coach": null,
+      "value1": 2.17,
+      "value2": 2.18,
+      "value3": 2.06,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 50,
+    "fields": {
+      "phase": "prep",
+      "boxer": 7,
+      "test": 4,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:40:39.021Z",
+      "coach": null,
+      "value1": 2.38,
+      "value2": 2.37,
+      "value3": 2.17,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 51,
+    "fields": {
+      "phase": "prep",
+      "boxer": 8,
+      "test": 4,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:40:39.047Z",
+      "coach": null,
+      "value1": 2.04,
+      "value2": 1.8,
+      "value3": 2.13,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 52,
+    "fields": {
+      "phase": "prep",
+      "boxer": 11,
+      "test": 4,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:40:39.075Z",
+      "coach": null,
+      "value1": 2.06,
+      "value2": 2.04,
+      "value3": 2.12,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 53,
+    "fields": {
+      "phase": "prep",
+      "boxer": 15,
+      "test": 4,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-12T17:40:39.105Z",
+      "coach": null,
+      "value1": 2.05,
+      "value2": 2.1,
+      "value3": 2.25,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 60,
+    "fields": {
+      "phase": "prep",
+      "boxer": 21,
+      "test": 1,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-17T19:30:15.934Z",
+      "coach": null,
+      "value1": 18.7,
+      "value2": 17.64,
+      "value3": 17.98,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 61,
+    "fields": {
+      "phase": "prep",
+      "boxer": 21,
+      "test": 5,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-18T18:11:31.698Z",
+      "coach": null,
+      "value1": 1620.0,
+      "value2": null,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 62,
+    "fields": {
+      "phase": "prep",
+      "boxer": 22,
+      "test": 1,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-19T21:14:29.206Z",
+      "coach": null,
+      "value1": 19.89,
+      "value2": 19.14,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 63,
+    "fields": {
+      "phase": "prep",
+      "boxer": 22,
+      "test": 4,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-19T21:14:30.020Z",
+      "coach": null,
+      "value1": 2.43,
+      "value2": 2.56,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 64,
+    "fields": {
+      "phase": "prep",
+      "boxer": 22,
+      "test": 5,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-19T21:14:30.804Z",
+      "coach": null,
+      "value1": 740.0,
+      "value2": null,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 66,
+    "fields": {
+      "phase": "prep",
+      "boxer": 27,
+      "test": 1,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-27T13:05:32.511Z",
+      "coach": null,
+      "value1": 22.25,
+      "value2": 20.87,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 67,
+    "fields": {
+      "phase": "prep",
+      "boxer": 27,
+      "test": 5,
+      "measured_at": "2025-08-29T11:36:59.605Z",
+      "updated_at": "2025-08-27T13:05:32.549Z",
+      "coach": null,
+      "value1": 480.0,
+      "value2": null,
+      "value3": null,
+      "notes": ""
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.testresult",
+    "pk": 77,
+    "fields": {
+      "phase": "",
+      "boxer": 20,
+      "test": 3,
+      "measured_at": "2025-09-05T14:07:00Z",
+      "updated_at": "2025-09-05T12:08:10.320Z",
+      "coach": null,
+      "value1": 500.0,
+      "value2": 650.0,
+      "value3": 1000.0,
+      "notes": "HULK"
+    }
+  }
+]

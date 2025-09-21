@@ -1,0 +1,72 @@
+[
+{
+  "model": "BoxersPresenceApp.classtemplate",
+  "pk": 1,
+  "fields": {
+    "gym": 2,
+    "title": "Juniors 2025/2026",
+    "description": "2011-2009",
+    "coaches": []
+  }
+},
+{
+  "model": "BoxersPresenceApp.classtemplate",
+  "pk": 2,
+  "fields": {
+    "gym": 2,
+    "title": "Youth 2025/2026",
+    "description": "2008-2004",
+    "coaches": []
+  }
+},
+{
+  "model": "BoxersPresenceApp.classtemplate",
+  "pk": 3,
+  "fields": {
+    "gym": 2,
+    "title": "School Boys and Girls 2025/2026",
+    "description": "",
+    "coaches": []
+  }
+},
+{
+  "model": "BoxersPresenceApp.classtemplate",
+  "pk": 4,
+  "fields": {
+    "gym": 2,
+    "title": "Sweetpees 2025/2026",
+    "description": "2020-2017",
+    "coaches": []
+  }
+},
+{
+  "model": "BoxersPresenceApp.classtemplate",
+  "pk": 5,
+  "fields": {
+    "gym": 2,
+    "title": "Aspiranten 2025/2026",
+    "description": "2016-2013",
+    "coaches": []
+  }
+},
+{
+  "model": "BoxersPresenceApp.classtemplate",
+  "pk": 6,
+  "fields": {
+    "gym": 1,
+    "title": "Mini",
+    "description": "They learn how to get bigger",
+    "coaches": []
+  }
+},
+{
+  "model": "BoxersPresenceApp.classtemplate",
+  "pk": 7,
+  "fields": {
+    "gym": 1,
+    "title": "Grow",
+    "description": "",
+    "coaches": []
+  }
+}
+]

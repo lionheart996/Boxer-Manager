@@ -1,0 +1,666 @@
+[
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 2,
+    "fields": {
+      "boxer": 4,
+      "template": 1
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 3,
+    "fields": {
+      "boxer": 6,
+      "template": 1
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 5,
+    "fields": {
+      "boxer": 2,
+      "template": 1
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 6,
+    "fields": {
+      "boxer": 9,
+      "template": 1
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 7,
+    "fields": {
+      "boxer": 12,
+      "template": 1
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 12,
+    "fields": {
+      "boxer": 37,
+      "template": 1
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 14,
+    "fields": {
+      "boxer": 31,
+      "template": 1
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 16,
+    "fields": {
+      "boxer": 30,
+      "template": 1
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 17,
+    "fields": {
+      "boxer": 32,
+      "template": 1
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 18,
+    "fields": {
+      "boxer": 35,
+      "template": 1
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 19,
+    "fields": {
+      "boxer": 42,
+      "template": 1
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 21,
+    "fields": {
+      "boxer": 41,
+      "template": 1
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 23,
+    "fields": {
+      "boxer": 51,
+      "template": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 24,
+    "fields": {
+      "boxer": 47,
+      "template": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 25,
+    "fields": {
+      "boxer": 39,
+      "template": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 26,
+    "fields": {
+      "boxer": 46,
+      "template": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 27,
+    "fields": {
+      "boxer": 44,
+      "template": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 28,
+    "fields": {
+      "boxer": 48,
+      "template": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 29,
+    "fields": {
+      "boxer": 45,
+      "template": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 31,
+    "fields": {
+      "boxer": 5,
+      "template": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 32,
+    "fields": {
+      "boxer": 50,
+      "template": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 33,
+    "fields": {
+      "boxer": 49,
+      "template": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 34,
+    "fields": {
+      "boxer": 15,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 35,
+    "fields": {
+      "boxer": 77,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 36,
+    "fields": {
+      "boxer": 59,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 37,
+    "fields": {
+      "boxer": 78,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 38,
+    "fields": {
+      "boxer": 55,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 39,
+    "fields": {
+      "boxer": 68,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 40,
+    "fields": {
+      "boxer": 10,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 41,
+    "fields": {
+      "boxer": 65,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 42,
+    "fields": {
+      "boxer": 64,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 43,
+    "fields": {
+      "boxer": 8,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 44,
+    "fields": {
+      "boxer": 56,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 45,
+    "fields": {
+      "boxer": 62,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 46,
+    "fields": {
+      "boxer": 71,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 47,
+    "fields": {
+      "boxer": 70,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 48,
+    "fields": {
+      "boxer": 60,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 49,
+    "fields": {
+      "boxer": 58,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 50,
+    "fields": {
+      "boxer": 73,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 51,
+    "fields": {
+      "boxer": 67,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 52,
+    "fields": {
+      "boxer": 16,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 53,
+    "fields": {
+      "boxer": 76,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 54,
+    "fields": {
+      "boxer": 72,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 55,
+    "fields": {
+      "boxer": 11,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 56,
+    "fields": {
+      "boxer": 53,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 57,
+    "fields": {
+      "boxer": 14,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 58,
+    "fields": {
+      "boxer": 54,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 59,
+    "fields": {
+      "boxer": 57,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 60,
+    "fields": {
+      "boxer": 63,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 61,
+    "fields": {
+      "boxer": 75,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 62,
+    "fields": {
+      "boxer": 66,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 63,
+    "fields": {
+      "boxer": 52,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 64,
+    "fields": {
+      "boxer": 7,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 65,
+    "fields": {
+      "boxer": 3,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 66,
+    "fields": {
+      "boxer": 74,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 67,
+    "fields": {
+      "boxer": 61,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 68,
+    "fields": {
+      "boxer": 13,
+      "template": 1
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 69,
+    "fields": {
+      "boxer": 80,
+      "template": 1
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 70,
+    "fields": {
+      "boxer": 79,
+      "template": 1
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 71,
+    "fields": {
+      "boxer": 81,
+      "template": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 72,
+    "fields": {
+      "boxer": 82,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 73,
+    "fields": {
+      "boxer": 83,
+      "template": 4
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 74,
+    "fields": {
+      "boxer": 20,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 75,
+    "fields": {
+      "boxer": 119,
+      "template": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 76,
+    "fields": {
+      "boxer": 118,
+      "template": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 77,
+    "fields": {
+      "boxer": 117,
+      "template": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 78,
+    "fields": {
+      "boxer": 116,
+      "template": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 79,
+    "fields": {
+      "boxer": 115,
+      "template": 5
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 80,
+    "fields": {
+      "boxer": 69,
+      "template": 1
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 81,
+    "fields": {
+      "boxer": 120,
+      "template": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 82,
+    "fields": {
+      "boxer": 33,
+      "template": 3
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 83,
+    "fields": {
+      "boxer": 69,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 84,
+    "fields": {
+      "boxer": 123,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 85,
+    "fields": {
+      "boxer": 121,
+      "template": 2
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 86,
+    "fields": {
+      "boxer": 125,
+      "template": 6
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 87,
+    "fields": {
+      "boxer": 124,
+      "template": 6
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 88,
+    "fields": {
+      "boxer": 126,
+      "template": 6
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 89,
+    "fields": {
+      "boxer": 126,
+      "template": 7
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 90,
+    "fields": {
+      "boxer": 124,
+      "template": 7
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 91,
+    "fields": {
+      "boxer": 125,
+      "template": 7
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 92,
+    "fields": {
+      "boxer": 20,
+      "template": 1
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 93,
+    "fields": {
+      "boxer": 127,
+      "template": 1
+    }
+  },
+  {
+    "model": "BoxersPresenceApp.enrollment",
+    "pk": 94,
+    "fields": {
+      "boxer": 128,
+      "template": 1
+    }
+  }
+]

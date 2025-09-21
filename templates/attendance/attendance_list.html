@@ -6,23 +6,20 @@
 
   <!-- Filters -->
   <form method="get" class="filter-bar">
-  <div class="date-field">
-    <input type="date" id="date" name="date" value="{{ date }}">
-    <span class="calendar-icon" onclick="document.getElementById('date').showPicker?.()">📅</span>
-  </div>
+    <div class="date-field">
+      <input type="date" id="date" name="date" value="{{ date }}">
+      <span class="calendar-icon" onclick="document.getElementById('date').showPicker?.()">📅</span>
+    </div>
+    <input type="text" name="q" value="{{ q }}" placeholder="Search boxer…" />
+    <button class="btn btn--primary" type="submit">Filter</button>
+    <a class="btn btn--quiet" href="{% url 'attendance_list' %}">Clear</a>
 
-  <select name="q">
-    <option value="">-- Select Boxer --</option>
-    {% for b in boxers %}
-      <option value="{{ b.boxer__id }}" {% if q == b.boxer__id|stringformat:"s" %}selected{% endif %}>
-        {{ b.boxer__name }}
-      </option>
-    {% endfor %}
-  </select>
-
-  <button class="btn btn--primary" type="submit">Filter</button>
-  <a class="btn btn--quiet" href="{% url 'attendance_list' %}">Clear</a>
-</form>
+    {% if show_absences %}
+      <a class="btn btn--secondary" href="?date={{ date }}&q={{ q }}">Show Present</a>
+    {% else %}
+      <a class="btn btn--secondary" href="?date={{ date }}&q={{ q }}&show_absences=1">Show Absences</a>
+    {% endif %}
+  </form>
 
   <!-- CASE 4: sentence mode -->
   {% if presence_mode %}
@@ -45,13 +42,19 @@
         {% for a in attendances %}
           <div class="att-card">
             <div class="att-date">{{ a.date|date:"d M Y (D)" }}</div>
-            <div class="att-boxer">{{ a.boxer.name }}</div>
+            <div class="att-boxer">{{ a.boxer.first_name }} {{ a.boxer.last_name }}</div>
+
             <div class="att-class">
-              {% if a.session and a.session.template %}
-                {{ a.session.template.title }}
-              {% else %}
-                –
-              {% endif %}
+              {% if show_absences %}
+                  {% if a.is_excused %}
+                    <span class="excused">Excused</span>
+                  {% else %}
+                    <span class="absent">Unexcused</span>
+                  {% endif %}
+                {% else %}
+                  <span class="present">Present</span>
+                {% endif %}
+              – {% if a.class_template %}{{ a.class_template.title }}{% else %}–{% endif %}
             </div>
           </div>
         {% endfor %}
@@ -60,11 +63,11 @@
       {% if is_paginated %}
         <div class="pagination">
           {% if page_obj.has_previous %}
-            <a class="btn" href="?page={{ page_obj.previous_page_number }}&date={{ date }}&q={{ q }}">← Prev</a>
+            <a class="btn" href="?page={{ page_obj.previous_page_number }}&date={{ date }}&q={{ q }}{% if show_absences %}&show_absences=1{% endif %}">← Prev</a>
           {% endif %}
           <span>Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
           {% if page_obj.has_next %}
-            <a class="btn" href="?page={{ page_obj.next_page_number }}&date={{ date }}&q={{ q }}">Next →</a>
+            <a class="btn" href="?page={{ page_obj.next_page_number }}&date={{ date }}&q={{ q }}{% if show_absences %}&show_absences=1{% endif %}">Next →</a>
           {% endif %}
         </div>
       {% endif %}
@@ -116,7 +119,11 @@
   box-shadow: 0 0 18px rgba(0,255,102,.4);
 }
 .att-date { font-weight:700; color:var(--brand); }
-.att-boxer { font-size:15px; font-weight:600; }
+.att-boxer {
+  font-size:15px;
+  font-weight:600;
+  color: #fff;  /* or var(--text) if your --text is light */
+}
 .att-class { font-size:13px; color:var(--muted); text-align:right; }
 
 /* Pagination */

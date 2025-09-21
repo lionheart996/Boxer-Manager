@@ -1,0 +1,50 @@
+[
+{
+  "model": "BoxersPresenceApp.coachprofile",
+  "pk": 15,
+  "fields": {
+    "user": 15,
+    "gym": 2
+  }
+},
+{
+  "model": "BoxersPresenceApp.coachprofile",
+  "pk": 17,
+  "fields": {
+    "user": 18,
+    "gym": 1
+  }
+},
+{
+  "model": "BoxersPresenceApp.coachprofile",
+  "pk": 18,
+  "fields": {
+    "user": 19,
+    "gym": 2
+  }
+},
+{
+  "model": "BoxersPresenceApp.coachprofile",
+  "pk": 19,
+  "fields": {
+    "user": 20,
+    "gym": 2
+  }
+},
+{
+  "model": "BoxersPresenceApp.coachprofile",
+  "pk": 20,
+  "fields": {
+    "user": 21,
+    "gym": 2
+  }
+},
+{
+  "model": "BoxersPresenceApp.coachprofile",
+  "pk": 21,
+  "fields": {
+    "user": 22,
+    "gym": 2
+  }
+}
+]

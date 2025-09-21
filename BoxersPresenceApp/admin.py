@@ -16,9 +16,19 @@ from .models import (
 # --- Simple registrations ---
 @admin.register(Attendance)
 class AttendanceAdmin(admin.ModelAdmin):
-    list_display = ("boxer", "date")
-    list_filter = ("date",)
-    search_fields = ("boxer__name",)
+    list_display = ("date", "class_name", "boxer", "status")
+    list_filter = ("date", "class_template", "is_present", "is_excused")
+    search_fields = ("boxer__name", "class_template__title", "class_template__gym__name")
+
+    def class_name(self, obj):
+        return obj.class_template.title if obj.class_template else "-"
+    class_name.short_description = "Class"
+
+    def status(self, obj):
+        if obj.is_present:
+            return "Present"
+        return "Excused" if obj.is_excused else "Absent"
+    status.short_description = "Attendance Status"
 
 # --- TestResult ---
 class TestResultInline(admin.TabularInline):
@@ -51,9 +61,9 @@ class HeartRateAdmin(admin.ModelAdmin):
 # --- Boxer ---
 @admin.register(Boxer)
 class BoxerAdmin(admin.ModelAdmin):
-    list_display = ("name", "parent_name", "date_of_birth", "gym")
+    list_display = ("first_name", "last_name", "parent_name", "date_of_birth", "gym")
     list_filter = ("gym",)
-    search_fields = ("name", "parent_name")
+    search_fields = ("first_name", "last_name", "parent_name")
     autocomplete_fields = ("gym",)
     filter_horizontal = ("coaches",)
 

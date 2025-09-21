@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="resume-container">
+  <h2>📄 Boxer Resume</h2>
+
+  <p><strong>Boxer’s forename:</strong> {{ boxer.first_name|default:"Not Specified" }}</p>
+  <p><strong>Boxer’s last name:</strong> {{ boxer.last_name|default:"Not Specified" }}</p>
+  <p><strong>Parent:</strong>
+  {{ boxer.parent_name|default:"Not Specified" }}
+  </p>
+  <p><strong>Date of birth:</strong>
+    {% if boxer.date_of_birth %}
+      {{ boxer.date_of_birth|date:"d M Y" }}
+    {% else %}
+      Not Specified
+    {% endif %}
+  </p>
+
+  <hr>
+
+  <h3>Attendance Summary</h3>
+  {% if att_total %}
+    <p>Until today: {{ boxer.name }} has been <strong>{{ att_present }}</strong> times present 
+    ({{ att_present }} / {{ att_total }} = {{ att_present_pct }}%).</p>
+
+    <p>Absent: <strong>{{ att_absent }}</strong> ({{ att_absent_pct }}%). 
+    Of these, <strong>{{ att_excused }}</strong> were excused 
+    ({{ att_excused_pct }}%).</p>
+  {% else %}
+    <p><em>No attendance records yet.</em></p>
+  {% endif %}
+
+  <hr>
+
+  <h3>Weight Progress</h3>
+  {% if weight_min %}
+    <p>Minimum recorded: {{ weight_min.kg }} kg (on {{ weight_min.measured_at|date:"d M Y" }})</p>
+    <p>Maximum recorded: {{ weight_max.kg }} kg (on {{ weight_max.measured_at|date:"d M Y" }})</p>
+    <p>Average: {{ weight_avg }} kg</p>
+  {% else %}
+    <p><em>No records for Weight</em></p>
+  {% endif %}
+
+  <hr>
+  <button class="btn" onclick="window.print()">🖨️ Print</button>
+</div>
+
+<style>
+.resume-container {
+  max-width: 700px;
+  margin: auto;
+  padding: 20px;
+  background: #111;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+</style>
+{% endblock %}

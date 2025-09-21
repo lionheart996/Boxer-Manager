@@ -21,17 +21,16 @@
     <noscript><button class="btn" type="submit">Apply</button></noscript>
     <a class="btn btn--accent" href="{% url 'attendance_list' %}">All Attendance</a>
 
-    {# Show the toggle button ONLY when a class is selected and there are no Add Class errors #}
     {% if selected_class and not class_create_form.errors %}
-  <button type="button"
-          id="add-class-toggle"
-          class="btn btn--quiet">
-    Add a class
-  </button>
-{% endif %}
+      <button type="button"
+              id="add-class-toggle"
+              class="btn btn--quiet">
+        Add a class
+      </button>
+    {% endif %}
   </form>
 
-  <!-- Add Class form (hidden when a class is selected & no errors; always visible otherwise) -->
+  <!-- Add Class form -->
   <div id="add-class-panel"
        class="add-class-panel"
        {% if selected_class and not class_create_form.errors %}hidden{% endif %}>
@@ -66,8 +65,8 @@
     <ul class="enrolled-list">
       {% for b in boxers %}
         <li class="enrolled-item">
-          <span class="enrolled-name">{{ b.name }}</span>
-          <form method="post" class="inline" onsubmit="return confirm('Remove {{ b.name }} from this class?');">
+          <span class="enrolled-name">{{ b.first_name }} {{ b.last_name }}</span>
+          <form method="post" class="inline" onsubmit="return confirm('Remove {{ b.first_name }} {{ b.last_name }} from this class?');">
             {% csrf_token %}
             <input type="hidden" name="action" value="unenroll">
             <input type="hidden" name="class_id" value="{{ selected_class.id }}">
@@ -92,7 +91,7 @@
       {% for boxer in boxers %}
       <section class="att-card" data-boxer-id="{{ boxer.id }}">
         <header class="att-card__head">
-          <h4 class="att-card__name">{{ boxer.name }}</h4>
+          <h4 class="att-card__name">{{ boxer.first_name }} {{ boxer.last_name }}</h4>
           <a class="btn btn--sm btn--quiet att-card__progress" href="{% url 'weight_progress' boxer.id %}">
             Weight Progress
           </a>

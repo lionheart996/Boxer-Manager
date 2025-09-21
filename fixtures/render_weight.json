@@ -1,0 +1,119 @@
+[
+{
+  "model": "BoxersPresenceApp.weight",
+  "pk": 2,
+  "fields": {
+    "boxer": 20,
+    "measured_at": "2025-08-13T00:00:00Z",
+    "kg": "110.00"
+  }
+},
+{
+  "model": "BoxersPresenceApp.weight",
+  "pk": 19,
+  "fields": {
+    "boxer": 29,
+    "measured_at": "2025-08-31T12:00:00Z",
+    "kg": "52.00"
+  }
+},
+{
+  "model": "BoxersPresenceApp.weight",
+  "pk": 20,
+  "fields": {
+    "boxer": 29,
+    "measured_at": "2025-08-30T12:00:00Z",
+    "kg": "51.00"
+  }
+},
+{
+  "model": "BoxersPresenceApp.weight",
+  "pk": 24,
+  "fields": {
+    "boxer": 4,
+    "measured_at": "2025-09-03T12:00:00Z",
+    "kg": "54.80"
+  }
+},
+{
+  "model": "BoxersPresenceApp.weight",
+  "pk": 25,
+  "fields": {
+    "boxer": 2,
+    "measured_at": "2025-09-03T12:00:00Z",
+    "kg": "45.00"
+  }
+},
+{
+  "model": "BoxersPresenceApp.weight",
+  "pk": 26,
+  "fields": {
+    "boxer": 32,
+    "measured_at": "2025-09-03T12:00:00Z",
+    "kg": "71.00"
+  }
+},
+{
+  "model": "BoxersPresenceApp.weight",
+  "pk": 27,
+  "fields": {
+    "boxer": 13,
+    "measured_at": "2025-09-03T12:00:00Z",
+    "kg": "77.00"
+  }
+},
+{
+  "model": "BoxersPresenceApp.weight",
+  "pk": 28,
+  "fields": {
+    "boxer": 79,
+    "measured_at": "2025-09-03T12:00:00Z",
+    "kg": "43.00"
+  }
+},
+{
+  "model": "BoxersPresenceApp.weight",
+  "pk": 29,
+  "fields": {
+    "boxer": 55,
+    "measured_at": "2025-09-04T12:00:00Z",
+    "kg": "65.00"
+  }
+},
+{
+  "model": "BoxersPresenceApp.weight",
+  "pk": 34,
+  "fields": {
+    "boxer": 11,
+    "measured_at": "2025-09-06T12:00:00Z",
+    "kg": "67.00"
+  }
+},
+{
+  "model": "BoxersPresenceApp.weight",
+  "pk": 37,
+  "fields": {
+    "boxer": 124,
+    "measured_at": "2025-09-09T17:00:00Z",
+    "kg": "37.00"
+  }
+},
+{
+  "model": "BoxersPresenceApp.weight",
+  "pk": 38,
+  "fields": {
+    "boxer": 125,
+    "measured_at": "2025-09-09T17:00:00Z",
+    "kg": "36.00"
+  }
+},
+{
+  "model": "BoxersPresenceApp.weight",
+  "pk": 47,
+  "fields": {
+    "boxer": 13,
+    "measured_at": "2025-09-09T17:00:00Z",
+    "kg": "78.00"
+  }
+}
+]
