@@ -36,6 +36,8 @@ urlpatterns = [
     # Attendance
     path('attendance/', views.AttendanceListView.as_view(), name='attendance_list'),
     path('attendance/mark/', views.MarkAttendanceView.as_view(), name='mark_attendance'),
+    path("attendance/export/", views.export_form, name="export_form"),
+    path("attendance/export/download/", views.export_download, name="export_download"),
     path('attendance/weight/<int:boxer_id>/', WeightProgressView.as_view(), name='weight_progress'),
     path('attendance/date/', views.attendance_by_date, name='attendance_by_date'),
     path('attendance/delete/<int:attendance_id>/', views.delete_attendance, name='delete_attendance'),

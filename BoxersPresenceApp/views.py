@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from datetime import date, time as dt_time
 from datetime import date as Date
 from decimal import InvalidOperation
+import openpyxl
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
@@ -208,54 +209,6 @@ class BatteryTestDeleteView(View):
         # No deletes via GET; just bounce back
         return redirect(self.success_url)
 
-
-
-# ===== RESULTS MATRIX (phase-aware) =====
-# class ResultsMatrixView(LoginRequiredMixin, TemplateView):
-#     template_name = 'tests_results.html'
-#
-#     def current_phase(self):
-#         return self.request.GET.get('phase') or TestResult.PHASE_PRE
-#
-#     def get(self, request, *args, **kwargs):
-#         phase = self.current_phase()
-#         tests = BatteryTest.objects.filter(coach=request.user).order_by('display_order', 'name')
-#         boxers = Boxer.objects.filter(coach=request.user).order_by('name')
-#         results = {
-#             (r.boxer_id, r.test_id): r
-#             for r in TestResult.objects.filter(
-#                 boxer__coach=request.user, test__coach=request.user, phase=phase
-#             )
-#         }
-#         return render(request, self.template_name, {
-#             'phase_form': PhaseSelectForm(initial={'phase': phase}),
-#             'phase': phase,
-#             'tests': tests,
-#             'boxers': boxers,
-#             'results': results,
-#         })
-#
-#     def post(self, request, *args, **kwargs):
-#         # Save All for selected phase
-#         phase = request.GET.get('phase') or request.POST.get('phase') or TestResult.PHASE_PRE
-#         tests = BatteryTest.objects.filter(coach=request.user)
-#         boxers = Boxer.objects.filter(coach=request.user)
-#
-#         for b in boxers:
-#             for t in tests:
-#                 prefix = f"r-{b.id}-{t.id}-"
-#                 v1 = request.POST.get(prefix + "value1")
-#                 v2 = request.POST.get(prefix + "value2")
-#                 v3 = request.POST.get(prefix + "value3")
-#                 notes = (request.POST.get(prefix + "notes") or "").strip()
-#                 if all(x in (None, '') for x in (v1, v2, v3, notes)):
-#                     continue
-#                 obj, _ = TestResult.objects.get_or_create(boxer=b, test=t, phase=phase)
-#                 obj.value1, obj.value2, obj.value3 = v1 or None, v2 or None, v3 or None
-#                 obj.notes = notes
-#                 obj.save()
-#
-#         return redirect(f"{reverse_lazy('tests_results')}?phase={phase}")
 
 def post(self, request, *args, **kwargs):
     # Save a single (boxer, test, phase) result from the detail form
@@ -491,6 +444,97 @@ def parse_iso_date_or_today(s: str | None) -> date:
     except Exception:
         pass
     return timezone.localdate()
+
+
+@login_required
+def export_form(request):
+    """Form with start/end + class dropdown (scoped to current user's gym)."""
+    gym = user_gym(request)
+    classes = ClassTemplate.objects.all().order_by("title") if request.user.is_superuser \
+        else ClassTemplate.objects.filter(gym=gym).order_by("title")
+    return render(request, "attendance/export_form.html", {"classes": classes})
+
+
+@login_required
+def export_download(request):
+    start_raw = request.GET.get("start_date")
+    end_raw   = request.GET.get("end_date")
+    class_id  = (request.GET.get("class_id") or "").strip()
+
+    if not start_raw or not end_raw:
+        return HttpResponse("Please provide start_date and end_date", status=400)
+
+    try:
+        start_date = datetime.strptime(start_raw, "%Y-%m-%d").date()
+        end_date   = datetime.strptime(end_raw,   "%Y-%m-%d").date()
+    except Exception:
+        return HttpResponse("Dates must be YYYY-MM-DD", status=400)
+
+    if end_date < start_date:
+        return HttpResponse("end_date must be on/after start_date", status=400)
+
+    gym = user_gym(request)
+
+    # ---- get selected class ----
+    selected_class = None
+    if class_id:
+        qs = ClassTemplate.objects.all() if request.user.is_superuser \
+             else ClassTemplate.objects.filter(gym=gym)
+        try:
+            selected_class = qs.get(pk=int(class_id))
+        except (ValueError, ClassTemplate.DoesNotExist):
+            return HttpResponse("Invalid class", status=400)
+
+    # ---- boxer list from class enrollments ----
+    if not selected_class:
+        return HttpResponse("Class required", status=400)
+
+    boxer_qs = Boxer.objects.filter(enrollments__template=selected_class).distinct()
+    boxer_qs = boxer_qs.order_by("first_name", "last_name", "name")
+
+    # ---- workbook ----
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Summary"
+
+    ws.append([f"Attendance {start_date} → {end_date} — Class: {selected_class.title}"])
+    ws.append([])
+    ws.append(["Boxer", "Present", "Absent", "Excused"])
+
+    ws2 = wb.create_sheet("Details")
+    ws2.append(["Date", "Boxer", "Status"])
+
+    # ---- per boxer ----
+    for boxer in boxer_qs:
+        full_name = f"{(boxer.first_name or '').strip()} {(boxer.last_name or '').strip()}".strip() or boxer.name
+
+        # pull *all* attendances for this boxer in range (ignore class_template)
+        att_qs = Attendance.objects.filter(
+            boxer=boxer,
+            date__gte=start_date,
+            date__lte=end_date,
+        )
+
+        present = att_qs.filter(is_present=True).count()
+        excused = att_qs.filter(is_present=False, is_excused=True).count()
+        absent  = att_qs.filter(is_present=False, is_excused=False).count()
+
+        ws.append([full_name, present, absent, excused])
+
+        for a in att_qs.order_by("date"):
+            status = "Present" if a.is_present else ("Excused" if a.is_excused else "Absent")
+            ws2.append([a.date.isoformat(), full_name, status])
+
+    # ---- response ----
+    filename = f"attendance_{start_date}_to_{end_date}_{selected_class.title.replace(' ', '_')}.xlsx"
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    wb.save(response)
+    return response
+
+
 class MarkAttendanceView(LoginRequiredMixin, TemplateView):
     template_name = "attendance/mark_attendance.html"
 
