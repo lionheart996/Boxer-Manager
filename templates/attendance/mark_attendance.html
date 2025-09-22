@@ -131,17 +131,25 @@
   {% else %}
     <p>Select a class above to enroll boxers and mark attendance.</p>
   {% endif %}
+
+  <!-- Always show Export button -->
+  <div style="text-align: right; margin-top: 2rem;">
+    <a href="{% url 'export_form' %}{% if selected_class %}?class_id={{ selected_class.id }}{% endif %}"
+       class="btn"
+       style="color: black; background: #f0f0f0; border: 1px solid #ccc; border-radius: 8px; padding: 0.5rem 1rem; font-weight: 600; text-decoration: none;">
+      Export Data
+    </a>
+  </div>
 </div>
+
 
 <style>
 .selector-bar { gap:10px; margin-bottom:16px; flex-wrap:wrap; }
 
-/* Add class panel (minimal, clean) */
 .add-class-panel[hidden] { display:none; }
 .add-class-card { padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--panel-2); }
 .add-class-head { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
 
-/* Enroll list & Attendance (kept tidy) */
 .enroll-card{ padding:12px; border:1px solid var(--border); border-radius:12px; margin:16px 0; background:var(--panel-2); }
 .enroll-form{ display:grid; gap:10px; margin-bottom:10px; }
 .enrolled-list{ list-style:none; padding:0; margin:0; display:grid; gap:8px; }
@@ -176,7 +184,6 @@
 </style>
 
 <script>
-  // Toggle Add Class panel (button only visible when a class is selected)
   document.addEventListener("DOMContentLoaded", () => {
     const btn   = document.getElementById("add-class-toggle");
     const panel = document.getElementById("add-class-panel");
@@ -199,7 +206,6 @@
     }
   });
 
-  // Auto-select Present when typing weight
   document.addEventListener('input', e => {
     if(e.target.name && e.target.name.startsWith('weight_')){
       const id = e.target.name.split('_')[1];
@@ -208,7 +214,6 @@
     }
   });
 
-  // Toggle excused based on Absent/Present
   document.addEventListener('change', e => {
     if(e.target.type === 'radio' && e.target.name.startsWith('attendance_')){
       const id = e.target.name.split('_')[1];
@@ -220,7 +225,6 @@
     }
   });
 
-  // Initialize excused states on load
   document.querySelectorAll('[name^="attendance_"][value="Absent"]').forEach(radio=>{
     const id = radio.name.split('_')[1];
     const excused = document.querySelector(`input[name="excused_${id}"]`);
