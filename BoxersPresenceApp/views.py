@@ -697,35 +697,41 @@ class MarkAttendanceView(LoginRequiredMixin, TemplateView):
             has_weight_input = bool(raw_weight)
             excused_flag = f"excused_{boxer.id}" in request.POST
 
-            # --- Save Attendance ---
-            is_present = status == "Present" or (status is None and has_weight_input)
-            defaults = {"is_present": is_present}
-            if excused_field:
-                defaults[excused_field] = bool(excused_flag) and not is_present
+            if status or has_weight_input:
+                # --- Save Attendance ---
+                is_present = status == "Present" or (status is None and has_weight_input)
+                defaults = {"is_present": is_present}
+                if excused_field:
+                    defaults[excused_field] = bool(excused_flag) and not is_present
 
-            Attendance.objects.update_or_create(
-                boxer=boxer,
-                date=target_date,
-                class_template=selected_class,
-                defaults=defaults,
-            )
+                Attendance.objects.update_or_create(
+                    boxer=boxer,
+                    date=target_date,
+                    class_template=selected_class,
+                    defaults=defaults,
+                )
 
-            # --- Save Weight (only if explicitly entered) ---
-            if is_present and has_weight_input:
-                try:
-                    kg = Decimal(raw_weight)
-                except (InvalidOperation, ValueError):
-                    kg = None
-                if kg is not None:
-                    Weight.objects.update_or_create(
-                        boxer=boxer,
-                        measured_at=measured_dt,
-                        defaults={"kg": kg},
-                    )
+                # --- Save Weight (only if explicitly entered) ---
+                if is_present and has_weight_input:
+                    try:
+                        kg = Decimal(raw_weight)
+                    except (InvalidOperation, ValueError):
+                        kg = None
+                    if kg is not None:
+                        Weight.objects.update_or_create(
+                            boxer=boxer,
+                            measured_at=measured_dt,
+                            defaults={"kg": kg},
+                        )
+            else:
+                # If nothing selected and no weight → remove any existing record
+                Attendance.objects.filter(
+                    boxer=boxer,
+                    date=target_date,
+                    class_template=selected_class
+                ).delete()
 
         return redirect(self._preserve_redirect(selected_class, target_date))
-
-
 
 
 @login_required

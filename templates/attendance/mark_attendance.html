@@ -144,7 +144,7 @@
 .add-class-card{ padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--panel-2); }
 .add-class-head{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
 
-/* Enrolled list (futuristic) */
+/* Enrolled list */
 .enrolled-title{ margin-top:1rem; margin-bottom:0.5rem; font-size:1.1rem; font-weight:700; color:var(--brand); text-transform:uppercase; letter-spacing:1px; }
 .enrolled-list{ list-style:none; padding:0; margin:0; display:grid; gap:10px; }
 .enrolled-item{ display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border:1px solid var(--border); border-radius:12px; background:linear-gradient(145deg,#151515,#101010); box-shadow:0 2px 6px rgba(0,0,0,0.5); transition:transform 0.2s ease, box-shadow 0.3s ease; }
@@ -220,20 +220,42 @@ function updateCardState(card){
 }
 
 document.querySelectorAll('.att-card').forEach(card=>{
-  updateCardState(card);
+  const present = card.querySelector('input[value="Present"]');
+  const absent = card.querySelector('input[value="Absent"]');
+  let lastClicked = null;
+
+  [present, absent].forEach(input=>{
+    input.addEventListener('click', e=>{
+      if(lastClicked === input && input.checked){
+        // toggle off
+        e.preventDefault();
+        input.checked = false;
+        lastClicked = null;
+      } else {
+        lastClicked = input;
+      }
+      updateCardState(card);
+    });
+  });
+
   card.addEventListener('change', e=>{
-    if(e.target.matches('input[type="radio"], .excused-toggle')){
+    if(e.target.matches('.excused-toggle')){
       updateCardState(card);
     }
   });
+
   card.addEventListener('input', e=>{
     if(e.target.name && e.target.name.startsWith('weight_')){
       if(e.target.value.trim() !== ''){
-        card.querySelector('input[value="Present"]').checked = true;
+        present.checked = true;
+        absent.checked = false;
+        lastClicked = present;
         updateCardState(card);
       }
     }
   });
+
+  updateCardState(card);
 });
 
 // Toggle Add Class panel
