@@ -587,20 +587,20 @@ class MarkAttendanceView(LoginRequiredMixin, TemplateView):
         target_date = self._target_date()
         selected_class = self._selected_class(gym)
 
-        # All classes in this gym
+        # All classes for selector
         classes = ClassTemplate.objects.filter(gym=gym).order_by("title")
 
-        # Boxers scoped to gym + selected class
+        # Boxers scoped to this gym, and filtered by selected class enrollment (when chosen)
         boxers = self._scoped_boxers_qs(gym, selected_class).order_by("name")
 
-        # Fetch attendance records for this class + date
+        # Pull any attendance already saved for this date + class
         att_qs = Attendance.objects.filter(
             boxer__in=boxers,
             date=target_date,
             class_template=selected_class,
         )
 
-        # detect excused field name dynamically
+        # Find which field represents "excused" on Attendance (supports different field names)
         excused_field = None
         for fname in ("is_excused", "excused", "excused_absence"):
             try:
@@ -610,28 +610,34 @@ class MarkAttendanceView(LoginRequiredMixin, TemplateView):
             except Exception:
                 pass
 
-        # Build per-boxer data for template
+        # Build a quick map boxer_id -> {status, excused}
         attendance_map = {}
         for att in att_qs:
             excused = bool(getattr(att, excused_field)) if excused_field else False
             status = "present" if att.is_present else ("excused" if excused else "absent")
             attendance_map[att.boxer_id] = {"status": status, "excused": excused}
 
+        # Build data the template uses for the dynamic UI
         boxer_data = []
         for boxer in boxers:
             att = attendance_map.get(boxer.id)
             boxer_data.append({
                 "boxer": boxer,
-                "status": att["status"] if att else None,
-                "excused": att["excused"] if att else False,
+                "status": (att["status"] if att else None),
+                "excused": (att["excused"] if att else False),
             })
 
-        # Context for template
         ctx.update({
             "date": target_date,
             "classes": classes,
             "selected_class": selected_class,
-            "boxer_data": boxer_data,  # <-- used directly in template
+
+            # IMPORTANT: keep both so the template can:
+            # - use boxer_data for the dynamic attendance UI
+            # - use boxers to render the "Enrolled" list
+            "boxers": boxers,
+            "boxer_data": boxer_data,
+
             "class_create_form": ClassCreateForm(request=self.request),
             "enroll_form": EnrollBoxerForm(request=self.request, template=selected_class) if selected_class else None,
             "unenroll_form": UnenrollForm(),

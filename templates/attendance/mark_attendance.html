@@ -3,7 +3,7 @@
 <div class="content-container">
   <h2 class="page-title">Mark Attendance</h2>
 
-  <!-- Class + Date selector (GET) -->
+  <!-- Class + Date selector -->
   <form method="get" class="form-row selector-bar">
     <label>Class:</label>
     <select name="class_id" onchange="this.form.submit()">
@@ -20,33 +20,7 @@
 
     <noscript><button class="btn" type="submit">Apply</button></noscript>
     <a class="btn btn--accent" href="{% url 'attendance_list' %}">All Attendance</a>
-
-    {% if selected_class and not class_create_form.errors %}
-      <button type="button"
-              id="add-class-toggle"
-              class="btn btn--quiet">
-        Add a class
-      </button>
-    {% endif %}
   </form>
-
-  <!-- Add Class form -->
-  <div id="add-class-panel"
-       class="add-class-panel"
-       {% if selected_class and not class_create_form.errors %}hidden{% endif %}>
-    <div class="card add-class-card">
-      <div class="add-class-head">
-        <h3 style="margin:0;">Add Class</h3>
-        <button type="button" id="add-class-close" class="btn btn--quiet btn--sm" style="margin-left:auto;">Close</button>
-      </div>
-      <form method="post">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="create_class">
-        {{ class_create_form.as_p }}
-        <button class="btn btn--primary" type="submit">Add</button>
-      </form>
-    </div>
-  </div>
 
   {% if selected_class %}
   <!-- ENROLL / REMOVE BOXERS -->
@@ -65,13 +39,18 @@
     <ul class="enrolled-list">
       {% for b in boxers %}
         <li class="enrolled-item">
-          <span class="enrolled-name">{{ b.first_name }} {{ b.last_name }}</span>
+          <div class="enrolled-info">
+            <div class="enrolled-avatar">
+              {{ b.first_name|slice:":1" }}{{ b.last_name|slice:":1" }}
+            </div>
+            <span class="enrolled-name">{{ b.first_name }} {{ b.last_name }}</span>
+          </div>
           <form method="post" class="inline" onsubmit="return confirm('Remove {{ b.first_name }} {{ b.last_name }} from this class?');">
             {% csrf_token %}
             <input type="hidden" name="action" value="unenroll">
             <input type="hidden" name="class_id" value="{{ selected_class.id }}">
             <input type="hidden" name="boxer_id" value="{{ b.id }}">
-            <button class="btn btn--danger btn--sm" type="submit">Remove</button>
+            <button class="btn btn--danger btn--sm" type="submit">✕</button>
           </form>
         </li>
       {% empty %}
@@ -92,7 +71,10 @@
       {% with boxer=item.boxer status=item.status excused=item.excused %}
       <section class="att-card" data-boxer-id="{{ boxer.id }}">
         <header class="att-card__head">
-          <h4 class="att-card__name">{{ boxer.first_name }} {{ boxer.last_name }}</h4>
+          <div class="att-boxer">
+            <div class="att-avatar">{{ boxer.first_name|slice:":1" }}{{ boxer.last_name|slice:":1" }}</div>
+            <h4 class="att-card__name">{{ boxer.first_name }} {{ boxer.last_name }}</h4>
+          </div>
           <a class="btn btn--sm btn--quiet att-card__progress" href="{% url 'weight_progress' boxer.id %}">
             Weight Progress
           </a>
@@ -115,7 +97,7 @@
           </fieldset>
 
           <!-- Excused -->
-          <label class="switch">
+          <label class="switch {% if status == 'excused' %}excused-active{% endif %}">
             <input type="checkbox" name="excused_{{ boxer.id }}" class="excused-toggle"
                    {% if excused %}checked{% endif %}
                    {% if status == 'present' or not status %}disabled{% endif %}>
@@ -126,7 +108,7 @@
           <!-- Weight -->
           <label class="weight">
             <span>Weight (kg)</span>
-            <input type="number" step="0.1" min="0" name="weight_{{ boxer.id }}" inputmode="decimal" placeholder="e.g. 72.5">
+            <input type="number" step="0.1" min="0" name="weight_{{ boxer.id }}" placeholder="e.g. 72.5">
           </label>
         </div>
       </section>
@@ -140,34 +122,78 @@
   {% else %}
     <p>Select a class above to enroll boxers and mark attendance.</p>
   {% endif %}
-
-  <!-- Always show Export button -->
-  <div style="text-align: right; margin-top: 2rem;">
-    <a href="{% url 'export_form' %}{% if selected_class %}?class_id={{ selected_class.id }}{% endif %}"
-       class="btn"
-       style="color: black; background: #f0f0f0; border: 1px solid #ccc; border-radius: 8px; padding: 0.5rem 1rem; font-weight: 600; text-decoration: none;">
-      Export Data
-    </a>
-  </div>
 </div>
 
 <style>
-/* Core styling (futuristic cards) */
-.selector-bar { gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+/* Futuristic Enrolled List */
+.enrolled-title {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--brand);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
 
+.enrolled-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.enrolled-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: linear-gradient(145deg, #151515, #101010);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+.enrolled-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.7), 0 0 8px var(--brand);
+}
+.enrolled-info { display:flex; align-items:center; gap:10px; }
+.enrolled-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--brand); color: #000;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px; text-transform: uppercase;
+}
+.enrolled-name { font-weight: 600; font-size: 0.95rem; color: #eee; }
+
+/* Attendance Cards */
 .attendance-list{ display:grid; gap:12px; margin-top:12px; }
 .att-card{ background:#121212; border:1px solid var(--border); border-radius:12px; padding:14px; display:grid; gap:12px; transition:background 0.3s ease; }
 .att-card__head{ display:flex; align-items:center; justify-content:space-between; }
+.att-boxer{ display:flex; align-items:center; gap:10px; }
+.att-avatar{
+  width:36px; height:36px; border-radius:50%;
+  background: var(--brand); color:#000;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:700; font-size:15px; text-transform:uppercase;
+}
 .att-card__name{ margin:0; font-size:16px; font-weight:700; }
 
+/* Controls */
+.att-card__controls{ display:grid; grid-template-columns:1fr auto 1fr; gap:10px; align-items:center; }
+@media(max-width:520px){ .att-card__controls{ grid-template-columns:1fr; } }
+
+/* Segmented controls */
 .segmented{ display:inline-grid; grid-template-columns:1fr 1fr; border:1px solid var(--border); border-radius:999px; overflow:hidden; }
 .segmented input{ position:absolute; opacity:0; pointer-events:none; }
 .segmented label{ padding:6px 12px; text-align:center; cursor:pointer; user-select:none; transition:all 0.3s ease; }
-
 .present-label.active{ background:#00ff66; color:#000; }
 .absent-label.active{ background:#ff3333; color:#fff; }
 .absent-label.excused{ background:#ffcc00 !important; color:#000; }
 
+/* Excused toggle */
 .switch{ display:inline-flex; align-items:center; gap:8px; }
 .switch input{ position:absolute; opacity:0; }
 .switch .slider{ width:38px; height:22px; border-radius:999px; border:1px solid var(--border); background:#0f0f0f; position:relative; transition:all .2s; }
@@ -176,12 +202,11 @@
 .switch input:checked + .slider::after{ left:18px; background:#000; }
 .switch.excused-active .slider{ background:#ffcc00 !important; }
 
+/* Weight input */
 .weight{ display:grid; gap:4px; }
 .weight input{ width:120px; text-align:center; }
 
-.att-card__controls{ display:grid; grid-template-columns:1fr auto 1fr; gap:10px; align-items:center; }
-@media(max-width:520px){ .att-card__controls{ grid-template-columns:1fr; } }
-
+/* Submit */
 .submit-btn{ width:100%; font-weight:700; border-radius:12px; }
 </style>
 
@@ -194,7 +219,6 @@ function updateCardState(card){
   const absentLabel = card.querySelector('.absent-label');
   const switchLabel = card.querySelector('.switch');
 
-  // reset classes
   presentLabel.classList.remove('active');
   absentLabel.classList.remove('active','excused');
   switchLabel.classList.remove('excused-active');
@@ -216,7 +240,6 @@ function updateCardState(card){
 }
 
 document.querySelectorAll('.att-card').forEach(card=>{
-  // initialize
   updateCardState(card);
 
   card.addEventListener('change', e=>{
