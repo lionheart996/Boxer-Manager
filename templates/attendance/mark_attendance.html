@@ -88,7 +88,8 @@
     <p class="muted">Tip: typing a weight will auto-select “Present”.</p>
 
     <div class="attendance-list">
-      {% for boxer in boxers %}
+      {% for item in boxer_data %}
+      {% with boxer=item.boxer status=item.status excused=item.excused %}
       <section class="att-card" data-boxer-id="{{ boxer.id }}">
         <header class="att-card__head">
           <h4 class="att-card__name">{{ boxer.first_name }} {{ boxer.last_name }}</h4>
@@ -101,16 +102,23 @@
           <!-- Present / Absent -->
           <fieldset class="segmented">
             <input id="p-{{ boxer.id }}" type="radio" name="attendance_{{ boxer.id }}" value="Present"
-                   {% if boxer.id in attendance_map %}checked{% endif %}>
-            <label for="p-{{ boxer.id }}">Present</label>
+                   {% if status == "present" %}checked{% endif %}>
+            <label for="p-{{ boxer.id }}" class="present-label {% if status == 'present' %}active{% endif %}">
+              Present
+            </label>
 
-            <input id="a-{{ boxer.id }}" type="radio" name="attendance_{{ boxer.id }}" value="Absent">
-            <label for="a-{{ boxer.id }}">Absent</label>
+            <input id="a-{{ boxer.id }}" type="radio" name="attendance_{{ boxer.id }}" value="Absent"
+                   {% if status in 'absent excused' %}checked{% endif %}>
+            <label for="a-{{ boxer.id }}" class="absent-label {% if status in 'absent excused' %}active{% endif %} {% if status == 'excused' %}excused{% endif %}">
+              Absent
+            </label>
           </fieldset>
 
           <!-- Excused -->
           <label class="switch">
-            <input type="checkbox" name="excused_{{ boxer.id }}" class="excused-toggle" disabled>
+            <input type="checkbox" name="excused_{{ boxer.id }}" class="excused-toggle"
+                   {% if excused %}checked{% endif %}
+                   {% if status == 'present' or not status %}disabled{% endif %}>
             <span class="slider"></span>
             <span class="switch__label">Excused?</span>
           </label>
@@ -122,6 +130,7 @@
           </label>
         </div>
       </section>
+      {% endwith %}
       {% endfor %}
     </div>
 
@@ -142,37 +151,30 @@
   </div>
 </div>
 
-
 <style>
+/* Core styling (futuristic cards) */
 .selector-bar { gap:10px; margin-bottom:16px; flex-wrap:wrap; }
 
-.add-class-panel[hidden] { display:none; }
-.add-class-card { padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--panel-2); }
-.add-class-head { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
-
-.enroll-card{ padding:12px; border:1px solid var(--border); border-radius:12px; margin:16px 0; background:var(--panel-2); }
-.enroll-form{ display:grid; gap:10px; margin-bottom:10px; }
-.enrolled-list{ list-style:none; padding:0; margin:0; display:grid; gap:8px; }
-.enrolled-item{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:8px 10px; border:1px solid var(--border); border-radius:10px; background:#111; }
-.enrolled-name{ font-weight:600; }
-
 .attendance-list{ display:grid; gap:12px; margin-top:12px; }
-.att-card{ background:#121212; border:1px solid var(--border); border-radius:12px; padding:14px; display:grid; gap:12px; }
+.att-card{ background:#121212; border:1px solid var(--border); border-radius:12px; padding:14px; display:grid; gap:12px; transition:background 0.3s ease; }
 .att-card__head{ display:flex; align-items:center; justify-content:space-between; }
 .att-card__name{ margin:0; font-size:16px; font-weight:700; }
 
 .segmented{ display:inline-grid; grid-template-columns:1fr 1fr; border:1px solid var(--border); border-radius:999px; overflow:hidden; }
 .segmented input{ position:absolute; opacity:0; pointer-events:none; }
-.segmented label{ padding:6px 12px; text-align:center; cursor:pointer; user-select:none; }
-.segmented input:checked + label{ background:var(--brand); color:#000; }
+.segmented label{ padding:6px 12px; text-align:center; cursor:pointer; user-select:none; transition:all 0.3s ease; }
+
+.present-label.active{ background:#00ff66; color:#000; }
+.absent-label.active{ background:#ff3333; color:#fff; }
+.absent-label.excused{ background:#ffcc00 !important; color:#000; }
 
 .switch{ display:inline-flex; align-items:center; gap:8px; }
 .switch input{ position:absolute; opacity:0; }
-.switch .slider{ width:38px; height:22px; border-radius:999px; border:1px solid var(--border); background:#0f0f0f; position:relative; }
-.switch .slider::after{ content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:var(--muted); transition:left .2s ease; }
+.switch .slider{ width:38px; height:22px; border-radius:999px; border:1px solid var(--border); background:#0f0f0f; position:relative; transition:all .2s; }
+.switch .slider::after{ content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:var(--muted); transition:left .2s ease, background .2s ease; }
 .switch input:checked + .slider{ background:var(--brand); }
 .switch input:checked + .slider::after{ left:18px; background:#000; }
-.switch .switch__label{ font-size:13px; color:var(--muted); }
+.switch.excused-active .slider{ background:#ffcc00 !important; }
 
 .weight{ display:grid; gap:4px; }
 .weight input{ width:120px; text-align:center; }
@@ -184,51 +186,53 @@
 </style>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const btn   = document.getElementById("add-class-toggle");
-    const panel = document.getElementById("add-class-panel");
-    const close = document.getElementById("add-class-close");
+function updateCardState(card){
+  const present = card.querySelector('input[value="Present"]');
+  const absent = card.querySelector('input[value="Absent"]');
+  const excused = card.querySelector('.excused-toggle');
+  const presentLabel = card.querySelector('.present-label');
+  const absentLabel = card.querySelector('.absent-label');
+  const switchLabel = card.querySelector('.switch');
 
-    if (btn && panel) {
-      btn.addEventListener("click", () => {
-        panel.hidden = false;
-        btn.style.display = "none";
-        const first = panel.querySelector("input, select, textarea");
-        if (first) first.focus();
-        panel.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
+  // reset classes
+  presentLabel.classList.remove('active');
+  absentLabel.classList.remove('active','excused');
+  switchLabel.classList.remove('excused-active');
+
+  if(present.checked){
+    presentLabel.classList.add('active');
+    if(excused){ excused.checked = false; excused.disabled = true; }
+  }
+  else if(absent.checked){
+    absentLabel.classList.add('active');
+    if(excused){
+      excused.disabled = false;
+      if(excused.checked){
+        absentLabel.classList.add('excused');
+        switchLabel.classList.add('excused-active');
+      }
     }
-    if (close && panel && btn) {
-      close.addEventListener("click", () => {
-        panel.hidden = true;
-        btn.style.display = "";
-      });
+  }
+}
+
+document.querySelectorAll('.att-card').forEach(card=>{
+  // initialize
+  updateCardState(card);
+
+  card.addEventListener('change', e=>{
+    if(e.target.matches('input[type="radio"], .excused-toggle')){
+      updateCardState(card);
     }
   });
 
-  document.addEventListener('input', e => {
+  card.addEventListener('input', e=>{
     if(e.target.name && e.target.name.startsWith('weight_')){
-      const id = e.target.name.split('_')[1];
-      const present = document.querySelector(`input[name="attendance_${id}"][value="Present"]`);
-      if(present && e.target.value.trim() !== '') present.checked = true;
+      if(e.target.value.trim() !== ''){
+        card.querySelector('input[value="Present"]').checked = true;
+        updateCardState(card);
+      }
     }
   });
-
-  document.addEventListener('change', e => {
-    if(e.target.type === 'radio' && e.target.name.startsWith('attendance_')){
-      const id = e.target.name.split('_')[1];
-      const absent = e.target.value === 'Absent';
-      const excused = document.querySelector(`input[name="excused_${id}"]`);
-      const weight  = document.querySelector(`input[name="weight_${id}"]`);
-      if(excused){ excused.disabled = !absent; if(!absent) excused.checked = false; }
-      if(absent && weight) weight.value = '';
-    }
-  });
-
-  document.querySelectorAll('[name^="attendance_"][value="Absent"]').forEach(radio=>{
-    const id = radio.name.split('_')[1];
-    const excused = document.querySelector(`input[name="excused_${id}"]`);
-    if(excused) excused.disabled = !radio.checked;
-  });
+});
 </script>
 {% endblock %}

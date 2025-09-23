@@ -587,24 +587,51 @@ class MarkAttendanceView(LoginRequiredMixin, TemplateView):
         target_date = self._target_date()
         selected_class = self._selected_class(gym)
 
+        # All classes in this gym
         classes = ClassTemplate.objects.filter(gym=gym).order_by("title")
+
+        # Boxers scoped to gym + selected class
         boxers = self._scoped_boxers_qs(gym, selected_class).order_by("name")
 
-        present_ids = set(
-            Attendance.objects.filter(
-                boxer__in=boxers,
-                date=target_date,
-                class_template=selected_class,
-                is_present=True,
-            ).values_list("boxer_id", flat=True)
+        # Fetch attendance records for this class + date
+        att_qs = Attendance.objects.filter(
+            boxer__in=boxers,
+            date=target_date,
+            class_template=selected_class,
         )
 
+        # detect excused field name dynamically
+        excused_field = None
+        for fname in ("is_excused", "excused", "excused_absence"):
+            try:
+                Attendance._meta.get_field(fname)
+                excused_field = fname
+                break
+            except Exception:
+                pass
+
+        # Build per-boxer data for template
+        attendance_map = {}
+        for att in att_qs:
+            excused = bool(getattr(att, excused_field)) if excused_field else False
+            status = "present" if att.is_present else ("excused" if excused else "absent")
+            attendance_map[att.boxer_id] = {"status": status, "excused": excused}
+
+        boxer_data = []
+        for boxer in boxers:
+            att = attendance_map.get(boxer.id)
+            boxer_data.append({
+                "boxer": boxer,
+                "status": att["status"] if att else None,
+                "excused": att["excused"] if att else False,
+            })
+
+        # Context for template
         ctx.update({
             "date": target_date,
             "classes": classes,
             "selected_class": selected_class,
-            "boxers": boxers,
-            "attendance_map": present_ids,
+            "boxer_data": boxer_data,  # <-- used directly in template
             "class_create_form": ClassCreateForm(request=self.request),
             "enroll_form": EnrollBoxerForm(request=self.request, template=selected_class) if selected_class else None,
             "unenroll_form": UnenrollForm(),
