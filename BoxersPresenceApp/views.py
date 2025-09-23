@@ -643,13 +643,9 @@ class MarkAttendanceView(LoginRequiredMixin, TemplateView):
             return redirect(self._preserve_redirect(selected_class, target_date))
 
         # D) Save attendance
-        # For new/updated weights, we use midday as the measured_at time.
         measured_dt = datetime.combine(target_date, dt_time(hour=12, minute=0))
         if timezone.is_naive(measured_dt):
             measured_dt = timezone.make_aware(measured_dt, timezone.get_current_timezone())
-
-        # Day bounds for safe range queries (avoid __date on SQLite)
-        day_start, day_end = self._day_bounds(target_date)
 
         # Detect excused field dynamically
         excused_field = None
@@ -668,20 +664,8 @@ class MarkAttendanceView(LoginRequiredMixin, TemplateView):
             has_weight_input = bool(raw_weight)
             excused_flag = f"excused_{boxer.id}" in request.POST
 
-            mark_row, is_present = False, False
-            if status == "Present":
-                is_present, mark_row = True, True
-            elif status == "Absent":
-                is_present, mark_row = False, True
-            elif status is None and has_weight_input:
-                try:
-                    if float(raw_weight) > 0:
-                        is_present, mark_row = True, True
-                except (TypeError, ValueError):
-                    pass
-            if not mark_row:
-                continue
-
+            # --- Save Attendance ---
+            is_present = status == "Present" or (status is None and has_weight_input)
             defaults = {"is_present": is_present}
             if excused_field:
                 defaults[excused_field] = bool(excused_flag) and not is_present
@@ -690,37 +674,25 @@ class MarkAttendanceView(LoginRequiredMixin, TemplateView):
                 boxer=boxer,
                 date=target_date,
                 class_template=selected_class,
-                defaults=defaults
+                defaults=defaults,
             )
 
-            # Weight handling (using day range instead of __date)
-            if (status == "Absent") or (is_present and not has_weight_input):
-                Weight.objects.filter(boxer=boxer, measured_at__gte=day_start, measured_at__lt=day_end).delete()
-                continue
-
+            # --- Save Weight (only if explicitly entered) ---
             if is_present and has_weight_input:
                 try:
                     kg = Decimal(raw_weight)
                 except (InvalidOperation, ValueError):
                     kg = None
                 if kg is not None:
-                    with transaction.atomic():
-                        existing = Weight.objects.filter(
-                            boxer=boxer, measured_at__gte=day_start, measured_at__lt=day_end
-                        ).order_by("-measured_at").first()
-                        if existing:
-                            existing.kg = kg
-                            existing.measured_at = measured_dt
-                            existing.save(update_fields=["kg", "measured_at"])
-                            Weight.objects.filter(
-                                boxer=boxer, measured_at__gte=day_start, measured_at__lt=day_end
-                            ).exclude(pk=existing.pk).delete()
-                        else:
-                            Weight.objects.create(
-                                boxer=boxer, kg=kg, measured_at=measured_dt
-                            )
+                    Weight.objects.update_or_create(
+                        boxer=boxer,
+                        measured_at=measured_dt,
+                        defaults={"kg": kg},
+                    )
 
         return redirect(self._preserve_redirect(selected_class, target_date))
+
+
 
 
 @login_required
