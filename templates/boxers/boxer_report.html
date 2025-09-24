@@ -13,8 +13,10 @@
     {% endif %}
     <a class="btn" href="{% url 'boxer_classes' boxer.id %}">Classes</a>
     <a class="btn" href="{% url 'weight_progress' boxer.id %}">Weight Progress</a>
-    <a class="btn " href="{% url 'boxer_resume' boxer.id %}">Resume</a>
 
+    {% if boxer.pk %}
+      <a class="btn" href="{% url 'heart_rate_detail' boxer_id=boxer.pk %}">Heart Rate</a>
+    {% endif %}
   </div>
 
   <!-- Summary -->

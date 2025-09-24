@@ -3,7 +3,7 @@
 <div class="content-container">
   <h2 class="page-title">Mark Attendance</h2>
 
-  <!-- Class + Date selector (GET) -->
+  <!-- Class + Date selector -->
   <form method="get" class="form-row selector-bar">
     <label>Class:</label>
     <select name="class_id" onchange="this.form.submit()">
@@ -22,15 +22,11 @@
     <a class="btn btn--accent" href="{% url 'attendance_list' %}">All Attendance</a>
 
     {% if selected_class and not class_create_form.errors %}
-      <button type="button"
-              id="add-class-toggle"
-              class="btn btn--quiet">
-        Add a class
-      </button>
+      <button type="button" id="add-class-toggle" class="btn btn--quiet">Add a class</button>
     {% endif %}
   </form>
 
-  <!-- Add Class form -->
+  <!-- Add Class form panel -->
   <div id="add-class-panel"
        class="add-class-panel"
        {% if selected_class and not class_create_form.errors %}hidden{% endif %}>
@@ -65,13 +61,16 @@
     <ul class="enrolled-list">
       {% for b in boxers %}
         <li class="enrolled-item">
-          <span class="enrolled-name">{{ b.first_name }} {{ b.last_name }}</span>
+          <div class="enrolled-info">
+            <div class="enrolled-avatar">{{ b.first_name|slice:":1" }}{{ b.last_name|slice:":1" }}</div>
+            <span class="enrolled-name">{{ b.first_name }} {{ b.last_name }}</span>
+          </div>
           <form method="post" class="inline" onsubmit="return confirm('Remove {{ b.first_name }} {{ b.last_name }} from this class?');">
             {% csrf_token %}
             <input type="hidden" name="action" value="unenroll">
             <input type="hidden" name="class_id" value="{{ selected_class.id }}">
             <input type="hidden" name="boxer_id" value="{{ b.id }}">
-            <button class="btn btn--danger btn--sm" type="submit">Remove</button>
+            <button class="btn btn--danger btn--sm" type="submit">✕</button>
           </form>
         </li>
       {% empty %}
@@ -88,29 +87,34 @@
     <p class="muted">Tip: typing a weight will auto-select “Present”.</p>
 
     <div class="attendance-list">
-      {% for boxer in boxers %}
+      {% for item in boxer_data %}
+      {% with boxer=item.boxer status=item.status excused=item.excused %}
       <section class="att-card" data-boxer-id="{{ boxer.id }}">
         <header class="att-card__head">
-          <h4 class="att-card__name">{{ boxer.first_name }} {{ boxer.last_name }}</h4>
-          <a class="btn btn--sm btn--quiet att-card__progress" href="{% url 'weight_progress' boxer.id %}">
-            Weight Progress
-          </a>
+          <div class="att-boxer">
+            <div class="att-avatar">{{ boxer.first_name|slice:":1" }}{{ boxer.last_name|slice:":1" }}</div>
+            <h4 class="att-card__name">{{ boxer.first_name }} {{ boxer.last_name }}</h4>
+          </div>
+          <a class="btn btn--sm btn--quiet att-card__progress" href="{% url 'weight_progress' boxer.id %}">Weight Progress</a>
         </header>
 
         <div class="att-card__controls">
           <!-- Present / Absent -->
           <fieldset class="segmented">
             <input id="p-{{ boxer.id }}" type="radio" name="attendance_{{ boxer.id }}" value="Present"
-                   {% if boxer.id in attendance_map %}checked{% endif %}>
-            <label for="p-{{ boxer.id }}">Present</label>
+                   {% if status == "present" %}checked{% endif %}>
+            <label for="p-{{ boxer.id }}" class="present-label {% if status == 'present' %}active{% endif %}">Present</label>
 
-            <input id="a-{{ boxer.id }}" type="radio" name="attendance_{{ boxer.id }}" value="Absent">
-            <label for="a-{{ boxer.id }}">Absent</label>
+            <input id="a-{{ boxer.id }}" type="radio" name="attendance_{{ boxer.id }}" value="Absent"
+                   {% if status in 'absent excused' %}checked{% endif %}>
+            <label for="a-{{ boxer.id }}" class="absent-label {% if status in 'absent excused' %}active{% endif %} {% if status == 'excused' %}excused{% endif %}">Absent</label>
           </fieldset>
 
           <!-- Excused -->
-          <label class="switch">
-            <input type="checkbox" name="excused_{{ boxer.id }}" class="excused-toggle" disabled>
+          <label class="switch {% if status == 'excused' %}excused-active{% endif %}">
+            <input type="checkbox" name="excused_{{ boxer.id }}" class="excused-toggle"
+                   {% if excused %}checked{% endif %}
+                   {% if status == 'present' or not status %}disabled{% endif %}>
             <span class="slider"></span>
             <span class="switch__label">Excused?</span>
           </label>
@@ -118,10 +122,11 @@
           <!-- Weight -->
           <label class="weight">
             <span>Weight (kg)</span>
-            <input type="number" step="0.1" min="0" name="weight_{{ boxer.id }}" inputmode="decimal" placeholder="e.g. 72.5">
+            <input type="number" step="0.1" min="0" name="weight_{{ boxer.id }}" placeholder="e.g. 72.5">
           </label>
         </div>
       </section>
+      {% endwith %}
       {% endfor %}
     </div>
 
@@ -134,97 +139,136 @@
 </div>
 
 <style>
-.selector-bar { gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+/* Add-class panel */
+.add-class-panel[hidden]{ display:none; }
+.add-class-card{ padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--panel-2); }
+.add-class-head{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
 
-/* Add class panel (minimal, clean) */
-.add-class-panel[hidden] { display:none; }
-.add-class-card { padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--panel-2); }
-.add-class-head { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+/* Enrolled list */
+.enrolled-title{ margin-top:1rem; margin-bottom:0.5rem; font-size:1.1rem; font-weight:700; color:var(--brand); text-transform:uppercase; letter-spacing:1px; }
+.enrolled-list{ list-style:none; padding:0; margin:0; display:grid; gap:10px; }
+.enrolled-item{ display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border:1px solid var(--border); border-radius:12px; background:linear-gradient(145deg,#151515,#101010); box-shadow:0 2px 6px rgba(0,0,0,0.5); transition:transform 0.2s ease, box-shadow 0.3s ease; }
+.enrolled-item:hover{ transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.7), 0 0 8px var(--brand); }
+.enrolled-info{ display:flex; align-items:center; gap:10px; }
+.enrolled-avatar{ width:32px; height:32px; border-radius:50%; background:var(--brand); color:#000; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; text-transform:uppercase; }
+.enrolled-name{ font-weight:600; font-size:0.95rem; color:#eee; }
 
-/* Enroll list & Attendance (kept tidy) */
-.enroll-card{ padding:12px; border:1px solid var(--border); border-radius:12px; margin:16px 0; background:var(--panel-2); }
-.enroll-form{ display:grid; gap:10px; margin-bottom:10px; }
-.enrolled-list{ list-style:none; padding:0; margin:0; display:grid; gap:8px; }
-.enrolled-item{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:8px 10px; border:1px solid var(--border); border-radius:10px; background:#111; }
-.enrolled-name{ font-weight:600; }
-
+/* Attendance cards */
 .attendance-list{ display:grid; gap:12px; margin-top:12px; }
-.att-card{ background:#121212; border:1px solid var(--border); border-radius:12px; padding:14px; display:grid; gap:12px; }
+.att-card{ background:#121212; border:1px solid var(--border); border-radius:12px; padding:14px; display:grid; gap:12px; transition:background 0.3s ease; }
 .att-card__head{ display:flex; align-items:center; justify-content:space-between; }
+.att-boxer{ display:flex; align-items:center; gap:10px; }
+.att-avatar{ width:36px; height:36px; border-radius:50%; background:var(--brand); color:#000; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px; text-transform:uppercase; }
 .att-card__name{ margin:0; font-size:16px; font-weight:700; }
 
-.segmented{ display:inline-grid; grid-template-columns:1fr 1fr; border:1px solid var(--border); border-radius:999px; overflow:hidden; }
-.segmented input{ position:absolute; opacity:0; pointer-events:none; }
-.segmented label{ padding:6px 12px; text-align:center; cursor:pointer; user-select:none; }
-.segmented input:checked + label{ background:var(--brand); color:#000; }
-
-.switch{ display:inline-flex; align-items:center; gap:8px; }
-.switch input{ position:absolute; opacity:0; }
-.switch .slider{ width:38px; height:22px; border-radius:999px; border:1px solid var(--border); background:#0f0f0f; position:relative; }
-.switch .slider::after{ content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:var(--muted); transition:left .2s ease; }
-.switch input:checked + .slider{ background:var(--brand); }
-.switch input:checked + .slider::after{ left:18px; background:#000; }
-.switch .switch__label{ font-size:13px; color:var(--muted); }
-
-.weight{ display:grid; gap:4px; }
-.weight input{ width:120px; text-align:center; }
-
+/* Controls */
 .att-card__controls{ display:grid; grid-template-columns:1fr auto 1fr; gap:10px; align-items:center; }
 @media(max-width:520px){ .att-card__controls{ grid-template-columns:1fr; } }
 
+/* Segmented controls */
+.segmented{ display:inline-grid; grid-template-columns:1fr 1fr; border:1px solid var(--border); border-radius:999px; overflow:hidden; }
+.segmented input{ position:absolute; opacity:0; pointer-events:none; }
+.segmented label{ padding:6px 12px; text-align:center; cursor:pointer; user-select:none; transition:all 0.3s ease; }
+.present-label.active{ background:#00ff66; color:#000; }
+.absent-label.active{ background:#ff3333; color:#fff; }
+.absent-label.excused{ background:#ffcc00 !important; color:#000; }
+
+/* Excused toggle */
+.switch{ display:inline-flex; align-items:center; gap:8px; }
+.switch input{ position:absolute; opacity:0; }
+.switch .slider{ width:38px; height:22px; border-radius:999px; border:1px solid var(--border); background:#0f0f0f; position:relative; transition:all .2s; }
+.switch .slider::after{ content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:var(--muted); transition:left .2s ease, background .2s ease; }
+.switch input:checked + .slider{ background:var(--brand); }
+.switch input:checked + .slider::after{ left:18px; background:#000; }
+.switch.excused-active .slider{ background:#ffcc00 !important; }
+
+/* Weight */
+.weight{ display:grid; gap:4px; }
+.weight input{ width:120px; text-align:center; }
+
+/* Submit */
 .submit-btn{ width:100%; font-weight:700; border-radius:12px; }
 </style>
 
 <script>
-  // Toggle Add Class panel (button only visible when a class is selected)
-  document.addEventListener("DOMContentLoaded", () => {
-    const btn   = document.getElementById("add-class-toggle");
-    const panel = document.getElementById("add-class-panel");
-    const close = document.getElementById("add-class-close");
+function updateCardState(card){
+  const present = card.querySelector('input[value="Present"]');
+  const absent = card.querySelector('input[value="Absent"]');
+  const excused = card.querySelector('.excused-toggle');
+  const presentLabel = card.querySelector('.present-label');
+  const absentLabel = card.querySelector('.absent-label');
+  const switchLabel = card.querySelector('.switch');
 
-    if (btn && panel) {
-      btn.addEventListener("click", () => {
-        panel.hidden = false;
-        btn.style.display = "none";
-        const first = panel.querySelector("input, select, textarea");
-        if (first) first.focus();
-        panel.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
+  presentLabel.classList.remove('active');
+  absentLabel.classList.remove('active','excused');
+  switchLabel.classList.remove('excused-active');
+
+  if(present.checked){
+    presentLabel.classList.add('active');
+    if(excused){ excused.checked = false; excused.disabled = true; }
+  }
+  else if(absent.checked){
+    absentLabel.classList.add('active');
+    if(excused){
+      excused.disabled = false;
+      if(excused.checked){
+        absentLabel.classList.add('excused');
+        switchLabel.classList.add('excused-active');
+      }
     }
-    if (close && panel && btn) {
-      close.addEventListener("click", () => {
-        panel.hidden = true;
-        btn.style.display = "";
-      });
+  }
+}
+
+document.querySelectorAll('.att-card').forEach(card=>{
+  const present = card.querySelector('input[value="Present"]');
+  const absent = card.querySelector('input[value="Absent"]');
+  let lastClicked = null;
+
+  [present, absent].forEach(input=>{
+    input.addEventListener('click', e=>{
+      if(lastClicked === input && input.checked){
+        // toggle off
+        e.preventDefault();
+        input.checked = false;
+        lastClicked = null;
+      } else {
+        lastClicked = input;
+      }
+      updateCardState(card);
+    });
+  });
+
+  card.addEventListener('change', e=>{
+    if(e.target.matches('.excused-toggle')){
+      updateCardState(card);
     }
   });
 
-  // Auto-select Present when typing weight
-  document.addEventListener('input', e => {
+  card.addEventListener('input', e=>{
     if(e.target.name && e.target.name.startsWith('weight_')){
-      const id = e.target.name.split('_')[1];
-      const present = document.querySelector(`input[name="attendance_${id}"][value="Present"]`);
-      if(present && e.target.value.trim() !== '') present.checked = true;
+      if(e.target.value.trim() !== ''){
+        present.checked = true;
+        absent.checked = false;
+        lastClicked = present;
+        updateCardState(card);
+      }
     }
   });
 
-  // Toggle excused based on Absent/Present
-  document.addEventListener('change', e => {
-    if(e.target.type === 'radio' && e.target.name.startsWith('attendance_')){
-      const id = e.target.name.split('_')[1];
-      const absent = e.target.value === 'Absent';
-      const excused = document.querySelector(`input[name="excused_${id}"]`);
-      const weight  = document.querySelector(`input[name="weight_${id}"]`);
-      if(excused){ excused.disabled = !absent; if(!absent) excused.checked = false; }
-      if(absent && weight) weight.value = '';
-    }
-  });
+  updateCardState(card);
+});
 
-  // Initialize excused states on load
-  document.querySelectorAll('[name^="attendance_"][value="Absent"]').forEach(radio=>{
-    const id = radio.name.split('_')[1];
-    const excused = document.querySelector(`input[name="excused_${id}"]`);
-    if(excused) excused.disabled = !radio.checked;
-  });
+// Toggle Add Class panel
+document.addEventListener('DOMContentLoaded', ()=>{
+  const toggleBtn = document.getElementById('add-class-toggle');
+  const panel = document.getElementById('add-class-panel');
+  const closeBtn = document.getElementById('add-class-close');
+  if(toggleBtn && panel){
+    toggleBtn.addEventListener('click', ()=>{ panel.hidden = false; });
+  }
+  if(closeBtn && panel){
+    closeBtn.addEventListener('click', ()=>{ panel.hidden = true; });
+  }
+});
 </script>
 {% endblock %}

@@ -28,9 +28,7 @@
 
         <div class="boxer-card__actions">
           <a class="btn btn--sm" href="{% url 'boxer_report' b.id %}">Report</a>
-          {% if b.pk %}
-            <a class="btn btn--sm" href="{% url 'heart_rate_detail' boxer_id=b.pk %}">Heart Rate</a>
-          {% endif %}
+          <a class="btn btn--sm" href="{% url 'boxer_resume' b.id %}">Resume</a>
           <form method="post"
                 action="{% url 'delete_boxer' b.pk %}"
                 style="display:inline"
