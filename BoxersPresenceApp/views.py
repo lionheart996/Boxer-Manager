@@ -1738,13 +1738,11 @@ class BulkBoxerCreateView(LoginRequiredMixin, View):
     template_name = "boxers/bulk_add.html"
 
     def get(self, request):
-        # Start with 8 empty rows
         FormSet = formset_factory(BulkBoxerForm, extra=8, can_delete=True)
         formset = FormSet()
         return render(request, self.template_name, {"formset": formset})
 
     def post(self, request):
-        # Use can_delete=True; JS toggles the hidden DELETE field on remove
         FormSet = formset_factory(BulkBoxerForm, extra=0, can_delete=True)
         formset = FormSet(request.POST)
 
@@ -1760,8 +1758,6 @@ class BulkBoxerCreateView(LoginRequiredMixin, View):
 
         for form in formset:
             cd = form.cleaned_data or {}
-
-            # UI remove → hidden DELETE
             if cd.get("DELETE"):
                 continue
 
@@ -1774,15 +1770,16 @@ class BulkBoxerCreateView(LoginRequiredMixin, View):
             if not any([fn, ln, parent, dob]):
                 continue
 
-            # Require first name if anything filled
+            # Require first name
             if not fn:
                 form.add_error("first_name", "First name is required.")
                 had_errors = True
                 continue
 
+            # Build full_name for .name field
             full_name = (fn + " " + ln).strip()
 
-            # Only first name & ambiguous → require more info
+            # Ambiguity & duplicate checks (same as before)
             if not ln and not parent and not dob:
                 ambiguous = existing_qs.filter(Q(name__iexact=fn) | Q(name__istartswith=fn + " ")).exists()
                 if ambiguous:
@@ -1790,7 +1787,6 @@ class BulkBoxerCreateView(LoginRequiredMixin, View):
                     had_errors = True
                     continue
 
-            # Full name exists → require parent or DOB; block exact duplicate
             if ln:
                 same_name_qs = existing_qs.filter(name__iexact=full_name)
                 if same_name_qs.exists():
@@ -1807,7 +1803,6 @@ class BulkBoxerCreateView(LoginRequiredMixin, View):
                         had_errors = True
                         continue
 
-            # Block duplicates within this submission
             key = (fn.lower(), ln.lower(), parent.lower(), dob.isoformat() if dob else None)
             if key in seen_keys:
                 form.add_error(None, "Duplicate of another row in this submission.")
@@ -1815,24 +1810,26 @@ class BulkBoxerCreateView(LoginRequiredMixin, View):
                 continue
             seen_keys.add(key)
 
-            rows_to_create.append((full_name, parent, dob))
+            # ✅ Save actual first_name / last_name
+            rows_to_create.append((fn, ln, full_name, parent, dob))
 
         if had_errors:
             return render(request, self.template_name, {"formset": formset})
 
         created = 0
-        for full_name, parent, dob in rows_to_create:
+        for fn, ln, full_name, parent, dob in rows_to_create:
             Boxer.objects.create(
-                name=full_name,
+                first_name=fn,
+                last_name=ln,
+                name=full_name,  # keep for backward compatibility
                 parent_name=parent or "",
                 date_of_birth=dob,
                 gym=gym,
             )
             created += 1
 
-        # ✅ Your exact message format
         messages.success(
             request,
-             f"{created} boxer{'s were' if created != 1 else ' was'} added to {gym}."
+            f"{created} boxer{'s were' if created != 1 else ' was'} added to {gym}."
         )
         return redirect("mark_attendance")

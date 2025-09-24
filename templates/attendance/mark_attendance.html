@@ -63,7 +63,13 @@
         <li class="enrolled-item">
           <div class="enrolled-info">
             <div class="enrolled-avatar">{{ b.first_name|slice:":1" }}{{ b.last_name|slice:":1" }}</div>
-            <span class="enrolled-name">{{ b.first_name }} {{ b.last_name }}</span>
+            <span class="enrolled-name">
+              {% if b.first_name or b.last_name %}
+                {{ b.first_name }} {{ b.last_name }}
+              {% else %}
+                {{ b.name }}
+              {% endif %}
+            </span>
           </div>
           <form method="post" class="inline" onsubmit="return confirm('Remove {{ b.first_name }} {{ b.last_name }} from this class?');">
             {% csrf_token %}

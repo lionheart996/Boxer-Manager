@@ -67,8 +67,8 @@
   <div class="topbar-center">
     {% if user.is_authenticated %}
       <span class="greeting" style="color: Yellow">
-        🔨🔥Enjoy the forging, {{ user.first_name|default:user.username }}
-      </span>
+      🔨🔥Enjoy the forging, {{ user.first_name|default:user.username }}
+    </span>
     {% else %}
       <span class="greeting">Enjoy the forging, guest</span>
     {% endif %}
