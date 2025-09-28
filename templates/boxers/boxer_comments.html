@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="content-container">
+  <h2 class="page-title">
+    💬 Comments —
+    {% if boxer.first_name or boxer.last_name %}
+      {{ boxer.first_name }} {{ boxer.last_name }}
+    {% else %}
+      {{ boxer.name }}
+    {% endif %}
+  </h2>
+
+  <!-- Add new comment -->
+  <form method="post" class="comment-form card-glow">
+    {% csrf_token %}
+    {{ form.text }}
+    <div class="char-counter"><span id="char-count">0</span>/300</div>
+    <div class="comment-actions-top">
+      <button type="submit" class="btn btn--primary">➕ Add Comment</button>
+    </div>
+  </form>
+
+  <!-- List of comments -->
+  <div class="comment-list">
+    {% for c in comments %}
+      <div class="comment-card">
+        <div class="comment-meta">
+          <div class="comment-avatar">{{ c.coach.get_full_name|default:c.coach.username|slice:":2" }}</div>
+          <div>
+            <strong class="comment-coach">{{ c.coach.get_full_name|default:c.coach.username }}</strong>
+            <span class="comment-date">{{ c.created_at|date:"Y-m-d H:i" }}</span>
+          </div>
+        </div>
+        <p class="comment-text">{{ c.text|linebreaksbr }}</p>
+
+        {% if c.coach == request.user %}
+        <div class="comment-actions">
+          <a href="{% url 'edit_comment' boxer.id c.id %}" class="btn btn--sm">✏️ Edit</a>
+          <form method="post" action="{% url 'delete_comment' boxer.id c.id %}" style="display:inline" onsubmit="return confirm('Delete this comment?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn--danger btn--sm">🗑️ Delete</button>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+    {% empty %}
+      <p class="muted">No comments yet. Be the first to write one 🚀</p>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+/* === Comment form === */
+.card-glow {
+  background: linear-gradient(145deg, #0f0f0f, #1a1a1a);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 12px rgba(0, 255, 102, 0.2);
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+.card-glow:focus-within {
+  box-shadow: 0 0 20px rgba(0, 255, 102, 0.6);
+  transform: translateY(-1px);
+}
+
+.comment-form textarea {
+  width: 100%;
+  max-width: 100%;
+  min-height: 80px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #111;
+  color: var(--text);
+  resize: vertical;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+.char-counter {
+  text-align: right;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.comment-actions-top {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+/* === Comment list === */
+.comment-list { display: grid; gap: 14px; margin-top: 16px; }
+.comment-card {
+  background: linear-gradient(145deg, #151515, #101010);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 0 10px rgba(0,255,102,0.15);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+.comment-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 16px rgba(0,255,102,0.4);
+}
+
+/* === Comment meta === */
+.comment-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.comment-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--brand);
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  box-shadow: 0 0 6px var(--brand);
+}
+.comment-coach {
+  font-weight: 600;
+  font-size: 15px;
+  color: #eee;
+}
+.comment-date {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* === Comment text === */
+.comment-text {
+  margin: 6px 0;
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.5;
+  white-space: pre-wrap; /* ensures new lines are respected */
+  word-wrap: break-word;
+}
+
+/* === Comment actions === */
+.comment-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const textarea = document.querySelector(".comment-form textarea");
+  const counter = document.getElementById("char-count");
+
+  if (textarea && counter) {
+    textarea.addEventListener("input", function() {
+      const len = this.value.length;
+      counter.textContent = len;
+
+      if (len > 300) {
+        alert("You cannot exceed 300 characters");
+        this.value = this.value.slice(0, 300);
+        counter.textContent = 300;
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

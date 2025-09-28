@@ -21,8 +21,8 @@
     {% endif %}
   </form>
 
-  <!-- CASE 4: sentence mode -->
   {% if presence_mode %}
+    <!-- CASE 4: sentence mode -->
     <p class="presence-result">
       {{ presence_name }}
       {% if presence_status == "present" %}
@@ -35,17 +35,17 @@
       on {{ presence_date }}
     </p>
 
-  <!-- CASES 1–3: list mode -->
   {% else %}
+    <!-- CASES 1–3: list mode -->
     {% if attendances %}
       <div class="attendance-list">
         {% for a in attendances %}
-          <div class="att-card">
-            <div class="att-date">{{ a.date|date:"d M Y (D)" }}</div>
-            <div class="att-boxer">{{ a.boxer.first_name }} {{ a.boxer.last_name }}</div>
-
-            <div class="att-class">
-              {% if show_absences %}
+          <div class="att-card" data-boxer="{{ a.boxer.id }}">
+            <div class="att-main">
+              <div class="att-date">{{ a.date|date:"d M Y (D)" }}</div>
+              <div class="att-boxer">{{ a.boxer.first_name }} {{ a.boxer.last_name }}</div>
+              <div class="att-class">
+                {% if show_absences %}
                   {% if a.is_excused %}
                     <span class="excused">Excused</span>
                   {% else %}
@@ -54,7 +54,15 @@
                 {% else %}
                   <span class="present">Present</span>
                 {% endif %}
-              – {% if a.class_template %}{{ a.class_template.title }}{% else %}–{% endif %}
+                – {% if a.class_template %}{{ a.class_template.title }}{% else %}–{% endif %}
+              </div>
+            </div>
+
+            <!-- Dropdown popup -->
+            <div class="att-dropdown">
+              <a href="{% url 'boxer_report' a.boxer.id %}" class="dropdown-btn">📊 Report</a>
+              <a href="{% url 'boxer_resume' a.boxer.id %}" class="dropdown-btn">📄 Resume</a>
+              <a href="{% url 'boxer_comments' a.boxer.id %}" class="dropdown-btn">💬 Comments</a>
             </div>
           </div>
         {% endfor %}
@@ -78,61 +86,104 @@
 </div>
 
 <style>
-/* Filter bar */
-.filter-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .6rem;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-.filter-bar input {
-  padding: 6px 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: #0f0f0f;
-  color: var(--text);
+.present {
+    color: #00cc55;
 }
 
-/* Presence sentence */
-.presence-result { margin: .5rem 0 1rem; font-size: 1.1rem; }
-.present { color:#00ff66; font-weight:700; }
-.absent { color:#ff4444; font-weight:700; }
-.excused { color:#ffaa00; font-weight:700; }
+.excused {
+    color: #fafa68
+}
 
-/* Attendance list */
-.attendance-list { display: grid; gap: 12px; }
+.absent {
+    color: #b31010;
+}
+/* Core card styling */
+.attendance-list { display: grid; gap: 14px; }
 .att-card {
   background: linear-gradient(145deg, #0e0e0e, #181818);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 12px;
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
-  gap: 12px;
-  align-items: center;
-  box-shadow: 0 0 10px rgba(0,255,102,.15);
-  transition: transform .2s ease, box-shadow .2s ease;
+  padding: 14px;
+  position: relative;
+  cursor: pointer;
+  z-index: 1;
+  transition: transform .2s ease, box-shadow .3s ease;
 }
-.att-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 18px rgba(0,255,102,.4);
-}
+.att-card:hover { transform: translateY(-2px); box-shadow: 0 0 18px rgba(0,255,102,.4); }
+.att-card.open { z-index: 100; }
+
+.att-main { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 10px; align-items: center; }
 .att-date { font-weight:700; color:var(--brand); }
-.att-boxer {
-  font-size:15px;
-  font-weight:600;
-  color: #fff;  /* or var(--text) if your --text is light */
-}
+.att-boxer { font-size:15px; font-weight:600; color: #fff; }
 .att-class { font-size:13px; color:var(--muted); text-align:right; }
 
-/* Pagination */
-.pagination {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  justify-content: center;
-  margin-top: 1rem;
+/* Dropdown popup */
+.att-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 14px;
+  background: #111;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  min-width: 180px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.8);
+  z-index: 200;
+  animation: fadeIn .2s ease;
+}
+.att-card.open .att-dropdown { display: block; }
+
+.dropdown-btn {
+  display: block;
+  padding: 14px 18px;
+  margin: 4px;
+  border-radius: 8px;
+  background: #1a1a1a;
+  font-weight: 600;
+  color: #00ffcc;
+  text-decoration: none;
+  text-align: center;
+  transition: all .2s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,.6);
+}
+.dropdown-btn:hover,
+.dropdown-btn:active {
+  background: #00ff66;
+  color: #000;
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #00ff66;
+}
+
+/* Mobile: larger tap targets */
+@media (max-width: 640px) {
+  .att-dropdown {
+    left: 10px;
+    right: 10px;
+    min-width: unset;
+    width: calc(100% - 20px);
+  }
+  .dropdown-btn {
+    font-size: 17px;
+    padding: 18px;
+  }
 }
 </style>
+
+<script>
+document.addEventListener("click", function(e) {
+  const card = e.target.closest(".att-card");
+  const allCards = document.querySelectorAll(".att-card");
+
+  if (card) {
+    if (card.classList.contains("open")) {
+      card.classList.remove("open"); // close if already open
+    } else {
+      allCards.forEach(c => c.classList.remove("open"));
+      card.classList.add("open"); // open this one
+    }
+  } else {
+    allCards.forEach(c => c.classList.remove("open")); // click outside closes all
+  }
+});
+</script>
 {% endblock %}

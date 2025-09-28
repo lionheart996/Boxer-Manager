@@ -30,10 +30,10 @@ from rest_framework.exceptions import PermissionDenied
 
 from . import models
 from .models import Boxer, BatteryTest, Attendance, HeartRate, Weight, ParentProfile, ClassTemplate, \
-     Enrollment, Gym
+    Enrollment, Gym, BoxerComment
 from .forms import BatteryTestForm, BoxerAndTestSelectForm, BoxerForm, HeartRateQuickForm, \
     WeightQuickForm, ParentSignupForm, GymForm, TestResultForm, EnrollBoxerForm, ClassCreateForm, UnenrollForm, \
-    BulkBoxerForm
+    BulkBoxerForm, BoxerCommentForm
 from .utils import expand_rrule
 
 
@@ -1833,3 +1833,63 @@ class BulkBoxerCreateView(LoginRequiredMixin, View):
             f"{created} boxer{'s were' if created != 1 else ' was'} added to {gym}."
         )
         return redirect("mark_attendance")
+
+
+class BoxerCommentsView(LoginRequiredMixin, View):
+    template_name = "boxers/boxer_comments.html"
+
+    def get(self, request, boxer_id):
+        boxer = get_object_or_404(Boxer, pk=boxer_id, gym=user_gym(request))
+        comments = boxer.comments.select_related("coach").all()
+        form = BoxerCommentForm()
+        return render(request, self.template_name, {
+            "boxer": boxer,
+            "comments": comments,
+            "form": form,
+        })
+
+    def post(self, request, boxer_id):
+        boxer = get_object_or_404(Boxer, pk=boxer_id, gym=user_gym(request))
+        form = BoxerCommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.boxer = boxer
+            comment.coach = request.user
+            comment.save()
+            messages.success(request, "Comment added.")
+            return redirect("boxer_comments", boxer_id=boxer.id)
+
+        comments = boxer.comments.select_related("coach").all()
+        return render(request, self.template_name, {
+            "boxer": boxer,
+            "comments": comments,
+            "form": form,
+        })
+
+class EditCommentView(LoginRequiredMixin, View):
+    template_name = "boxers/edit_comment.html"
+
+    def get(self, request, boxer_id, comment_id):
+        boxer = get_object_or_404(Boxer, pk=boxer_id, gym=user_gym(request))
+        comment = get_object_or_404(BoxerComment, pk=comment_id, boxer=boxer, coach=request.user)
+        form = BoxerCommentForm(instance=comment)
+        return render(request, self.template_name, {"form": form, "boxer": boxer, "comment": comment})
+
+    def post(self, request, boxer_id, comment_id):
+        boxer = get_object_or_404(Boxer, pk=boxer_id, gym=user_gym(request))
+        comment = get_object_or_404(BoxerComment, pk=comment_id, boxer=boxer, coach=request.user)
+        form = BoxerCommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Comment updated.")
+            return redirect("boxer_comments", boxer_id=boxer.id)
+        return render(request, self.template_name, {"form": form, "boxer": boxer, "comment": comment})
+
+
+class DeleteCommentView(LoginRequiredMixin, View):
+    def post(self, request, boxer_id, comment_id):
+        boxer = get_object_or_404(Boxer, pk=boxer_id, gym=user_gym(request))
+        comment = get_object_or_404(BoxerComment, pk=comment_id, boxer=boxer, coach=request.user)
+        comment.delete()
+        messages.success(request, "Comment deleted.")
+        return redirect("boxer_comments", boxer_id=boxer.id)

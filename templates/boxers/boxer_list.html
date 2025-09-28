@@ -27,8 +27,9 @@
         </header>
 
         <div class="boxer-card__actions">
-          <a class="btn btn--sm" href="{% url 'boxer_report' b.id %}">Report</a>
-          <a class="btn btn--sm" href="{% url 'boxer_resume' b.id %}">Resume</a>
+            <a class="btn btn--sm" href="{% url 'boxer_report' b.id %}">Report</a>
+            <a class="btn btn--sm" href="{% url 'boxer_resume' b.id %}">Resume</a>
+            <a class="btn btn--sm" href="{% url 'boxer_comments' b.id %}">Comments</a>
           <form method="post"
                 action="{% url 'delete_boxer' b.pk %}"
                 style="display:inline"

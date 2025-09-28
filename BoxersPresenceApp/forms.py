@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime, parse_date
 
-from .models import Attendance, BatteryTest, TestResult, Gym, HeartRate, Enrollment, ClassTemplate
+from .models import Attendance, BatteryTest, TestResult, Gym, HeartRate, Enrollment, ClassTemplate, BoxerComment
 from datetime import date
 from .models import Boxer
 from .utils import user_gym
@@ -240,3 +240,16 @@ class BulkBoxerForm(forms.Form):
 
         cleaned["_empty_row"] = False
         return cleaned
+
+class BoxerCommentForm(forms.ModelForm):
+    class Meta:
+        model = BoxerComment
+        fields = ["text"]
+        widgets = {
+            "text": forms.Textarea(attrs={
+                "rows": 3,
+                "placeholder": "Write your comment...",
+                "class": "comment-input",
+                "maxlength": 300,
+            }),
+        }
