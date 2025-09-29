@@ -1,54 +1,58 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="page-title">{{ boxer.name }} — Test Results</h2>
+<h2 class="page-title">📊 {{ boxer.first_name }} {{ boxer.last_name }} — Test Results</h2>
 
-<form method="get" action="{% url 'boxer_tests' boxer.uuid %}" class="content-container" style="display:flex; gap:12px; align-items:end; flex-wrap:wrap;">
-  <label>Test
-    <select name="test">
-      {% for t in tests %}
-        <option value="{{ t.id }}" {% if selected_test and t.id == selected_test.id %}selected{% endif %}>
-          {{ t.name }}{% if t.unit %} [{{ t.unit }}]{% endif %}
-        </option>
-      {% endfor %}
-    </select>
-  </label>
-  <button class="btn" type="submit">Apply</button>
+<!-- Test selector -->
+<form method="get" action="{% url 'boxer_tests' boxer.uuid %}" class="filter-bar">
+  <label class="filter-label">Choose Test</label>
+  <select name="test" onchange="this.form.submit()">
+    {% for t in tests %}
+      <option value="{{ t.id }}" {% if selected_test and t.id == selected_test.id %}selected{% endif %}>
+        {{ t.name }}{% if t.unit %} [{{ t.unit }}]{% endif %}
+      </option>
+    {% endfor %}
+  </select>
+  <noscript><button class="btn btn--primary" type="submit">Apply</button></noscript>
 </form>
 
 {% if selected_test %}
-  <h3 style="margin-top:1rem;">{{ selected_test.name }} progress {% if unit %}({{ unit }}){% endif %}</h3>
+  <h3 class="section-title">⚡ Progress for {{ selected_test.name }} {% if unit %}({{ unit }}){% endif %}</h3>
 
-  <!-- Always show summary above chart -->
-  <div class="summary-block">
-    <strong>Summary:</strong><br>
+  <!-- Summary -->
+  <div class="summary-card">
+    <h4>📌 Summary</h4>
     {% if summary %}
-      Boxer {{ boxer.name }}’s results for test {{ selected_test.name }}{% if unit %} ({{ unit }}){% endif %}:
       <ul>
         {% for row in summary %}
           <li>
-            {% if row.avg %}{{ row.avg|floatformat:2 }}{% if unit %} {{ unit }}{% endif %}{% endif %}
-            on {{ row.date|date:"Y-m-d" }}
+            {% if row.avg %}
+              <strong>{{ row.avg|floatformat:2 }}</strong>{% if unit %} {{ unit }}{% endif %}
+            {% endif %}
+            <span class="muted"> — {{ row.date|date:"Y-m-d" }}</span>
             {% if row.notes %}
-              <br><span class="muted">Notes: {{ row.notes|join:", " }}</span>
+              <br><span class="notes">📝 {{ row.notes|join:", " }}</span>
             {% endif %}
           </li>
         {% endfor %}
       </ul>
     {% else %}
-      No results yet.
+      <p class="muted"><em>No results yet.</em></p>
     {% endif %}
   </div>
 
-  <!-- Chart.js -->
+  <!-- Chart -->
   {{ labels|json_script:"labels-data" }}
   {{ values|json_script:"values-data" }}
-  <canvas id="progressChart" width="900" height="360" style="max-width:100%;"></canvas>
+  <div class="chart-box">
+    <canvas id="progressChart"></canvas>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     (function(){
       const labels = JSON.parse(document.getElementById('labels-data').textContent || "[]");
       const values = JSON.parse(document.getElementById('values-data').textContent || "[]");
+
       const ctx = document.getElementById('progressChart').getContext('2d');
       new Chart(ctx, {
         type: 'line',
@@ -57,20 +61,23 @@
           datasets: [{
             label: '{{ selected_test.name|escapejs }}{% if unit %} ({{ unit|escapejs }}){% endif %}',
             data: values,
-            tension: 0.3,
-            pointRadius: 3,
+            tension: 0.35,
+            pointRadius: 4,
             borderWidth: 2,
+            borderColor: '#00ff66',
+            backgroundColor: '#00ff66',
             fill: false
           }]
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           scales: {
             x: { title: { display: true, text: 'Date' } },
             y: { title: { display: true, text: '{{ unit|default:"Value"|escapejs }}' }, beginAtZero: false }
           },
           plugins: {
-            legend: { display: true }
+            legend: { display: true, labels: { color: '#eee' } }
           }
         }
       });
@@ -79,23 +86,62 @@
 {% endif %}
 
 <style>
-.summary-block {
-  background: var(--panel-2);
+/* Filter bar */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.filter-label { font-weight:700; color:var(--brand); }
+.filter-bar select {
+  padding: 8px 12px;
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 12px;
+  border-radius: 10px;
+  background: #0f0f0f;
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Section titles */
+.section-title { margin-top:1.5rem; font-size:1.2rem; font-weight:700; }
+
+/* Summary block */
+.summary-card {
+  background: linear-gradient(145deg,#0e0e0e,#181818);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
   margin: 1rem 0;
+  box-shadow:
+    0 -2px 6px rgba(0,255,102,.4),
+    0  2px 6px rgba(0,255,102,.4),
+    0  0 12px rgba(0,255,102,.2);
 }
-.summary-block ul {
-  margin: .5rem 0 0;
-  padding-left: 18px;
+.summary-card h4 { margin:0 0 .5rem; color:var(--brand); }
+.summary-card ul { margin:0; padding-left:18px; display:grid; gap:.5rem; }
+.summary-card li { font-size:15px; }
+.summary-card .muted { font-size:13px; color:var(--muted); }
+.summary-card .notes { font-size:13px; color:#ffaa00; }
+
+/* Chart container */
+.chart-box {
+  position: relative;
+  height: 360px;
+  max-width: 100%;
+  margin-top: 1rem;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:10px;
+  background:#111;
+  box-shadow:
+    0 -2px 6px rgba(0,255,102,.3),
+    0  2px 6px rgba(0,255,102,.3);
 }
-.summary-block .muted {
-  font-size: 13px;
-  color: var(--muted);
-}
+
+/* Mobile fixes */
+*, *::before, *::after { box-sizing:border-box; }
+html, body { max-width:100%; overflow-x:hidden; }
 </style>
 {% endblock %}
-
-
-

@@ -139,3 +139,19 @@ class ParentProfileAdmin(admin.ModelAdmin):
     def children_list(self, obj):
         return ", ".join(b.name for b in obj.children.all())
     children_list.short_description = "Children"
+
+from django.contrib import admin
+from .models import BoxerComment
+
+
+@admin.register(BoxerComment)
+class BoxerCommentAdmin(admin.ModelAdmin):
+    list_display = ("id", "boxer", "coach", "short_text", "created_at")
+    list_filter = ("created_at", "coach", "boxer")
+    search_fields = ("text", "coach__username", "coach__first_name", "coach__last_name", "boxer__first_name", "boxer__last_name")
+    date_hierarchy = "created_at"
+    ordering = ("-created_at",)
+
+    def short_text(self, obj):
+        return (obj.text[:50] + "...") if len(obj.text) > 50 else obj.text
+    short_text.short_description = "Comment"

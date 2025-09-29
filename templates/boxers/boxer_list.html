@@ -1,41 +1,51 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="page-title">Boxers</h2>
+<h2 class="page-title" style="text-align:center;">🥊 Boxers</h2>
 
 <div class="content-container">
 
-  <!-- Search -->
-  <form method="get" style="display:flex; gap:8px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
+  <!-- Filters -->
+  <form method="get" class="search-bar">
+    <!-- Class dropdown -->
+    <select name="class_id" class="class-select">
+      <option value="">All Classes</option>
+      {% for c in classes %}
+        <option value="{{ c.id }}" {% if class_id|default:'' == c.id|stringformat:"s" %}selected{% endif %}>
+          {{ c.title }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <!-- Search -->
     <input type="search"
            name="q"
            value="{{ q }}"
-           placeholder="Search by name or parent"
-           style="padding:6px 10px; min-width:240px;">
-    <button class="btn" type="submit">Search</button>
-    {% if q %}
-      <a class="btn" href="{% url 'boxer_list' %}">Clear</a>
-    {% endif %}
-    <span style="opacity:.7; margin-left:8px;">{{ result_count }} result{{ result_count|pluralize }}</span>
+           placeholder="🔍 Search by name or parent">
+    <button class="btn btn--primary" type="submit">Filter</button>
+    <a class="btn btn--quiet" href="{% url 'boxer_list' %}">Clear</a>
+
+    <span class="result-count">{{ result_count }} result{{ result_count|pluralize }}</span>
   </form>
+  <p class="filter-note">Click on <strong>Filter</strong> after choosing a class.</p>
 
   {% if boxers %}
     <div class="boxer-list">
       {% for b in boxers %}
       <section class="boxer-card">
         <header class="boxer-card__head">
-          <h3 class="boxer-card__name">{{ b.name }}</h3>
+          <h3 class="boxer-card__name">{{ b.first_name }} {{ b.last_name }}</h3>
         </header>
 
         <div class="boxer-card__actions">
-            <a class="btn btn--sm" href="{% url 'boxer_report' b.id %}">Report</a>
-            <a class="btn btn--sm" href="{% url 'boxer_resume' b.id %}">Resume</a>
-            <a class="btn btn--sm" href="{% url 'boxer_comments' b.id %}">Comments</a>
+          <a class="btn btn--sm btn--glow" href="{% url 'boxer_report' b.id %}">📊 Report</a>
+          <a class="btn btn--sm btn--glow" href="{% url 'boxer_resume' b.id %}">📄 Resume</a>
+          <a class="btn btn--sm btn--glow" href="{% url 'boxer_comments' b.id %}">💬 Comments</a>
           <form method="post"
                 action="{% url 'delete_boxer' b.pk %}"
                 style="display:inline"
                 onsubmit="return confirm('Delete {{ b.name }}?');">
             {% csrf_token %}
-            <button type="submit" class="btn btn--danger btn--sm">Delete</button>
+            <button type="submit" class="btn btn--danger btn--sm">🗑️ Delete</button>
           </form>
         </div>
       </section>
@@ -43,42 +53,104 @@
     </div>
 
     {% if is_paginated %}
-      <div style="margin-top:10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+      <div class="pagination">
         {% if page_obj.has_previous %}
-          <a class="btn" href="?q={{ q }}&page={{ page_obj.previous_page_number }}">← Prev</a>
+          <a class="btn" href="?q={{ q }}&class_id={{ class_id }}&page={{ page_obj.previous_page_number }}">← Prev</a>
         {% endif %}
         <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
         {% if page_obj.has_next %}
-          <a class="btn" href="?q={{ q }}&page={{ page_obj.next_page_number }}">Next →</a>
+          <a class="btn" href="?q={{ q }}&class_id={{ class_id }}&page={{ page_obj.next_page_number }}">Next →</a>
         {% endif %}
       </div>
     {% endif %}
 
   {% else %}
-    {% if q %}
-      <p>No boxers match “{{ q }}”.</p>
+    {% if q or class_id %}
+      <p class="muted">No boxers match your filters.</p>
     {% else %}
-      <p>No boxers yet.</p>
+      <p class="muted">No boxers yet.</p>
     {% endif %}
   {% endif %}
-
 </div>
 
 <style>
-/* === Boxer list cards === */
-.boxer-list{ display:grid; gap:12px; margin-top:12px; }
-.boxer-card{
-  background: var(--panel-2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 12px;
-  display: grid; gap: 8px;
+/* Search bar + filters */
+.search-bar {
+  display:flex;
+  flex-wrap:wrap;
+  gap:.6rem;
+  align-items:center;
+  margin-bottom:1rem;
 }
-.boxer-card__head{ display:flex; justify-content:space-between; align-items:center; }
-.boxer-card__name{ margin:0; font-size:16px; font-weight:700; }
+.search-bar input[type="search"], .class-select {
+  flex:1;
+  min-width:160px;
+  padding:8px 12px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:#0f0f0f;
+  color:var(--text);
+  transition:border-color .2s ease, box-shadow .2s ease;
+}
+.search-bar input[type="search"]:focus, .class-select:focus {
+  outline:none;
+  border-color:var(--brand);
+  box-shadow:0 0 8px rgba(0,255,102,0.5);
+}
+.result-count { opacity:.7; margin-left:6px; }
+.filter-note { font-size:.9rem; opacity:.7; margin-top:.4rem; }
+
+/* Boxer list */
+.boxer-list{ display:grid; gap:14px; margin-top:14px; }
+.boxer-card{
+  background:linear-gradient(145deg, #0f0f0f, #181818);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px;
+  display:grid;
+  gap:10px;
+  box-shadow:0 0 12px rgba(0,255,102,0.15);
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+.boxer-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 20px rgba(0,255,102,0.4);
+}
+.boxer-card__head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.boxer-card__name{
+  margin:0;
+  font-size:18px;
+  font-weight:700;
+  color:var(--brand);
+}
 .boxer-card__actions{
-  display:flex; flex-wrap:wrap; gap:8px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.btn--glow {
+  border:1px solid var(--brand);
+  color:var(--brand);
+  background:transparent;
+  transition:all .2s ease;
+}
+.btn--glow:hover {
+  background:var(--brand);
+  color:#000;
+  box-shadow:0 0 12px rgba(0,255,102,0.8);
+}
+
+/* Pagination */
+.pagination {
+  margin-top:1rem;
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  flex-wrap:wrap;
 }
 </style>
 {% endblock %}
-

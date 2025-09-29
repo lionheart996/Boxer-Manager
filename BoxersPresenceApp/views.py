@@ -20,21 +20,25 @@ from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse, Http
 from django.utils import timezone
 from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_POST
-from django.views.generic import TemplateView, UpdateView, FormView, ListView, DetailView, CreateView
+from django.views.generic import UpdateView, FormView, ListView, DetailView, CreateView
 from django.views import View
 from django.urls import reverse_lazy, reverse, get_resolver
 from django.shortcuts import render, redirect
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from rest_framework.exceptions import PermissionDenied
-
-from . import models
 from .models import Boxer, BatteryTest, Attendance, HeartRate, Weight, ParentProfile, ClassTemplate, \
     Enrollment, Gym, BoxerComment
 from .forms import BatteryTestForm, BoxerAndTestSelectForm, BoxerForm, HeartRateQuickForm, \
     WeightQuickForm, ParentSignupForm, GymForm, TestResultForm, EnrollBoxerForm, ClassCreateForm, UnenrollForm, \
     BulkBoxerForm, BoxerCommentForm
-from .utils import expand_rrule
+from .models import TestResult
+from .utils import user_gym, resolve_boxer, expand_rrule
+
+from decimal import Decimal
+from django.db.models import Exists, OuterRef, Q
+from django.shortcuts import get_object_or_404
+from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 # --- phase helpers (ensure these exist in the file once) ---
@@ -112,37 +116,37 @@ def _user_gym(user):
 class BoxerListView(LoginRequiredMixin, ListView):
     template_name = 'boxers/boxer_list.html'
     context_object_name = 'boxers'
-    paginate_by = 25  # optional; remove if you don't want pagination
+    paginate_by = 25
 
     def get_queryset(self):
         gym = user_gym(self.request)
         q = (self.request.GET.get("q") or "").strip()
+        class_id = self.request.GET.get("class_id")
+
         qs = Boxer.objects.filter(gym=gym)
 
+        if class_id:
+            qs = qs.filter(enrollments__template_id=class_id)
+
         if q:
-            # AND all terms; match against name OR parent_name
             for term in q.split():
                 qs = qs.filter(
                     Q(name__icontains=term) |
                     Q(parent_name__icontains=term)
                 )
-        return qs.order_by("name")
+        return qs.order_by("first_name", "last_name", "name")
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx["q"] = (self.request.GET.get("q") or "").strip()
-        ctx["result_count"] = self.get_queryset().count()
-        ctx["form"] = BoxerForm()  # keep if you still use POST add
-        return ctx
+        gym = user_gym(self.request)
 
-    def post(self, request, *args, **kwargs):
-        form = BoxerForm(request.POST)
-        if form.is_valid():
-            boxer = form.save(commit=False)
-            boxer.gym = user_gym(request)
-            boxer.save()
-            return redirect('boxer_list')
-        return self.render_to_response(self.get_context_data(form=form))
+        ctx["q"] = (self.request.GET.get("q") or "").strip()
+        ctx["class_id"] = self.request.GET.get("class_id") or ""
+        ctx["result_count"] = self.get_queryset().count()
+        ctx["form"] = BoxerForm()
+        ctx["classes"] = ClassTemplate.objects.filter(gym=gym).order_by("title")
+
+        return ctx
 
 class TestsListView(LoginRequiredMixin, TemplateView):
     template_name = "tests/tests_list.html"
@@ -1218,15 +1222,6 @@ class WeightDetailView(LoginRequiredMixin, TemplateView):
         })
         return ctx
 
-# views.py
-from .models import TestResult
-from .utils import user_gym, resolve_boxer
-
-from decimal import Decimal
-from django.db.models import Exists, OuterRef, Q
-from django.shortcuts import get_object_or_404
-from django.views.generic import TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
 
 class TestRankingView(LoginRequiredMixin, TemplateView):
     template_name = "tests/tests_rankings.html"
@@ -1617,63 +1612,110 @@ def _back_to_tests_list():
     return redirect("tests_list")
 
 
+
+
+def lower_is_better(test):
+    """Return True if lower values should rank higher for this test."""
+    u = (getattr(test, "unit", "") or "").strip().lower()
+    time_units = {
+        "s", "sec", "secs", "second", "seconds",
+        "ms", "millisecond", "milliseconds",
+        "min", "mins", "minute", "minutes",
+        "h", "hr", "hrs", "hour", "hours",
+    }
+    if u in time_units:
+        return True
+    if u in {"m", "meter", "meters", "metre", "metres",
+             "cm", "centimeter", "centimeters",
+             "centimetre", "centimetres"}:
+        return False
+    return False
+
+
 class TestResultCreateView(LoginRequiredMixin, CreateView):
-    template_name = "tests/tests_results.html"   # your template
+    template_name = "tests/tests_results.html"   # NEW template name
     form_class = TestResultForm
     success_url = reverse_lazy("tests_record")
 
+    def _selected_class(self, gym):
+        raw = (self.request.GET.get("class_id") or "").strip()
+        try:
+            cid = int(raw)
+        except (TypeError, ValueError):
+            return None
+        try:
+            return ClassTemplate.objects.get(id=cid, gym=gym)
+        except ClassTemplate.DoesNotExist:
+            return None
+
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-        # optional: set queryset / preselects
-        form.fields["boxer"].queryset = Boxer.objects.all().order_by("name")
-        form.fields["test"].queryset = BatteryTest.objects.all().order_by("display_order", "name")
+        gym = user_gym(self.request)
+
+        # Limit tests (you can scope by gym if needed)
+        form.fields["test"].queryset = form.fields["test"].queryset.order_by("display_order", "name")
+
+        # Filter boxers based on class_id (GET)
+        selected_class = self._selected_class(gym)
+        if selected_class:
+            boxers_qs = Boxer.objects.filter(
+                gym=gym,
+                enrollments__template=selected_class
+            ).distinct()
+        else:
+            boxers_qs = Boxer.objects.filter(gym=gym)
+
+        # Nice ordering; fallback to 'name' for legacy data
+        form.fields["boxer"].queryset = boxers_qs.order_by("first_name", "last_name", "name")
+        form.fields["boxer"].required = True
+        form.fields["test"].required = True
+
+        # Optional preselects
         if bid := self.request.GET.get("boxer"):
             form.initial["boxer"] = bid
         if tid := self.request.GET.get("test"):
             form.initial["test"] = tid
-        # make them required at the form level too
-        form.fields["boxer"].required = True
-        form.fields["test"].required = True
+
         return form
 
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        gym = user_gym(self.request)
+        classes = ClassTemplate.objects.filter(gym=gym).order_by("title")
+        selected_class = self._selected_class(gym)
+
+        # Count visible boxers to show a friendly hint
+        boxer_qs = self.get_form().fields["boxer"].queryset
+        ctx.update({
+            "classes": classes,
+            "selected_class": selected_class,
+            "visible_boxer_count": boxer_qs.count(),
+        })
+        return ctx
+
     def form_valid(self, form):
-        # Read raw POST values and validate them as integers
-        raw_boxer = (self.request.POST.get("boxer") or "").strip()
-        raw_test  = (self.request.POST.get("test")  or "").strip()
-
-        def to_int_or_none(s):
-            try:
-                return int(s)
-            except Exception:
-                return None
-
-        boxer_id = to_int_or_none(raw_boxer)
-        test_id  = to_int_or_none(raw_test)
-
-        if not boxer_id:
-            form.add_error("boxer", "Please select a boxer.")
-        if not test_id:
-            form.add_error("test", "Please select a test.")
-        if form.errors:
-            return self.form_invalid(form)
-
-        # Fetch instances safely
-        boxer = get_object_or_404(Boxer, pk=boxer_id)
-        test  = get_object_or_404(BatteryTest, pk=test_id)
-
-        # Attach to the model instance before saving
-        form.instance.boxer = boxer
-        form.instance.test  = test
-
         resp = super().form_valid(form)
-
-        # Nice popup message after save
         tr = self.object
-        measured = tr.value1 if tr.value1 is not None else (tr.value2 if tr.value2 is not None else tr.value3)
-        unit = tr.test.unit or ""
-        date_str = (tr.measured_at or tr.created_at if hasattr(tr, "created_at") else None)
-        date_str = date_str.strftime("%Y-%m-%d") if date_str else ""
-        messages.success(self.request, f"{tr.boxer} has scored {measured} {unit} for test - {tr.test} on this date: {date_str}")
+
+        # Collect all values
+        vals = [v for v in (tr.value1, tr.value2, tr.value3) if v is not None]
+
+        # Decide best according to test unit
+        best = None
+        if vals:
+            if lower_is_better(tr.test):
+                best = min(vals)
+            else:
+                best = max(vals)
+
+        unit = getattr(tr.test, "unit", "") or ""
+        date_str = tr.measured_at.strftime("%Y-%m-%d %H:%M") if tr.measured_at else "unspecified date"
+
+        if best is not None:
+            messages.success(self.request, f"{tr.boxer} scored {best} {unit} in '{tr.test}' on {date_str}.")
+        else:
+            messages.warning(self.request, f"{tr.boxer} had no valid measurement values for '{tr.test}' on {date_str}.")
+
         return resp
 
 class BoxerTestsView(LoginRequiredMixin, TemplateView):
@@ -1711,16 +1753,20 @@ class BoxerTestsView(LoginRequiredMixin, TemplateView):
                     if item["notes"]:
                         notes.append(item["notes"])
 
-                avg = sum(nums) / len(nums) if nums else None
-                if avg is not None:
-                    labels.append(d.strftime("%Y-%m-%d"))
-                    values.append(float(avg))
+                if nums:
+                    if lower_is_better(selected_test):
+                        best_val = min(nums)
+                    else:
+                        best_val = max(nums)
 
-                summary.append({
-                    "date": d,
-                    "avg": avg,
-                    "notes": notes,
-                })
+                    labels.append(d.strftime("%Y-%m-%d"))
+                    values.append(float(best_val))
+
+                    summary.append({
+                        "date": d,
+                        "avg": best_val,
+                        "notes": notes,
+                    })
 
         ctx.update({
             "boxer": boxer,

@@ -5,9 +5,7 @@
 
   <p><strong>Boxer’s forename:</strong> {{ boxer.first_name|default:"Not Specified" }}</p>
   <p><strong>Boxer’s last name:</strong> {{ boxer.last_name|default:"Not Specified" }}</p>
-  <p><strong>Parent:</strong>
-  {{ boxer.parent_name|default:"Not Specified" }}
-  </p>
+  <p><strong>Parent:</strong> {{ boxer.parent_name|default:"Not Specified" }}</p>
   <p><strong>Date of birth:</strong>
     {% if boxer.date_of_birth %}
       {{ boxer.date_of_birth|date:"d M Y" }}
@@ -20,12 +18,15 @@
 
   <h3>Attendance Summary</h3>
   {% if att_total %}
-    <p>Until today: {{ boxer.name }} has been <strong>{{ att_present }}</strong> times present 
-    ({{ att_present }} / {{ att_total }} = {{ att_present_pct }}%).</p>
-
-    <p>Absent: <strong>{{ att_absent }}</strong> ({{ att_absent_pct }}%). 
-    Of these, <strong>{{ att_excused }}</strong> were excused 
-    ({{ att_excused_pct }}%).</p>
+    <p>
+      Until today: {{ boxer.name }} has been <strong>{{ att_present }}</strong> times present
+      ({{ att_present }} / {{ att_total }} = {{ att_present_pct }}%).
+    </p>
+    <p>
+      Absent: <strong>{{ att_absent }}</strong> ({{ att_absent_pct }}%).
+      Of these, <strong>{{ att_excused }}</strong> were excused
+      ({{ att_excused_pct }}%).
+    </p>
   {% else %}
     <p><em>No attendance records yet.</em></p>
   {% endif %}
@@ -42,7 +43,8 @@
   {% endif %}
 
   <hr>
-  <button class="btn" onclick="window.print()">🖨️ Print</button>
+
+  <button class="btn print-btn" onclick="window.print()">🖨️ Print</button>
 </div>
 
 <style>
@@ -50,9 +52,42 @@
   max-width: 700px;
   margin: auto;
   padding: 20px;
-  background: #111;
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  background: #fff;   /* White background */
+  color: #000;        /* Black text */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-family: "Arial", sans-serif;
+  line-height: 1.6;
+}
+
+.resume-container h2,
+.resume-container h3 {
+  color: #000;
+  margin-top: 1rem;
+}
+
+.resume-container hr {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 1rem 0;
+}
+
+.print-btn {
+  margin-top: 16px;
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+/* Hide print button in print mode */
+@media print {
+  .print-btn {
+    display: none;
+  }
+  body {
+    background: #fff;
+    color: #000;
+  }
 }
 </style>
 {% endblock %}
+

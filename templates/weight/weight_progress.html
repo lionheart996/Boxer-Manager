@@ -1,15 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="content-container">
-     <a class="back-link" style="color: blue"
-   href="{{ request.META.HTTP_REFERER|default:attendance_fallback }}">
-    ← Back
-</a>
-  <h2 class="page-title">Weight Progress — {{ boxer.name }}</h2>
+<div class="weight-page">
+  <a class="back-link" style="color: dodgerblue" href="{% url 'boxer_list' %}">← Back to Boxers</a>
+    <h2 class="page-title">⚖️ Weight Progress — {{ boxer.name }}</h2>
 
   <!-- Fighting weight input -->
   <form method="get" class="fw-bar">
-    <label class="fw-label">
+    <label>
       Fighting Weight (kg)
       <input type="number" name="fighting_weight" step="0.1" min="0"
              value="{{ fighting_weight|default_if_none:'' }}" placeholder="e.g. 72.5">
@@ -21,134 +18,161 @@
     <p class="error-text">{{ fw_error }}</p>
   {% endif %}
 
-  {% if rows %}
-    <!-- Summary -->
-    <section class="summary-card">
-      <div class="summary-item">
-        <span class="label">Min</span>
-        <span class="value">{{ min_w }}<span class="unit">kg</span></span>
-      </div>
-      <div class="summary-item">
-        <span class="label">Max</span>
-        <span class="value">{{ max_w }}<span class="unit">kg</span></span>
-      </div>
-      <div class="summary-item">
-        <span class="label">Range</span>
-        <span class="value">{% if diff is not None %}{{ diff }}{% else %}–{% endif %}<span class="unit">kg</span></span>
-      </div>
-      <div class="summary-item">
-        <span class="label">Above FW{% if fighting_weight %} ({{ fighting_weight }}kg){% endif %}</span>
-        <span class="value">{% if count_above_fw is not None %}{{ count_above_fw }}{% else %}–{% endif %}</span>
-      </div>
-      <div class="summary-item">
-        <span class="label">Average</span>
-        <span class="value">{% if avg_w %}{{ avg_w|floatformat:2 }}<span class="unit">kg</span>{% else %}–{% endif %}</span>
-      </div>
-    </section>
+  <div class="weight-card">
+    {% if rows %}
+      <!-- Summary -->
+      <section class="summary-grid">
+        <div class="summary-item"><span class="label">Min</span><span class="value">{{ min_w }} kg</span></div>
+        <div class="summary-item"><span class="label">Max</span><span class="value">{{ max_w }} kg</span></div>
+        <div class="summary-item"><span class="label">Range</span><span class="value">{{ diff|default:"–" }} kg</span></div>
+        <div class="summary-item"><span class="label">Above FW{% if fighting_weight %} ({{ fighting_weight }}kg){% endif %}</span><span class="value">{{ count_above_fw|default:"–" }}</span></div>
+        <div class="summary-item"><span class="label">Average</span><span class="value">{{ avg_w|floatformat:2 }} kg</span></div>
+      </section>
 
-    <!-- Responsive chart -->
-    <section class="chart-card">
-      <h3 class="chart-title">History</h3>
-      <div class="chart-wrap">
+      <!-- Chart -->
+      <section class="chart-box">
+        <h3 class="chart-title">📊 History</h3>
         <canvas id="weightChart"></canvas>
-      </div>
-    </section>
+      </section>
 
-    <!-- History cards -->
-    <section class="history">
-      <h3 class="history-title">All Records</h3>
-      <div class="history-grid">
-        {% for r in rows %}
-          <article class="history-card">
-            <div class="history-date">{{ r.date|date:"d M Y (D)" }}</div>
-            <div class="history-weight">
-              <span class="chip">{{ r.weight }} kg</span>
-            </div>
-          </article>
-        {% endfor %}
-      </div>
-    </section>
-
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-      (function() {
-        const labels = [{% for r in rows %}"{{ r.date|date:'Y-m-d' }}"{% if not forloop.last %},{% endif %}{% endfor %}];
-        const data   = [{% for r in rows %}{{ r.weight }}{% if not forloop.last %},{% endif %}{% endfor %}];
-
-        const ctx = document.getElementById('weightChart').getContext('2d');
-
-        const datasets = [{
-          label: 'Weight (kg)',
-          data: data,
-          borderColor: 'rgba(0,255,102,0.9)',
-          backgroundColor: 'rgba(0,255,102,0.15)',
-          tension: 0.25,
-          pointRadius: 3,
-          borderWidth: 2,
-          fill: false
-        }];
-
-        {% if fighting_weight %}
-        datasets.push({
-          label: 'Fighting Weight',
-          data: labels.map(_ => {{ fighting_weight }}),
-          borderColor: 'rgba(255,255,255,0.7)',
-          borderDash: [6,6],
-          pointRadius: 0,
-          borderWidth: 1.5,
-          fill: false
-        });
-        {% endif %}
-
-        {% if avg_w %}
-        datasets.push({
-          label: 'Average',
-          data: labels.map(_ => {{ avg_w|floatformat:2 }}),
-          borderColor: 'rgba(0,160,255,0.9)',
-          borderDash: [3,3],
-          pointRadius: 0,
-          borderWidth: 1.5,
-          fill: false
-        });
-        {% endif %}
-
-        new Chart(ctx, {
-          type: 'line',
-          data: { labels, datasets },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { labels: { color: '#e7e9ee' } } },
-            scales: {
-              x: { ticks: { color: '#a9afbd' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-              y: { ticks: { color: '#a9afbd' }, grid: { color: 'rgba(255,255,255,0.05)' } }
-            }
-          }
-        });
-      })();
-    </script>
-  {% else %}
-    <p class="muted">No recorded weights yet for {{ boxer.name }}.</p>
-  {% endif %}
+      <!-- History -->
+      <section class="history-box">
+        <h3 class="history-title">All Records</h3>
+        <div class="history-grid">
+          {% for r in rows %}
+            <article class="history-item">
+              <div class="history-date">{{ r.date|date:"d M Y (D)" }}</div>
+              <div class="history-weight"><span class="chip">{{ r.weight }} kg</span></div>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+    {% else %}
+      <p class="muted">No recorded weights yet for {{ boxer.name }}.</p>
+    {% endif %}
+  </div>
 </div>
 
 <style>
-.fw-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:12px;}
-.fw-label{display:grid;gap:6px;font-weight:600;color:var(--muted);}
-.fw-label input{width:160px;padding:8px 10px;border-radius:10px;background:#0f0f0f;border:1px solid var(--border);color:var(--text);}
-.error-text{color:#ff4d4d;margin:.3rem 0 .6rem;}
-.summary-card{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;padding:14px;border-radius:12px;background:linear-gradient(145deg,#0e0e0e,#181818);border:1px solid var(--border);box-shadow:0 0 12px rgba(0,255,102,0.2);}
-.summary-item{display:grid;gap:6px;}
-.summary-item .label{color:var(--muted);font-size:13px;}
-.summary-item .value{font-weight:800;font-size:18px;color:var(--text);white-space:nowrap;}
-.summary-item .unit{color:var(--muted);margin-left:4px;}
-.chart-card{margin-top:14px;padding:14px;border-radius:12px;background:var(--panel-2);border:1px solid var(--border);}
-.chart-wrap{position:relative;width:100%;height:260px;}@media(min-width:768px){.chart-wrap{height:360px;}}
-.history{margin-top:16px;}
-.history-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
-.history-card{background:linear-gradient(145deg,#0f0f0f,#1b1b1b);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;justify-content:space-between;align-items:center;box-shadow:inset 0 0 8px rgba(0,255,102,0.1);}
-.history-date{font-weight:700;color:var(--brand);}
-.chip{padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:#121212;color:var(--text);font-weight:700;}
+/* Page wrapper */
+.weight-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* Fighting weight form */
+.fw-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.fw-bar input {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #0f0f0f;
+  color: var(--text);
+}
+
+/* Main card wrapper */
+.weight-card {
+  background: linear-gradient(145deg, #0f0f0f, #1c1c1c);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  display: grid;
+  gap: 20px;
+}
+
+/* Summary section */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(120px,1fr));
+  gap: 16px;
+}
+.summary-item {
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+  background: #111;
+  box-shadow: inset 0 0 6px rgba(0,255,102,0.1);
+}
+.summary-item .label { font-size: 13px; color: var(--muted); }
+.summary-item .value { font-size: 18px; font-weight: 700; }
+
+/* Chart */
+.chart-box {
+  padding: 12px;
+  border-radius: 12px;
+  background: #111;
+  border: 1px solid var(--border);
+}
+.chart-box canvas { width: 100% !important; height: 320px !important; }
+
+/* History */
+.history-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr;
+}
+@media(min-width:600px){
+  .history-grid { grid-template-columns: repeat(2,1fr); }
+}
+.history-item {
+  display:flex; justify-content:space-between; align-items:center;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #121212;
+}
+.history-date { font-weight: 600; color: var(--brand); }
+.chip { background:#1e1e1e; padding:4px 10px; border-radius:999px; border:1px solid var(--border); font-weight:700; }
 </style>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function() {
+  const labels = [{% for r in rows %}"{{ r.date|date:'Y-m-d' }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+  const data   = [{% for r in rows %}{{ r.weight }}{% if not forloop.last %},{% endif %}{% endfor %}];
+
+  const datasets = [{
+    label: 'Weight (kg)',
+    data,
+    borderColor: 'rgba(0,255,102,0.9)',
+    backgroundColor: 'rgba(0,255,102,0.15)',
+    borderWidth: 2,
+    pointRadius: 3,
+    tension: 0.25
+  }];
+
+  {% if fighting_weight %}
+  datasets.push({
+    label: 'Fighting Weight',
+    data: labels.map(() => {{ fighting_weight }}),
+    borderColor: 'rgba(255,99,132,0.9)',
+    borderDash: [6,6],
+    borderWidth: 2,
+    pointRadius: 0,
+    fill: false
+  });
+  {% endif %}
+
+  new Chart(document.getElementById('weightChart').getContext('2d'), {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#e7e9ee' } } },
+      scales: {
+        x: { ticks: { color: '#a9afbd' } },
+        y: { ticks: { color: '#a9afbd' } }
+      }
+    }
+  });
+})();
+</script>
 {% endblock %}

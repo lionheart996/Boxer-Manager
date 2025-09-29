@@ -1,15 +1,71 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="page-title">Edit Test</h2>
+<h2 class="page-title">✏️ Edit Test</h2>
 
 <div class="content-container">
   <div class="form-container">
-    <form method="post">
+    <form method="post" class="edit-test-form card-glow">
       {% csrf_token %}
       {{ form.as_p }}
-      <button class="btn" type="submit">Save Changes</button>
-      <a class="btn" href="{% url 'tests_list' %}">Cancel</a>
+      <div class="form-actions">
+        <button class="btn btn--primary" type="submit">💾 Save Changes</button>
+        <a class="btn btn--secondary" href="{% url 'tests_list' %}">✖ Cancel</a>
+      </div>
     </form>
   </div>
 </div>
+
+<style>
+/* Futuristic glowing form container */
+.edit-test-form {
+  background: linear-gradient(145deg, #0f0f0f, #1a1a1a);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 600px;
+  margin: auto;
+
+  /* Neon glow top + bottom */
+  box-shadow:
+    0 -2px 6px rgba(0, 255, 102, 0.4),
+    0  2px 6px rgba(0, 255, 102, 0.4),
+    0  0 12px rgba(0, 255, 102, 0.2);
+
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.edit-test-form:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 -4px 12px rgba(0, 255, 102, 0.7),
+    0  4px 12px rgba(0, 255, 102, 0.7),
+    0  0 20px rgba(0, 255, 102, 0.5);
+}
+
+/* Input fields */
+.edit-test-form input,
+.edit-test-form textarea,
+.edit-test-form select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #0f0f0f;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+/* Buttons */
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn {
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+</style>
 {% endblock %}

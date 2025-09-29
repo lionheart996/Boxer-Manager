@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="page-title">Battery Tests</h2>
+<h2 class="page-title">⚡ Battery Tests</h2>
 
-<div class="content-container">
+<div class="content-container tests-container">
 
   <!-- Create new test -->
-  <div class="card" style="padding:12px; border:1px solid var(--brand); border-radius:10px; margin-bottom:16px;">
-    <h3>Create a new test</h3>
-    <form method="post">
+  <div class="card new-test-card">
+    <h3>➕ Create a new test</h3>
+    <form method="post" class="test-form">
       {% csrf_token %}
       {{ form.as_p }}
       <button class="btn btn--primary" type="submit">Save Test</button>
@@ -17,7 +17,7 @@
   {% if tests %}
     <div class="test-list">
       {% for t in tests %}
-      <section class="test-card">
+      <section class="test-card" data-test="{{ t.pk }}">
         <header class="test-card__head">
           <h3 class="test-card__name">{{ forloop.counter }}. {{ t.name }}</h3>
           <span class="test-card__unit">[{{ t.unit }}]</span>
@@ -29,14 +29,22 @@
           <span>Order: {{ t.display_order }}</span>
         </div>
 
-        <div class="test-card__actions">
-          <a class="btn btn--sm" href="{% url 'test_edit' t.pk %}">Edit</a>
-          {% if t.pk %}
-            <form method="post" action="{% url 'battery_test_delete' pk=t.pk %}" style="display:inline;" onsubmit="return confirm('Delete this test?');">
-              {% csrf_token %}
-              <button type="submit" class="btn btn--danger btn--sm">Delete</button>
-            </form>
-          {% endif %}
+        <div class="test-footer">
+          <button type="button" class="btn btn--accent btn--sm toggle-options" aria-expanded="false">
+            Actions ▾
+          </button>
+        </div>
+
+        <!-- Dropdown (inside card; never overflows) -->
+        <div id="options-{{ t.pk }}" class="test-options" hidden>
+          <a class="btn btn--sm btn--accent" href="{% url 'test_edit' t.pk %}">✏️ Edit</a>
+
+          <form method="post"
+                action="{% url 'battery_test_delete' pk=t.pk %}"
+                onsubmit="return confirm('Delete this test?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn--danger btn--sm">🗑️ Delete</button>
+          </form>
         </div>
       </section>
       {% endfor %}
@@ -47,30 +55,180 @@
 </div>
 
 <style>
-/* === Battery test cards === */
-.test-list{ display:grid; gap:12px; margin-top:12px; }
+/* ==== HARDEN LAYOUT (NO SIDEWAYS SCROLL) ==== */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { max-width: 100%; overflow-x: hidden; }
+.tests-container { max-width: 100%; overflow-x: hidden; }
+.tests-container input, .tests-container select, .tests-container textarea, .tests-container button, .tests-container a {
+  max-width: 100%;
+}
 
-.test-card{
-  background: var(--panel-2);
+/* ==== CREATE FORM ==== */
+.new-test-card{
+  padding:16px;
+  border:1px solid var(--brand);
+  border-radius:12px;
+  margin-bottom:18px;
+  background:linear-gradient(135deg,#0f0f0f,#1a1a1a);
+  box-shadow:0 0 12px rgba(0,255,102,.2);
+}
+.test-form p { margin:8px 0; }
+.new-test-card input[type="text"],
+.new-test-card select,
+.new-test-card textarea {
+  width:100%;
+}
+
+/* ==== LIST WRAPPER ==== */
+.test-list{
+  display:grid;
+  gap:14px;
+}
+
+/* ==== CARD ==== */
+.test-card {
+  background: linear-gradient(145deg, #0f0f0f, #1a1a1a);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 14px;
-  display:grid;
-  gap:8px;
+  display: grid;
+  gap: 8px;
+
+  /* ✨ Futuristic glow effect */
+  box-shadow:
+    0 -2px 6px rgba(0, 255, 102, 0.4),   /* top glow */
+    0  2px 6px rgba(0, 255, 102, 0.4),   /* bottom glow */
+    0  0 12px rgba(0, 255, 102, 0.2);    /* ambient */
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
 }
 
+.test-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 -4px 12px rgba(0, 255, 102, 0.7),
+    0  4px 12px rgba(0, 255, 102, 0.7),
+    0  0 20px rgba(0, 255, 102, 0.5);
+}
+/* Header: name (wraps) + unit (no wrap) */
 .test-card__head{
-  display:flex; justify-content:space-between; align-items:center;
+  display:grid;
+  grid-template-columns: 1fr auto; /* name grows, unit stays compact */
+  align-items:center;
+  column-gap:10px;
 }
-.test-card__name{ margin:0; font-size:16px; font-weight:700; }
-.test-card__unit{ font-size:14px; color:var(--muted); }
+.test-card__name{
+  margin:0;
+  font-size:16px;
+  font-weight:700;
+  color:#fff;
+  min-width:0;              /* ✅ allow shrink in grid */
+  overflow-wrap:anywhere;   /* ✅ break long words */
+}
+.test-card__unit{
+  font-size:14px;
+  color:var(--muted);
+  white-space:nowrap;       /* ✅ stay compact */
+}
 
-.test-card__desc{ margin:0; font-size:14px; color:var(--text); }
-.test-card__meta{ font-size:13px; color:var(--muted); }
+/* Description + meta */
+.test-card__desc{
+  margin:0;
+  font-size:14px;
+  color:var(--text);
+  overflow-wrap:anywhere;
+}
+.test-card__meta{
+  font-size:13px;
+  color:var(--muted);
+}
 
-.test-card__actions{
-  display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;
+/* Footer (actions trigger) */
+.test-footer{
+  display:flex;
+  justify-content:flex-end;
+}
+
+/* Dropdown inside card – responsive grid so it never overflows */
+.test-options{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:10px;
+  padding:10px;
+  background:#0e0e0e;
+  border:1px solid var(--border);
+  border-radius:10px;
+}
+.test-options[hidden]{ display:none; }
+.test-options .btn,
+.test-options button,
+.test-options a{
+  width:100%;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  white-space:normal;          /* ✅ let text wrap if needed */
+  line-height:1.2;
+  padding:10px 12px;
+}
+.test-options form{ margin:0; }
+
+/* ==== MOBILE-FIRST (stack & wrap cleanly) ==== */
+@media (max-width: 640px){
+  .test-card{ padding:12px; }
+  .test-options{ grid-template-columns: 1fr; }  /* ✅ full-width buttons */
+}
+
+/* Slight “press” feedback for mobile taps */
+.toggle-options:active,
+.test-options .btn:active,
+.test-options button:active,
+.test-options a:active{
+  transform:scale(0.98);
+  filter:brightness(1.1);
 }
 </style>
-{% endblock %}
 
+<script>
+(function(){
+  // Toggle only the clicked card's options; never overflow; never require sideways scroll.
+  document.addEventListener('click', function(e){
+    const toggle = e.target.closest('.toggle-options');
+    const card   = e.target.closest('.test-card');
+
+    // Clicking the toggle button
+    if (toggle && card) {
+      const id = card.getAttribute('data-test');
+      const pane = document.getElementById('options-' + id);
+      const isOpen = !pane.hasAttribute('hidden');
+
+      // Close all others
+      document.querySelectorAll('.test-options').forEach(p => p.setAttribute('hidden',''));
+      document.querySelectorAll('.toggle-options[aria-expanded]').forEach(b => b.setAttribute('aria-expanded','false'));
+
+      // Open this one if it was closed
+      if (!isOpen) {
+        pane.removeAttribute('hidden');
+        toggle.setAttribute('aria-expanded','true');
+      }
+      // Prevent card container from re-toggling
+      e.stopPropagation();
+      return;
+    }
+
+    // If click occurred inside the dropdown (links/forms), do nothing special
+    if (e.target.closest('.test-options')) {
+      return; // allow normal link/form behavior
+    }
+
+    // Clicking anywhere else inside a card shouldn't open/close automatically.
+    // We keep it explicit via the "Actions" button so taps don't cause layout shifts.
+    if (!e.target.closest('.test-card')) {
+      // Clicked outside → close all
+      document.querySelectorAll('.test-options').forEach(p => p.setAttribute('hidden',''));
+      document.querySelectorAll('.toggle-options[aria-expanded]').forEach(b => b.setAttribute('aria-expanded','false'));
+    }
+  });
+})();
+</script>
+{% endblock %}

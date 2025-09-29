@@ -1,46 +1,156 @@
-
 {% extends "base.html" %}
 {% block content %}
-<h2 class="page-title">Record Test Result</h2>
+<h2 class="page-title">🚀 Record Test Result</h2>
 
-<form method="post" action="{% url 'tests_record' %}" class="content-container" style="display:grid; gap:12px; max-width:560px;">
-  {% csrf_token %}
-  {{ form.non_field_errors }}
+<div class="content-container">
 
-  <label>Boxer
-    {{ form.boxer }}
-    {% if form.boxer.errors %}
-      <div class="error">{{ form.boxer.errors|striptags }}</div>
+  <!-- Class filter (GET) -->
+  <form method="get" class="filter-bar" style="margin-bottom:12px;">
+    <label class="filter-label">Class</label>
+    <select name="class_id" onchange="this.form.submit()">
+      <option value="">— All Classes —</option>
+      {% for c in classes %}
+        <option value="{{ c.id }}" {% if selected_class and selected_class.id == c.id %}selected{% endif %}>
+          {{ c.title }}
+        </option>
+      {% endfor %}
+    </select>
+    {% if selected_class %}
+      <span class="pill">Showing boxers enrolled in “{{ selected_class.title }}” ({{ visible_boxer_count }})</span>
+    {% else %}
+      <span class="pill">Showing all boxers ({{ visible_boxer_count }})</span>
     {% endif %}
-  </label>
+  </form>
 
-  <label>Test
-    {{ form.test }}
-    {% if form.test.errors %}
-      <div class="error">{{ form.test.errors|striptags }}</div>
-    {% endif %}
-  </label>
+  <!-- POST form -->
+  <form method="post" action="" class="test-form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
 
-  <label>Date/Time {{ form.measured_at }}</label>
+    <section class="form-card">
+      <label class="form-card__label">Boxer *</label>
+      <div class="form-card__field">
+        {{ form.boxer }}
+        {% if form.boxer.errors %}<div class="error">{{ form.boxer.errors|striptags }}</div>{% endif %}
+      </div>
+    </section>
 
-  <label>Value 1 {{ form.value1 }}</label>
-  <label>Value 2 {{ form.value2 }}</label>
-  <label>Value 3 {{ form.value3 }}</label>
+    <section class="form-card">
+      <label class="form-card__label">Test *</label>
+      <div class="form-card__field">
+        {{ form.test }}
+        {% if form.test.errors %}<div class="error">{{ form.test.errors|striptags }}</div>{% endif %}
+      </div>
+    </section>
 
-  <label>Notes {{ form.notes }}</label>
+    <section class="form-card">
+      <label class="form-card__label">Date / Time</label>
+      <div class="form-card__field">
+        <!-- Force calendar+clock; preserve current value if any -->
+        <input type="datetime-local" name="measured_at"
+               value="{{ form.measured_at.value|default:'' }}">
+      </div>
+    </section>
 
-  <button type="submit" class="btn">Save</button>
-</form>
+    <section class="form-card grid-3">
+      <div>
+        <label class="form-card__label">Value 1</label>
+        <div class="form-card__field">{{ form.value1 }}</div>
+      </div>
+      <div>
+        <label class="form-card__label">Value 2</label>
+        <div class="form-card__field">{{ form.value2 }}</div>
+      </div>
+      <div>
+        <label class="form-card__label">Value 3</label>
+        <div class="form-card__field">{{ form.value3 }}</div>
+      </div>
+    </section>
 
-{% if messages %}
-  <script>
-    (function(){
-      var txt = "";
-      {% for m in messages %} txt += {{ m|escapejs }} + "\n"; {% endfor %}
-      if (txt.trim()) alert(txt.trim());
-    })();
-  </script>
-{% endif %}
+    <section class="form-card">
+      <label class="form-card__label">Notes</label>
+      <div class="form-card__field">{{ form.notes }}</div>
+    </section>
+
+    <button type="submit" class="btn btn--primary save-btn">💾 Save Result</button>
+  </form>
+</div>
+
+<style>
+/* Kill sideways scroll anywhere */
+*, *::before, *::after{ box-sizing:border-box; }
+html, body, .content-container{ max-width:100%; overflow-x:hidden; }
+
+/* Filter bar */
+.filter-bar{
+  display:flex; flex-wrap:wrap; gap:.6rem; align-items:center;
+}
+.filter-bar select{
+  padding:8px 10px; border:1px solid var(--border); border-radius:10px;
+  background:#0f0f0f; color:var(--text);
+}
+.filter-label{ font-weight:700; color:var(--brand); }
+.pill{
+  font-size:12px; padding:4px 8px; border:1px solid var(--border);
+  border-radius:999px; color:var(--muted);
+}
+
+/* Form layout */
+.test-form{
+  display:grid; gap:20px; max-width:700px; margin:0 auto; padding:10px;
+}
+.form-card{
+  background:linear-gradient(145deg,#0e0e0e,#181818);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px;
+  display:grid; gap:8px;
+  box-shadow:
+    0 -2px 6px rgba(0,255,102,.4),
+    0  2px 6px rgba(0,255,102,.4),
+    0  0 12px rgba(0,255,102,.2);
+  transition:transform .2s ease, box-shadow .3s ease;
+}
+.form-card:hover{
+  transform:translateY(-2px);
+  box-shadow:
+    0 -4px 12px rgba(0,255,102,.7),
+    0  4px 12px rgba(0,255,102,.7),
+    0  0 20px rgba(0,255,102,.5);
+}
+.form-card__label{ font-weight:700; font-size:14px; color:var(--brand); letter-spacing:.5px; }
+.form-card__field select,
+.form-card__field input,
+.form-card__field textarea{
+  width:100%; min-width:0;
+  border-radius:10px; padding:10px 12px;
+  background:#0f0f0f; border:1px solid var(--border); color:var(--text);
+  font-family:monospace; overflow-wrap:anywhere;
+}
+input[type="datetime-local"]{ color-scheme:dark; }
+
+/* Values grid */
+.grid-3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+@media(max-width: 640px){ .grid-3{ grid-template-columns:1fr; } }
+
+/* Save button */
+.save-btn{
+  width:100%; font-size:18px; font-weight:700; border-radius:12px;
+  box-shadow:
+    0 -2px 6px rgba(0,255,102,.5),
+    0  2px 6px rgba(0,255,102,.5),
+    0  0 14px rgba(0,255,102,.3);
+  transition:all .2s ease;
+}
+.save-btn:hover{
+  transform:scale(1.02);
+  box-shadow:
+    0 -4px 12px rgba(0,255,102,.8),
+    0  4px 12px rgba(0,255,102,.8),
+    0  0 22px rgba(0,255,102,.6);
+}
+
+/* Errors */
+.error{ color:#ff5555; font-size:13px; margin-top:4px; }
+</style>
 {% endblock %}
-
-
