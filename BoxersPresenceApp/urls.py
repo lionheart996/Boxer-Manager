@@ -7,7 +7,7 @@ from .api import BoxerViewSet, TestResultViewSet, TestViewSet, WeightViewSet
 from .async_views import boxers_search
 from .views import WeightProgressView, ParentHomeView, ParentAttendanceView, \
     ParentSignupView, GymCreateView, GymListView, BoxerTestsView, TestResultCreateView, BoxerClassesView, \
-    BoxerCommentsView, EditCommentView, DeleteCommentView
+    BoxerCommentsView, EditCommentView, DeleteCommentView, export_attendance_preview
 
 router = DefaultRouter()
 router.register(r'boxers', BoxerViewSet, basename='boxer')
@@ -40,8 +40,9 @@ urlpatterns = [
     # Attendance
     path('attendance/', views.AttendanceListView.as_view(), name='attendance_list'),
     path('attendance/mark/', views.MarkAttendanceView.as_view(), name='mark_attendance'),
-    path("attendance/export/", views.export_form, name="export_form"),
-    path("attendance/export/download/", views.export_download, name="export_download"),
+    path("export-attendance/", views.export_attendance_view, name="export_attendance"),
+    path("export-attendance/excel/", views.export_attendance_excel, name="export_attendance_excel"),
+    path("export-attendance/preview/", export_attendance_preview, name="export_attendance_preview"),
     path('attendance/weight/<int:boxer_id>/', WeightProgressView.as_view(), name='weight_progress'),
     path('attendance/date/', views.attendance_by_date, name='attendance_by_date'),
     path('attendance/delete/<int:attendance_id>/', views.delete_attendance, name='delete_attendance'),

@@ -13,7 +13,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.db import transaction, IntegrityError
-from django.db.models import Max, ProtectedError, Min, Avg
+from django.db.models import Max, ProtectedError, Min, Avg, Count
 from django.db.models.functions import TruncDate
 from django.forms import formset_factory
 from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse, HttpResponseForbidden, Http404
@@ -25,6 +25,7 @@ from django.views import View
 from django.urls import reverse_lazy, reverse, get_resolver
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from openpyxl.utils import get_column_letter
 from rest_framework.exceptions import PermissionDenied
 from .models import Boxer, BatteryTest, Attendance, HeartRate, Weight, ParentProfile, ClassTemplate, \
     Enrollment, Gym, BoxerComment
@@ -450,95 +451,6 @@ def parse_iso_date_or_today(s: str | None) -> date:
     return timezone.localdate()
 
 
-@login_required
-def export_form(request):
-    """Form with start/end + class dropdown (scoped to current user's gym)."""
-    gym = user_gym(request)
-    classes = ClassTemplate.objects.all().order_by("title") if request.user.is_superuser \
-        else ClassTemplate.objects.filter(gym=gym).order_by("title")
-    return render(request, "attendance/export_form.html", {"classes": classes})
-
-
-@login_required
-def export_download(request):
-    start_raw = request.GET.get("start_date")
-    end_raw   = request.GET.get("end_date")
-    class_id  = (request.GET.get("class_id") or "").strip()
-
-    if not start_raw or not end_raw:
-        return HttpResponse("Please provide start_date and end_date", status=400)
-
-    try:
-        start_date = datetime.strptime(start_raw, "%Y-%m-%d").date()
-        end_date   = datetime.strptime(end_raw,   "%Y-%m-%d").date()
-    except Exception:
-        return HttpResponse("Dates must be YYYY-MM-DD", status=400)
-
-    if end_date < start_date:
-        return HttpResponse("end_date must be on/after start_date", status=400)
-
-    gym = user_gym(request)
-
-    # ---- get selected class ----
-    selected_class = None
-    if class_id:
-        qs = ClassTemplate.objects.all() if request.user.is_superuser \
-             else ClassTemplate.objects.filter(gym=gym)
-        try:
-            selected_class = qs.get(pk=int(class_id))
-        except (ValueError, ClassTemplate.DoesNotExist):
-            return HttpResponse("Invalid class", status=400)
-
-    # ---- boxer list from class enrollments ----
-    if not selected_class:
-        return HttpResponse("Class required", status=400)
-
-    boxer_qs = Boxer.objects.filter(enrollments__template=selected_class).distinct()
-    boxer_qs = boxer_qs.order_by("first_name", "last_name", "name")
-
-    # ---- workbook ----
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.title = "Summary"
-
-    ws.append([f"Attendance {start_date} → {end_date} — Class: {selected_class.title}"])
-    ws.append([])
-    ws.append(["Boxer", "Present", "Absent", "Excused"])
-
-    ws2 = wb.create_sheet("Details")
-    ws2.append(["Date", "Boxer", "Status"])
-
-    # ---- per boxer ----
-    for boxer in boxer_qs:
-        full_name = f"{(boxer.first_name or '').strip()} {(boxer.last_name or '').strip()}".strip() or boxer.name
-
-        # pull *all* attendances for this boxer in range (ignore class_template)
-        att_qs = Attendance.objects.filter(
-            boxer=boxer,
-            date__gte=start_date,
-            date__lte=end_date,
-        )
-
-        present = att_qs.filter(is_present=True).count()
-        excused = att_qs.filter(is_present=False, is_excused=True).count()
-        absent  = att_qs.filter(is_present=False, is_excused=False).count()
-
-        ws.append([full_name, present, absent, excused])
-
-        for a in att_qs.order_by("date"):
-            status = "Present" if a.is_present else ("Excused" if a.is_excused else "Absent")
-            ws2.append([a.date.isoformat(), full_name, status])
-
-    # ---- response ----
-    filename = f"attendance_{start_date}_to_{end_date}_{selected_class.title.replace(' ', '_')}.xlsx"
-    response = HttpResponse(
-        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
-    response["Content-Disposition"] = f'attachment; filename="{filename}"'
-    wb.save(response)
-    return response
-
-
 class MarkAttendanceView(LoginRequiredMixin, TemplateView):
     template_name = "attendance/mark_attendance.html"
 
@@ -690,6 +602,10 @@ class MarkAttendanceView(LoginRequiredMixin, TemplateView):
                 pass
 
         boxer_qs = self._scoped_boxers_qs(gym, selected_class)
+        if not selected_class:
+            messages.error(request, "Please select a class before saving attendance.")
+            return redirect(self._preserve_redirect(None, target_date))
+
         for boxer in boxer_qs:
             status = request.POST.get(f"attendance_{boxer.id}")  # "Present" | "Absent" | None
             raw_weight = (request.POST.get(f"weight_{boxer.id}") or "").strip()
@@ -1939,3 +1855,141 @@ class DeleteCommentView(LoginRequiredMixin, View):
         comment.delete()
         messages.success(request, "Comment deleted.")
         return redirect("boxer_comments", boxer_id=boxer.id)
+
+
+@login_required
+def export_attendance_view(request):
+    # If the user is a superuser/admin → show all classes
+    if request.user.is_superuser or request.user.is_staff:
+        classes = ClassTemplate.objects.all()
+    else:
+        # Otherwise (coach) → filter by their gym
+        coach_profile = getattr(request.user, "coach_profile", None)
+        if coach_profile and coach_profile.gym:
+            classes = ClassTemplate.objects.filter(gym=coach_profile.gym)
+        else:
+            classes = ClassTemplate.objects.none()
+
+    return render(request, "attendance/export_attendance.html", {"classes": classes})
+
+from django.db.models import Q
+
+@login_required
+def export_attendance_excel(request):
+    class_id = request.GET.get("class_id")
+    start_date = request.GET.get("start_date")
+    end_date = request.GET.get("end_date")
+
+    if not (class_id and start_date and end_date):
+        return HttpResponse("Missing parameters", status=400)
+
+    try:
+        gym_class = ClassTemplate.objects.get(id=class_id)
+    except ClassTemplate.DoesNotExist:
+        return HttpResponse("Class not found", status=404)
+
+    # Permission: admins/staff ok; coaches only their gym
+    if not (request.user.is_superuser or request.user.is_staff):
+        coach_profile = getattr(request.user, "coach_profile", None)
+        if not coach_profile or coach_profile.gym_id != gym_class.gym_id:
+            return HttpResponse("You do not have permission to export this class", status=403)
+
+    start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+    end_date   = datetime.strptime(end_date,   "%Y-%m-%d").date()
+
+    # 1) Enrolled boxers (the list you asked for)
+    enrollments = Enrollment.objects.filter(template=gym_class).select_related("boxer")
+    boxers = [en.boxer for en in enrollments]
+
+    # 2) Session dates = any date within range where this class has at least one attendance row
+    session_dates = set(
+        Attendance.objects.filter(
+            class_template=gym_class,
+            date__range=(start_date, end_date)
+        ).values_list("date", flat=True).distinct()
+    )
+
+    # 3) Excel setup
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Attendance Export"
+    ws.append(["Boxer", "Presents", "Excused Absences", "Unexcused Absences"])
+
+    # 4) Count per boxer
+    for boxer in boxers:
+        # all rows for this boxer/class/range
+        rows = list(
+            Attendance.objects.filter(
+                boxer=boxer,
+                class_template=gym_class,
+                date__range=(start_date, end_date),
+            ).values("date", "is_present", "is_excused")
+        )
+
+        present  = sum(1 for r in rows if r["is_present"])
+        excused  = sum(1 for r in rows if (not r["is_present"] and r["is_excused"]))
+        explicit_unexcused = sum(1 for r in rows if (not r["is_present"] and not r["is_excused"]))
+
+        # dates this boxer has *any* row
+        boxer_dates = {r["date"] for r in rows}
+        # treat missing rows on session dates as unexcused
+        present = sum(1 for r in rows if r["is_present"])
+        excused = sum(1 for r in rows if (not r["is_present"] and r["is_excused"]))
+        unexcused = sum(1 for r in rows if (not r["is_present"] and not r["is_excused"]))
+
+        ws.append([str(boxer), present, excused, unexcused])
+
+    # Autosize columns
+    for col in ws.columns:
+        max_len = max((len(str(cell.value)) for cell in col if cell.value is not None), default=0)
+        ws.column_dimensions[get_column_letter(col[0].column)].width = max_len + 2
+
+    # Response
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    safe_classname = gym_class.title.replace(" ", "_")
+    filename = f"attendance_{safe_classname}_{start_date}_to_{end_date}.xlsx"
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    wb.save(response)
+    return response
+
+
+@login_required
+def export_attendance_preview(request):
+    class_id = request.GET.get("class_id")
+    start_date = request.GET.get("start_date")
+    end_date = request.GET.get("end_date")
+
+    if not (class_id and start_date and end_date):
+        return JsonResponse([], safe=False)
+
+    try:
+        gym_class = ClassTemplate.objects.get(id=class_id)
+    except ClassTemplate.DoesNotExist:
+        return JsonResponse([], safe=False)
+
+    start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+    end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+
+    enrollments = Enrollment.objects.filter(template=gym_class).select_related("boxer")
+    boxers = [en.boxer for en in enrollments]
+
+    result = []
+    for boxer in boxers:
+        rows = Attendance.objects.filter(
+            boxer=boxer,
+            class_template=gym_class,
+            date__range=(start_date, end_date),
+        )
+        present = rows.filter(is_present=True).count()
+        excused = rows.filter(is_present=False, is_excused=True).count()
+        unexcused = rows.filter(is_present=False, is_excused=False).count()
+        result.append({
+            "boxer": str(boxer),
+            "present": present,
+            "excused": excused,
+            "unexcused": unexcused,
+        })
+
+    return JsonResponse(result, safe=False)
