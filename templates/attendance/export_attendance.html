@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="export-container">
+  <h2 class="export-title">🚀 Export Attendance</h2>
+  <p class="export-subtitle">Choose a class and date range to preview and export attendance data.</p>
+
+  <form id="export-form" method="get" action="{% url 'export_attendance_excel' %}" class="export-form">
+    <!-- Class selector -->
+    <div class="form-group">
+      <label for="class_id">🎓 Class</label>
+      <select name="class_id" id="class_id" required>
+        <option value="">-- Select a class --</option>
+        {% for c in classes %}
+          <option value="{{ c.id }}">{{ c.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Start Date -->
+    <div class="form-group">
+      <label for="start_date">📅 Start Date</label>
+      <input type="date" name="start_date" id="start_date" required>
+    </div>
+
+    <!-- End Date -->
+    <div class="form-group">
+      <label for="end_date">📅 End Date</label>
+      <input type="date" name="end_date" id="end_date" required>
+    </div>
+
+    <!-- Buttons -->
+    <button type="button" id="preview-btn" class="btn-preview" disabled>👀 Preview Data</button>
+    <button type="submit" id="export-btn" class="btn-export" disabled>⚡ Export Excel</button>
+  </form>
+
+  <!-- Preview Table -->
+  <div id="preview-container" class="preview-container" hidden>
+    <h3 class="preview-title">📋 Attendance Preview</h3>
+    <table class="preview-table">
+      <thead>
+        <tr>
+          <th class="col-boxer"><span class="header-text">Boxer</span></th>
+          <th class="col-present"><span class="header-text">Presents</span></th>
+          <th class="col-excused"><span class="header-text">Excused</span></th>
+          <th class="col-absent"><span class="header-text">Unexcused</span></th>
+        </tr>
+      </thead>
+      <tbody id="preview-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+/* Container */
+.export-container {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 20px;
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 255, 100, 0.3);
+  box-shadow: 0 0 20px rgba(0, 255, 100, 0.25), inset 0 0 10px rgba(0, 255, 100, 0.05);
+  text-align: center;
+  animation: fadeIn 0.6s ease-out;
+  box-sizing: border-box;
+}
+
+/* Titles */
+.export-title {
+  font-size: 2rem;
+  color: #00ff88;
+  text-shadow: 0 0 12px rgba(0, 255, 136, 0.7);
+  margin-bottom: 10px;
+}
+.export-subtitle {
+  color: #bbb;
+  margin-bottom: 25px;
+  font-size: 1.05rem;
+}
+
+/* Form */
+.export-form {
+  display: grid;
+  gap: 20px;
+  text-align: left;
+  width: 100%;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+.form-group label {
+  font-weight: 600;
+  color: #eee;
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+}
+
+/* Inputs */
+select, input[type="date"] {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #333;
+  background: rgba(30, 30, 30, 0.9);
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+select:focus, input[type="date"]:focus {
+  border-color: #00ff88;
+  box-shadow: 0 0 10px #00ff88;
+  outline: none;
+}
+/* Compact dropdown options (panel) */
+#class_id option { font-size: 0.85rem; padding: 6px 10px; }
+
+/* Buttons */
+.btn-preview, .btn-export {
+  width: 100%;
+  margin-top: 5px;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn-preview {
+  background: linear-gradient(135deg, #00c3ff, #0066ff);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(0, 195, 255, 0.6);
+}
+.btn-preview:hover:enabled { transform: translateY(-3px); box-shadow: 0 0 20px rgba(0, 195, 255, 0.9); }
+.btn-export {
+  background: linear-gradient(135deg, #00ff88, #00cc66);
+  color: #000;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
+}
+.btn-export:hover:enabled { transform: translateY(-3px); box-shadow: 0 0 20px rgba(0, 255, 136, 0.9); }
+.btn-preview:disabled, .btn-export:disabled { background:#333; color:#777; box-shadow:none; cursor:not-allowed; }
+
+/* Preview section */
+.preview-container {
+  margin-top: 30px;
+  text-align: left;
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Table (desktop base) */
+.preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(25, 25, 25, 0.9);
+  box-shadow: 0 0 12px rgba(0, 255, 100, 0.2);
+  table-layout: fixed; /* needed for truncation rules */
+}
+.preview-table th, .preview-table td {
+  padding: 12px;
+  border-bottom: 1px solid #333;
+  text-align: center;
+  color: #eee;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.preview-table th {
+  background: rgba(0, 255, 100, 0.2);
+  font-weight: 700;
+  text-shadow: 0 0 6px rgba(0, 255, 100, 0.5);
+}
+.preview-table tr:hover td { background: rgba(0, 255, 100, 0.05); }
+
+/* Desktop widths + colors */
+.col-boxer   { text-align: left; width: 40%; }
+.col-present { width: 20%; color: #00ff88; }
+.col-excused { width: 20%; color: #ffcc00; }
+.col-absent  { width: 20%; color: #ff4444; }
+
+/* -------- Mobile-only behavior -------- */
+@media (max-width: 640px) {
+  .preview-table { font-size: 0.85rem; }
+  .preview-table th, .preview-table td { padding: 8px; }
+
+  /* Make boxer name column wider and truncate long names */
+  .col-boxer { width: 60%; max-width: 0; }
+  .preview-table td:first-child { text-align: left; }
+
+  /* Compact number columns */
+  .preview-table th:not(:first-child),
+  .preview-table td:not(:first-child) { width: 13%; }
+
+  /* Swap header text for symbols with colors */
+  .col-present .header-text,
+  .col-excused .header-text,
+  .col-absent .header-text { display: none; } /* hide words on mobile */
+
+  .col-present::after { content: "+";   color: #00ff88; font-weight: 800; }
+  .col-excused::after { content: "+/-"; color: #ffcc00; font-weight: 800; }
+  .col-absent::after  { content: "−";   color: #ff4444; font-weight: 800; } /* en dash for nicer look */
+}
+</style>
+
+<script>
+const classSelect = document.getElementById('class_id');
+const startDate = document.getElementById('start_date');
+const endDate = document.getElementById('end_date');
+const exportBtn = document.getElementById('export-btn');
+const previewBtn = document.getElementById('preview-btn');
+const previewContainer = document.getElementById('preview-container');
+const previewBody = document.getElementById('preview-body');
+
+// Calendar logic: sync min/max
+startDate.addEventListener('change', () => {
+  endDate.min = startDate.value || '';
+  validateForm();
+});
+endDate.addEventListener('change', () => {
+  startDate.max = endDate.value || '';
+  validateForm();
+});
+
+// Enable/disable buttons
+function validateForm() {
+  const ready = classSelect.value && startDate.value && endDate.value;
+  exportBtn.disabled = !ready;
+  previewBtn.disabled = !ready;
+}
+[classSelect, startDate, endDate].forEach(el => el.addEventListener('change', validateForm));
+
+// Preview via AJAX
+previewBtn.addEventListener('click', async () => {
+  const url = `{% url 'export_attendance_preview' %}?class_id=${classSelect.value}&start_date=${startDate.value}&end_date=${endDate.value}`;
+  const res = await fetch(url);
+  const data = await res.json();
+
+  previewBody.innerHTML = '';
+  data.forEach(row => {
+    previewBody.innerHTML += `
+      <tr>
+        <td title="${row.boxer}">${row.boxer}</td>
+        <td>${row.present}</td>
+        <td>${row.excused}</td>
+        <td>${row.unexcused}</td>
+      </tr>`;
+  });
+  previewContainer.hidden = false;
+});
+</script>
+{% endblock %}
