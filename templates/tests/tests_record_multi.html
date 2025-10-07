@@ -1,0 +1,389 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">⚡ Record Multiple Test Results</h2>
+
+<form method="post" action="{% url 'tests_record_multi' %}?{% if selected_class %}class_id={{ selected_class.id }}{% endif %}" class="bulk-form">
+  {% csrf_token %}
+
+  <!-- === Control Panel === -->
+  <section class="form-card control-panel">
+    <!-- Class -->
+    <div class="field">
+      <label class="form-card__label">Class</label>
+      <select id="classSelect" name="class_id" onchange="onClassChange(this)">
+        <option value="">-- All Boxers --</option>
+        {% for c in classes %}
+          <option value="{{ c.id }}" {% if selected_class and c.id == selected_class.id %}selected{% endif %}>{{ c.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Test -->
+    <div class="field">
+      <label class="form-card__label">Test</label>
+      <select name="test" required>
+        <option value="">-- Select Test --</option>
+        {% for t in tests %}
+          <option value="{{ t.id }}">{{ t.name }} {% if t.unit %}({{ t.unit }}){% endif %}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Date -->
+    <div class="field">
+      <label class="form-card__label">Date / Time</label>
+      <div class="inline">
+        <input id="measured_at" type="datetime-local" name="measured_at" required>
+        <button type="button" class="btn btn--ghost now-btn" id="setNow">Now</button>
+      </div>
+    </div>
+
+
+    <!-- Boxer Filter -->
+    <div class="field">
+      <label class="form-card__label">Filter Boxers</label>
+      <input id="boxerFilter" type="text" placeholder="Type to filter… e.g. Ana, Ben">
+    </div>
+
+    <p class="hint">
+      Showing <strong>{{ visible_boxer_count }}</strong> boxers
+      {% if selected_class %} from <strong>{{ selected_class.title }}</strong>{% endif %}.
+      Only rows with any input will be saved.
+    </p>
+  </section>
+
+  <!-- === Boxer Table === -->
+  <div class="table-wrap">
+    <table class="boxer-table">
+      <thead>
+        <tr>
+          <th>Boxer</th>
+          <th>Value 1</th>
+          <th>Value 2</th>
+          <th>Value 3</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody id="boxerRows">
+        {% for b in boxers %}
+        <tr data-name="{{ b|lower }}">
+          <td class="cell-name" data-label="Boxer"><span class="name-text">{{ b }}</span></td>
+          <td data-label="Value 1"><input type="number" step="any" name="boxer_{{ b.id }}_v1" inputmode="decimal"></td>
+          <td data-label="Value 2"><input type="number" step="any" name="boxer_{{ b.id }}_v2" inputmode="decimal"></td>
+          <td data-label="Value 3"><input type="number" step="any" name="boxer_{{ b.id }}_v3" inputmode="decimal"></td>
+          <td data-label="Notes"><input type="text" name="boxer_{{ b.id }}_notes" placeholder="optional"></td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" style="text-align:center; padding: 20px;">No boxers found for this class.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <button type="submit" class="btn btn--primary save-btn">💾 Save All</button>
+</form>
+
+<style>
+/* === Layout === */
+.bulk-form {
+  display: grid;
+  gap: 20px;
+  margin: 0 auto;
+  width: min(1100px, 100%);
+}
+
+/* === Card Styles === */
+.form-card {
+  background: linear-gradient(145deg, #0e0e0e, #181818);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  display: grid;
+  gap: 14px;
+  box-shadow:
+    0 -2px 6px rgba(0, 255, 102, 0.4),
+    0  2px 6px rgba(0, 255, 102, 0.4),
+    0  0 12px rgba(0, 255, 102, 0.2);
+  transition: transform .2s ease, box-shadow .3s ease;
+}
+.form-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 -4px 12px rgba(0, 255, 102, 0.7),
+    0  4px 12px rgba(0, 255, 102, 0.7),
+    0  0 20px rgba(0, 255, 102, 0.5);
+}
+.form-card__label {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--brand);
+  letter-spacing: .5px;
+}
+.control-panel {
+  grid-template-columns: 1fr;
+}
+.control-panel .field select,
+.control-panel .field input {
+  width: 100%;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #0f0f0f;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: monospace;
+}
+.inline {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+}
+.hint {
+  margin: 0;
+  font-size: 12px;
+  opacity: .8;
+}
+
+/* === Table === */
+.table-wrap {
+  background: linear-gradient(145deg, #0e0e0e, #181818);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow:
+    0 -2px 6px rgba(0, 255, 102, 0.25),
+    0  2px 6px rgba(0, 255, 102, 0.25),
+    0  0 12px rgba(0, 255, 102, 0.2);
+}
+
+.boxer-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #111;
+  table-layout: fixed;
+}
+.boxer-table th, .boxer-table td {
+  border-bottom: 1px solid var(--border);
+  padding: 10px;
+  text-align: center;
+  color: var(--text);
+  word-wrap: break-word;
+}
+.boxer-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #0f0f0f;
+  color: var(--brand);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+.boxer-table tbody tr:hover {
+  background: rgba(0,255,102,0.06);
+}
+.cell-name {
+  text-align: left;
+  font-weight: 600;
+}
+
+/* Inputs */
+.boxer-table input[type="number"],
+.boxer-table input[type="text"] {
+  width: 100%;
+  background: #0f0f0f;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  padding: 10px 12px;
+  font-family: monospace;
+}
+.boxer-table input:focus,
+.control-panel input:focus,
+.control-panel select:focus {
+  outline: none;
+  border-color: #00ff66;
+  box-shadow: 0 0 0 3px rgba(0,255,102,0.2);
+}
+
+/* Save button */
+.save-btn {
+  width: 100%;
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 8px;
+  border-radius: 12px;
+  box-shadow:
+    0 -2px 6px rgba(0, 255, 102, 0.5),
+    0  2px 6px rgba(0, 255, 102, 0.5),
+    0  0 14px rgba(0, 255, 102, 0.3);
+  transition: all .2s ease;
+}
+.save-btn:hover {
+  transform: scale(1.02);
+  box-shadow:
+    0 -4px 12px rgba(0, 255, 102, 0.8),
+    0  4px 12px rgba(0, 255, 102, 0.8),
+    0  0 22px rgba(0, 255, 102, 0.6);
+}
+
+/* === Mobile Responsive (No Horizontal Scroll) === */
+@media (max-width: 780px) {
+  /* Stack everything as blocks for card-style rows */
+  .boxer-table,
+  .boxer-table thead,
+  .boxer-table tbody,
+  .boxer-table th,
+  .boxer-table td,
+  .boxer-table tr {
+    display: block;
+  }
+
+  /* Hide header row */
+  .boxer-table thead {
+    display: none;
+  }
+
+  /* Space between row cards */
+  .boxer-table tbody {
+    display: grid;
+    gap: 14px;
+    padding: 12px;
+  }
+
+  /* Each boxer row becomes a card */
+  .boxer-table tr {
+    background: linear-gradient(145deg, #0e0e0e, #151515);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 8px 10px;
+    box-shadow:
+      0 -2px 6px rgba(0, 255, 102, 0.25),
+      0  2px 6px rgba(0, 255, 102, 0.25),
+      0  0 12px rgba(0, 255, 102, 0.18);
+  }
+
+  /* Table cells become label + value stacks */
+  .boxer-table td {
+    display: grid;
+    grid-template-columns: minmax(70px, 40%) 1fr;
+    align-items: center;
+    border: none;
+    padding: 8px 6px;
+    gap: 8px;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  /* Labels on mobile */
+  .boxer-table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--brand);
+    text-align: left;
+    white-space: normal;
+  }
+
+  /* Boxer name styling */
+  .cell-name {
+    font-size: 15px;
+    font-weight: 800;
+    padding-top: 10px;
+    line-height: 1.3;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  /* Ensure name text wraps inside span */
+  .cell-name span,
+  .cell-name .name-text {
+    display: block;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  /* Inputs should not stretch past screen width */
+  .boxer-table input[type="number"],
+  .boxer-table input[type="text"] {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  /* Table container cleanup */
+  .table-wrap {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    overflow-x: hidden;
+  }
+
+  /* Inline form elements stack vertically */
+  .inline {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* === Tiny Screens (under 380px) === */
+@media (max-width: 380px) {
+  .boxer-table td {
+    grid-template-columns: minmax(60px, 35%) 1fr;
+    gap: 6px;
+  }
+}
+
+/* === Ghost Button (same style as before) === */
+.btn--ghost {
+  background: #0f0f0f;
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 10px 12px;
+  transition: all 0.2s ease;
+}
+.btn--ghost:hover {
+  border-color: #00ff66;
+  box-shadow: 0 0 0 3px rgba(0, 255, 102, 0.2);
+}
+</style>
+
+<script>
+(function() {
+  // Auto-set current datetime
+  const setNowBtn = document.getElementById('setNow');
+  const dt = document.getElementById('measured_at');
+  if (setNowBtn && dt) {
+    setNowBtn.addEventListener('click', () => {
+      const local = new Date(Date.now() - new Date().getTimezoneOffset() * 60000);
+      dt.value = local.toISOString().slice(0,16);
+      dt.focus();
+    });
+  }
+
+  // Live filter for boxer names
+  const filter = document.getElementById('boxerFilter');
+  const rows = document.querySelectorAll('#boxerRows tr');
+  if (filter) {
+    filter.addEventListener('input', (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      rows.forEach(r => {
+        const name = (r.getAttribute('data-name') || '').toLowerCase();
+        r.style.display = name.includes(q) ? '' : 'none';
+      });
+    });
+  }
+})();
+
+// Handle class change
+function onClassChange(sel) {
+  const val = sel.value;
+  const base = "{% url 'tests_record_multi' %}";
+  window.location.href = val ? `${base}?class_id=${val}` : base;
+}
+</script>
+{% endblock %}

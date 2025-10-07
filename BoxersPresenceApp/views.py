@@ -1634,6 +1634,122 @@ class TestResultCreateView(LoginRequiredMixin, CreateView):
 
         return resp
 
+class TestResultBulkCreateView(LoginRequiredMixin, TemplateView):
+    template_name = "tests/tests_record_multi.html"
+
+    # --- helpers ---
+    def _selected_class(self, gym):
+        raw = (self.request.GET.get("class_id") or "").strip()
+        try:
+            cid = int(raw)
+        except (TypeError, ValueError):
+            return None
+        try:
+            return ClassTemplate.objects.get(id=cid, gym=gym)
+        except ClassTemplate.DoesNotExist:
+            return None
+
+    def _parse_dt(self, value):
+        """Parse HTML datetime-local (YYYY-MM-DDTHH:MM) into an aware datetime."""
+        if not value:
+            return timezone.now()
+        try:
+            # Handles 'YYYY-MM-DDTHH:MM' and also with :SS if present
+            naive = datetime.fromisoformat(value)
+        except ValueError:
+            # Fallback in case the browser sends a space instead of 'T'
+            try:
+                naive = datetime.strptime(value, "%Y-%m-%d %H:%M")
+            except ValueError:
+                return timezone.now()
+        # Make timezone-aware in the current TZ
+        return timezone.make_aware(naive, timezone.get_current_timezone()) if timezone.is_naive(naive) else naive
+
+    def _to_float(self, s):
+        if s in (None, ""):
+            return None
+        try:
+            return float(s)
+        except (TypeError, ValueError):
+            return None
+
+    # --- GET ---
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        gym = user_gym(self.request)
+        selected_class = self._selected_class(gym)
+
+        if selected_class:
+            boxers = (Boxer.objects
+                      .filter(gym=gym, enrollments__template=selected_class)
+                      .distinct()
+                      .order_by("first_name", "last_name", "name"))
+        else:
+            boxers = Boxer.objects.filter(gym=gym).order_by("first_name", "last_name", "name")
+
+        ctx.update({
+            "classes": ClassTemplate.objects.filter(gym=gym).order_by("title"),
+            "selected_class": selected_class,
+            "tests": BatteryTest.objects.order_by("display_order", "name"),
+            "boxers": boxers,
+            "visible_boxer_count": boxers.count(),
+        })
+        return ctx
+
+    # --- POST ---
+    def post(self, request, *args, **kwargs):
+        gym = user_gym(request)
+        test_id = request.POST.get("test")
+        measured_at_raw = request.POST.get("measured_at")
+        phase = request.POST.get("phase") or TestResult.PHASE_PRE
+        class_id = request.GET.get("class_id")  # keep the filter after save
+
+        if not test_id or not measured_at_raw:
+            messages.error(request, "Please select a test and date.")
+            return redirect("tests_record_multi")
+
+        test = get_object_or_404(BatteryTest, id=test_id)
+        measured_at = self._parse_dt(measured_at_raw)
+
+        # filter the same set of boxers as in GET
+        selected_class = self._selected_class(gym)
+        if selected_class:
+            boxers_qs = (Boxer.objects
+                         .filter(gym=gym, enrollments__template=selected_class)
+                         .distinct())
+        else:
+            boxers_qs = Boxer.objects.filter(gym=gym)
+
+        created = 0
+        for boxer in boxers_qs:
+            prefix = f"boxer_{boxer.id}_"
+            v1 = self._to_float(request.POST.get(prefix + "v1"))
+            v2 = self._to_float(request.POST.get(prefix + "v2"))
+            v3 = self._to_float(request.POST.get(prefix + "v3"))
+            notes = request.POST.get(prefix + "notes") or ""
+
+            # only save if something provided
+            if any(val is not None for val in (v1, v2, v3)) or notes:
+                TestResult.objects.create(
+                    boxer=boxer,
+                    test=test,
+                    phase=phase,
+                    measured_at=measured_at,
+                    coach=request.user,
+                    value1=v1,
+                    value2=v2,
+                    value3=v3,
+                    notes=notes,
+                )
+                created += 1
+
+        messages.success(request, f"✅ Recorded {created} results for '{test.name}'.")
+        redirect_url = reverse("tests_record_multi")
+        if class_id:
+            redirect_url += f"?class_id={class_id}"
+        return redirect(redirect_url)
+
+
 class BoxerTestsView(LoginRequiredMixin, TemplateView):
     template_name = "tests/boxer_tests.html"
 

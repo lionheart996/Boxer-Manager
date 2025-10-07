@@ -64,6 +64,7 @@ urlpatterns = [
     path('tests/rankings/', views.TestRankingView.as_view(), name='tests_rankings'),
     path('tests/rankings/<int:test_id>/', views.TestRankingView.as_view(), name='tests_rankings_for_test'),
     path("tests/record/", TestResultCreateView.as_view(), name="tests_record"),
+    path("tests/record-multi/", views.TestResultBulkCreateView.as_view(), name="tests_record_multi"),
 
     path('heart-rate/record/', views.record_heart_rate, name='record_heart_rate'),
     path('heart-rate/summary/', views.HeartRateSummaryView.as_view(), name='heart_rate_summary'),
