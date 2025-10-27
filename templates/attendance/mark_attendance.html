@@ -137,6 +137,11 @@
     </div>
 
     <br>
+    <button type="button" id="mark-all-absent" class="btn btn--quiet" style="margin-bottom:10px;">
+      Mark All Unmarked as Absent
+    </button>
+
+
     <button type="submit" class="btn btn--primary submit-btn">Submit Attendance</button>
   </form>
   {% else %}
@@ -194,87 +199,345 @@
 
 /* Submit */
 .submit-btn{ width:100%; font-weight:700; border-radius:12px; }
+
+#mark-all-absent{
+  width: 100%;
+  border-radius: 12px;
+  font-weight: 600;
+    background-color: #00c3ff;
+}
+
 </style>
 
 <script>
-function updateCardState(card){
+/* ===========================
+   Attendance card interactions
+   =========================== */
+function updateCardState(card) {
   const present = card.querySelector('input[value="Present"]');
-  const absent = card.querySelector('input[value="Absent"]');
+  const absent  = card.querySelector('input[value="Absent"]');
   const excused = card.querySelector('.excused-toggle');
   const presentLabel = card.querySelector('.present-label');
-  const absentLabel = card.querySelector('.absent-label');
-  const switchLabel = card.querySelector('.switch');
+  const absentLabel  = card.querySelector('.absent-label');
+  const switchLabel  = card.querySelector('.switch');
 
-  presentLabel.classList.remove('active');
-  absentLabel.classList.remove('active','excused');
-  switchLabel.classList.remove('excused-active');
+  // reset visual state
+  presentLabel?.classList.remove('active');
+  absentLabel?.classList.remove('active','excused');
+  switchLabel?.classList.remove('excused-active');
 
-  if(present.checked){
-    presentLabel.classList.add('active');
-    if(excused){ excused.checked = false; excused.disabled = true; }
-  }
-  else if(absent.checked){
-    absentLabel.classList.add('active');
-    if(excused){
+  if (present?.checked) {
+    presentLabel?.classList.add('active');
+    if (excused) { excused.checked = false; excused.disabled = true; }
+  } else if (absent?.checked) {
+    absentLabel?.classList.add('active');
+    if (excused) {
       excused.disabled = false;
-      if(excused.checked){
-        absentLabel.classList.add('excused');
-        switchLabel.classList.add('excused-active');
+      if (excused.checked) {
+        absentLabel?.classList.add('excused');
+        switchLabel?.classList.add('excused-active');
       }
     }
   }
 }
 
-document.querySelectorAll('.att-card').forEach(card=>{
+/* ===========================
+   Unsaved attendance guard
+   =========================== */
+let attendanceDirty = false;
+function hasAnyMarkOnCard(card) {
   const present = card.querySelector('input[value="Present"]');
-  const absent = card.querySelector('input[value="Absent"]');
-  let lastClicked = null;
+  const absent  = card.querySelector('input[value="Absent"]');
+  const weight  = card.querySelector('input[name^="weight_"]');
+  const excused = card.querySelector('.excused-toggle');
+  return !!(
+    (present && present.checked) ||
+    (absent  && absent.checked)  ||
+    (weight  && weight.value.trim() !== '') ||
+    (excused && excused.checked)
+  );
+}
+function recomputeDirtyFlag() {
+  attendanceDirty = Array.from(document.querySelectorAll('.att-card')).some(hasAnyMarkOnCard);
+}
 
-  [present, absent].forEach(input=>{
-    input.addEventListener('click', e=>{
-      if(lastClicked === input && input.checked){
-        // toggle off
-        e.preventDefault();
-        input.checked = false;
-        lastClicked = null;
-      } else {
-        lastClicked = input;
+/* ===========================
+   Futuristic warning modal
+   =========================== */
+function showAttentionModal(message, onConfirm) {
+  // Create modal only once
+  let modal = document.getElementById("attention-modal");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "attention-modal";
+    modal.innerHTML = `
+      <div class="attention-card" onclick="event.stopPropagation()">
+        <h3>⚠️ Attention</h3>
+        <p class="attention-msg"></p>
+        <div class="attention-actions">
+          <button class="btn-cancel">Cancel</button>
+          <button class="btn-confirm">Continue</button>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+
+    // Add styles
+    const style = document.createElement("style");
+    style.textContent = `
+      #attention-modal {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(5px);
+        z-index: 10000;
       }
-      updateCardState(card);
-    });
-  });
+      #attention-modal.active { display: flex; }
+      .attention-card {
+        background: #111;
+        border: 1px solid #00ffcc;
+        border-radius: 14px;
+        padding: 20px;
+        width: min(420px, 90vw);
+        box-shadow: 0 0 25px rgba(0,255,150,.4);
+        text-align: center;
+        color: #fff;
+      }
+      .attention-card h3 {
+        color: #00ffcc;
+        margin-bottom: 10px;
+        font-size: 1.4rem;
+      }
+      .attention-msg { color: #ddd; font-size: 0.95rem; margin-bottom: 20px; }
+      .attention-actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+      }
+      .attention-actions button {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .btn-cancel {
+        background: #333;
+        color: #ddd;
+      }
+      .btn-confirm {
+        background: #00ff66;
+        color: #000;
+      }
+      .btn-cancel:hover { background: #444; }
+      .btn-confirm:hover { background: #00ffaa; }
+    `;
+    document.head.appendChild(style);
+  }
 
-  card.addEventListener('change', e=>{
-    if(e.target.matches('.excused-toggle')){
-      updateCardState(card);
+  modal.querySelector(".attention-msg").textContent = message;
+  modal.classList.add("active");
+
+  const cancelBtn = modal.querySelector(".btn-cancel");
+  const confirmBtn = modal.querySelector(".btn-confirm");
+
+  cancelBtn.onclick = () => modal.classList.remove("active");
+  confirmBtn.onclick = () => {
+    modal.classList.remove("active");
+    if (onConfirm) onConfirm();
+  };
+}
+
+/* Replace confirmIfDirty */
+function confirmIfDirty(e) {
+  if (!attendanceDirty) return true;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  showAttentionModal(
+    "Are you sure you want to enroll this boxer without saving the current attendancies? Continuing will remove all unsaved attendancies.",
+    () => {
+      attendanceDirty = false;
+      e.target.closest("form").submit();
     }
-  });
+  );
+  return false;
+}
 
-  card.addEventListener('input', e=>{
-    if(e.target.name && e.target.name.startsWith('weight_')){
-      if(e.target.value.trim() !== ''){
-        present.checked = true;
-        absent.checked = false;
-        lastClicked = present;
+/* =====================================
+   Initialize after DOM is ready
+   ===================================== */
+document.addEventListener('DOMContentLoaded', () => {
+  /* ----- Card behavior (dataset-based lastClicked) ----- */
+  document.querySelectorAll('.att-card').forEach(card => {
+    const present = card.querySelector('input[value="Present"]');
+    const absent  = card.querySelector('input[value="Absent"]');
+
+    card.dataset.lastClicked = '';
+
+    [present, absent].forEach(input => {
+      if (!input) return;
+      input.addEventListener('click', e => {
+        const v = input.value;
+        const last = card.dataset.lastClicked || '';
+        if (last === v && input.checked) {
+          e.preventDefault();
+          input.checked = false;
+          card.dataset.lastClicked = '';
+        } else {
+          card.dataset.lastClicked = v;
+        }
         updateCardState(card);
+        recomputeDirtyFlag();
+      });
+    });
+
+    card.addEventListener('change', e => {
+      if (e.target.matches('.excused-toggle')) {
+        updateCardState(card);
+        recomputeDirtyFlag();
       }
-    }
+    });
+
+    card.addEventListener('input', e => {
+      if (e.target.name && e.target.name.startsWith('weight_')) {
+        if (present && absent) {
+          if (e.target.value.trim() !== '') {
+            present.checked = true; absent.checked = false;
+            card.dataset.lastClicked = 'Present';
+          }
+          updateCardState(card);
+          recomputeDirtyFlag();
+        }
+      }
+    });
+
+    updateCardState(card);
   });
 
-  updateCardState(card);
-});
+  /* ----- Add-class panel toggle ----- */
+  document.getElementById('add-class-toggle')?.addEventListener('click', () => {
+    const panel = document.getElementById('add-class-panel'); if (panel) panel.hidden = false;
+  });
+  document.getElementById('add-class-close')?.addEventListener('click', () => {
+    const panel = document.getElementById('add-class-panel'); if (panel) panel.hidden = true;
+  });
 
-// Toggle Add Class panel
-document.addEventListener('DOMContentLoaded', ()=>{
-  const toggleBtn = document.getElementById('add-class-toggle');
-  const panel = document.getElementById('add-class-panel');
-  const closeBtn = document.getElementById('add-class-close');
-  if(toggleBtn && panel){
-    toggleBtn.addEventListener('click', ()=>{ panel.hidden = false; });
+  /* ----- Guard on enroll/unenroll submits ----- */
+  const markForm = document.getElementById('mark-form');
+  markForm?.addEventListener('submit', () => { attendanceDirty = false; });
+  document.querySelector('.enroll-form')?.addEventListener('submit', confirmIfDirty);
+  document.querySelectorAll('form.inline').forEach(f => f.addEventListener('submit', confirmIfDirty));
+
+  /* ===========================
+     Mark All Unmarked as Absent
+     =========================== */
+  function isCardUnmarked(card) {
+    const present = card.querySelector('input[value="Present"]');
+    const absent  = card.querySelector('input[value="Absent"]');
+    const weight  = card.querySelector('input[name^="weight_"]');
+    return !((present && present.checked) || (absent && absent.checked) || (weight && weight.value.trim() !== ''));
   }
-  if(closeBtn && panel){
-    closeBtn.addEventListener('click', ()=>{ panel.hidden = true; });
+
+  function forceAbsent(card) {
+    const present = card.querySelector('input[value="Present"]');
+    const absent  = card.querySelector('input[value="Absent"]');
+    const excused = card.querySelector('.excused-toggle');
+    if (!absent) return;
+    card.dataset.lastClicked = '';
+    if (present) present.checked = false;
+    absent.checked = true;
+    if (excused) { excused.disabled = false; excused.checked = false; }
+    updateCardState(card);
   }
+
+  const markAllBtn = document.getElementById('mark-all-absent');
+  if (markAllBtn) {
+    markAllBtn.addEventListener('click', () => {
+      document.querySelectorAll('.att-card').forEach(card => {
+        if (isCardUnmarked(card)) forceAbsent(card);
+      });
+      recomputeDirtyFlag();
+    });
+  }
+
+  /* ====== Add loading overlay without changing template ====== */
+  (function attachLoadingOverlay() {
+    const form = document.getElementById('mark-form');
+    if (!form) return;
+    const hadInline = form.getAttribute('onsubmit');
+    if (hadInline) form.removeAttribute('onsubmit');
+
+    form.addEventListener('submit', function(e) {
+      const ok = window.confirm('Submit attendance?');
+      if (!ok) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return false;
+      }
+      const overlay = document.getElementById('att-loading-overlay');
+      if (overlay) {
+        overlay.classList.add('att-active');
+      }
+      return true;
+    });
+  })();
 });
 </script>
+<!-- ===== Futuristic Loading Overlay (no conflicts) ===== -->
+<div id="att-loading-overlay">
+  <div class="att-loading-spinner"></div>
+  <p class="att-loading-text">⚡ Submitting attendance.</p>
+</div>
+<style>
+#att-loading-overlay{
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(0,255,136,0.12) 0%, rgba(0,0,0,0.92) 80%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+}
+#att-loading-overlay.att-active{
+  opacity: 1;
+  pointer-events: all;
+}
+.att-loading-spinner{
+  width: 80px;
+  height: 80px;
+  border: 4px solid rgba(0,255,136,0.25);
+  border-top-color: #00ff88;
+  border-radius: 50%;
+  animation: att_spin 1.1s linear infinite, att_glow 2s ease-in-out infinite;
+  box-shadow: 0 0 18px rgba(0,255,136,0.35);
+}
+.att-loading-text{
+  margin-top: 18px;
+  color: #00ff88;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-shadow: 0 0 12px rgba(0,255,136,0.8);
+  animation: att_pulse 1.2s ease-in-out infinite;
+}
+@keyframes att_spin { to { transform: rotate(360deg); } }
+@keyframes att_glow {
+  0%,100% { box-shadow: 0 0 14px rgba(0,255,136,0.35); }
+  50% { box-shadow: 0 0 28px rgba(0,255,136,0.7); }
+}
+@keyframes att_pulse {
+  0%,100% { opacity: .75; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+</style>
+
 {% endblock %}

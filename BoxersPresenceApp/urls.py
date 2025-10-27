@@ -39,6 +39,8 @@ urlpatterns = [
 
     # Attendance
     path('attendance/', views.AttendanceListView.as_view(), name='attendance_list'),
+    path("attendance/<int:pk>/edit/", views.attendance_edit, name="attendance_edit"),
+    path("attendance/<int:pk>/delete/", views.attendance_delete, name="attendance_delete"),
     path('attendance/mark/', views.MarkAttendanceView.as_view(), name='mark_attendance'),
     path("export-attendance/", views.export_attendance_view, name="export_attendance"),
     path("export-attendance/excel/", views.export_attendance_excel, name="export_attendance_excel"),

@@ -5,24 +5,24 @@
 <div class="content-container">
 
   <!-- Filters -->
-  <form method="get" class="filter-bar">
+  <form method="get" class="filter-bar" id="filter-form">
     <div class="date-field">
       <input type="date" id="date" name="date" value="{{ date }}">
       <span class="calendar-icon" onclick="document.getElementById('date').showPicker?.()">📅</span>
     </div>
     <input type="text" name="q" value="{{ q }}" placeholder="Search boxer…" />
-    <button class="btn btn--primary" type="submit">Filter</button>
-    <a class="btn btn--quiet" href="{% url 'attendance_list' %}">Clear</a>
+    <button class="btn btn--primary" type="submit" data-loading>Filter</button>
+    <a class="btn btn--quiet" href="{% url 'attendance_list' %}" data-loading>Clear</a>
 
     {% if show_absences %}
-      <a class="btn btn--secondary" href="?date={{ date }}&q={{ q }}">Show Present</a>
+      <a class="btn btn--secondary" href="?date={{ date }}&q={{ q }}" data-loading>Show Present</a>
     {% else %}
-      <a class="btn btn--secondary" href="?date={{ date }}&q={{ q }}&show_absences=1">Show Absences</a>
+      <a class="btn btn--secondary" href="?date={{ date }}&q={{ q }}&show_absences=1" data-loading>Show Absences</a>
     {% endif %}
   </form>
 
   {% if presence_mode %}
-    <!-- CASE 4: sentence mode -->
+    <!-- Sentence mode -->
     <p class="presence-result">
       {{ presence_name }}
       {% if presence_status == "present" %}
@@ -36,11 +36,18 @@
     </p>
 
   {% else %}
-    <!-- CASES 1–3: list mode -->
+    <!-- List mode -->
     {% if attendances %}
       <div class="attendance-list">
         {% for a in attendances %}
-          <div class="att-card" data-boxer="{{ a.boxer.id }}">
+          <div
+            class="att-card"
+            data-boxer="{{ a.boxer.id }}"
+            data-edit-url="{% url 'attendance_edit' a.id %}"
+            data-delete-url="{% url 'attendance_delete' a.id %}"
+            data-date="{{ a.date|date:'Y-m-d' }}"
+            data-status="{% if a.is_present %}present{% elif a.is_excused %}excused{% else %}absent{% endif %}"
+          >
             <div class="att-main">
               <div class="att-date">{{ a.date|date:"d M Y (D)" }}</div>
               <div class="att-boxer">{{ a.boxer.first_name }} {{ a.boxer.last_name }}</div>
@@ -56,13 +63,19 @@
                 {% endif %}
                 – {% if a.class_template %}{{ a.class_template.title }}{% else %}–{% endif %}
               </div>
+
+              <!-- Right-side actions (do not toggle dropdown) -->
+              <div class="att-actions">
+                <button type="button" class="icon-btn attm-edit-btn" title="Edit" aria-label="Edit">✏️</button>
+                <button type="button" class="icon-btn attm-del-btn" title="Delete" aria-label="Delete">🗑️</button>
+              </div>
             </div>
 
-            <!-- Dropdown popup -->
+            <!-- Dropdown popup (Report / Resume / Comments) -->
             <div class="att-dropdown">
-              <a href="{% url 'boxer_report' a.boxer.id %}" class="dropdown-btn">📊 Report</a>
-              <a href="{% url 'boxer_resume' a.boxer.id %}" class="dropdown-btn">📄 Resume</a>
-              <a href="{% url 'boxer_comments' a.boxer.id %}" class="dropdown-btn">💬 Comments</a>
+              <a href="{% url 'boxer_report' a.boxer.id %}" class="dropdown-btn" data-loading>📊 Report</a>
+              <a href="{% url 'boxer_resume' a.boxer.id %}" class="dropdown-btn" data-loading>📄 Resume</a>
+              <a href="{% url 'boxer_comments' a.boxer.id %}" class="dropdown-btn" data-loading>💬 Comments</a>
             </div>
           </div>
         {% endfor %}
@@ -71,11 +84,11 @@
       {% if is_paginated %}
         <div class="pagination">
           {% if page_obj.has_previous %}
-            <a class="btn" href="?page={{ page_obj.previous_page_number }}&date={{ date }}&q={{ q }}{% if show_absences %}&show_absences=1{% endif %}">← Prev</a>
+            <a class="btn" href="?page={{ page_obj.previous_page_number }}&date={{ date }}&q={{ q }}{% if show_absences %}&show_absences=1{% endif %}" data-loading>← Prev</a>
           {% endif %}
           <span>Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
           {% if page_obj.has_next %}
-            <a class="btn" href="?page={{ page_obj.next_page_number }}&date={{ date }}&q={{ q }}{% if show_absences %}&show_absences=1{% endif %}">Next →</a>
+            <a class="btn" href="?page={{ page_obj.next_page_number }}&date={{ date }}&q={{ q }}{% if show_absences %}&show_absences=1{% endif %}" data-loading>Next →</a>
           {% endif %}
         </div>
       {% endif %}
@@ -85,19 +98,51 @@
   {% endif %}
 </div>
 
+<!-- Edit Modal -->
+<div id="edit-modal-backdrop" aria-hidden="true">
+  <div id="edit-modal" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+    <h3>✏️ Edit Attendance</h3>
+    <form id="edit-form" method="post" action="#">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <div class="modal-row">
+        <label for="edit-date">Date</label>
+        <input type="date" id="edit-date" name="date" required>
+      </div>
+      <div class="modal-row">
+        <label>Status</label>
+        <div class="modal-status">
+          <label><input type="radio" name="status" value="present"> Present</label>
+          <label><input type="radio" name="status" value="absent"> Absent</label>
+          <label><input type="radio" name="status" value="excused"> Excused</label>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" id="modal-cancel">Cancel</button>
+        <button type="submit" class="btn-save" data-loading>Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Hidden Delete Form -->
+<form id="delete-form" method="post" style="display:none;">{% csrf_token %}
+  <input type="hidden" name="next" value="{{ request.get_full_path }}">
+</form>
+
+<!-- Futuristic Loading Overlay -->
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <p>Loading...</p>
+</div>
+
 <style>
-.present {
-    color: #00cc55;
-}
+/* Status colors */
+.present { color: #00cc55; }
+.excused { color: #fafa68; }
+.absent  { color: #b31010; }
 
-.excused {
-    color: #fafa68
-}
-
-.absent {
-    color: #b31010;
-}
-/* Core card styling */
+/* List + cards (original look, with subtle neon) */
 .attendance-list { display: grid; gap: 14px; }
 .att-card {
   background: linear-gradient(145deg, #0e0e0e, #181818);
@@ -107,17 +152,32 @@
   position: relative;
   cursor: pointer;
   z-index: 1;
-  transition: transform .2s ease, box-shadow .3s ease;
+  transition: transform .2s ease, box-shadow .3s ease, border-color .2s ease;
+  box-shadow: 0 8px 18px rgba(0,0,0,.45), inset 0 0 0 1px rgba(0,255,120,.06);
 }
-.att-card:hover { transform: translateY(-2px); box-shadow: 0 0 18px rgba(0,255,102,.4); }
-.att-card.open { z-index: 100; }
+.att-card:hover { transform: translateY(-2px); box-shadow: 0 0 18px rgba(0,255,102,.25); }
+.att-card.open { z-index: 10000; } /* lift above neighbors */
 
-.att-main { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 10px; align-items: center; }
-.att-date { font-weight:700; color:var(--brand); }
-.att-boxer { font-size:15px; font-weight:600; color: #fff; }
-.att-class { font-size:13px; color:var(--muted); text-align:right; }
+.att-main { display: grid; grid-template-columns: 1fr 2fr 1fr auto; gap: 10px; align-items: center; }
+.att-date { font-weight:700; color:var(--brand); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.att-boxer { font-size:15px; font-weight:600; color: #fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.att-class { font-size:13px; color:var(--muted); text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-/* Dropdown popup */
+/* Right-side action icons */
+.att-actions{ display:flex; gap:8px; justify-content:flex-end; }
+.icon-btn{
+  background: rgba(20,20,20,.9);
+  border: 1px solid rgba(0,255,150,.25);
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  cursor: pointer; font-size: 18px; line-height: 1;
+  color: #bfffe8;
+  transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease, color .2s ease;
+  box-shadow: 0 0 10px rgba(0,255,150,0.18);
+}
+.icon-btn:hover{ transform: translateY(-1px) scale(1.04); border-color: rgba(0,255,150,0.5); color:#00ff99; }
+
+/* Dropdown popup (kept as original absolute — just higher z-index) */
 .att-dropdown {
   display: none;
   position: absolute;
@@ -128,7 +188,7 @@
   border-radius: 12px;
   min-width: 180px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.8);
-  z-index: 200;
+  z-index: 10001; /* above open card */
   animation: fadeIn .2s ease;
 }
 .att-card.open .att-dropdown { display: block; }
@@ -154,36 +214,148 @@
   box-shadow: 0 0 10px #00ff66;
 }
 
-/* Mobile: larger tap targets */
+/* Modal */
+#edit-modal-backdrop{
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.7); backdrop-filter:blur(4px);
+  z-index: 20000;
+  align-items:center; justify-content:center;
+}
+#edit-modal{
+  background:#111; border:1px solid #00ffcc; border-radius:14px;
+  padding:16px; width:min(420px, 92vw); max-height: 90vh; overflow:auto;
+  box-shadow:0 10px 30px rgba(0,255,120,.35); color:#fff;
+}
+#edit-modal h3{ margin:0 0 10px 0; color:#00ffcc; }
+.modal-row{ margin:10px 0; display:grid; gap:6px; }
+.modal-row label{ font-weight:600; color:#ddd; }
+.modal-status label{ margin-right:12px; }
+.modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:14px; }
+.btn-cancel,.btn-save{ border:none; border-radius:10px; padding:10px 14px; font-weight:700; }
+.btn-cancel{ background:#333; color:#ddd; }
+.btn-save{ background:#00ff66; color:#000; }
+
+/* Loading overlay */
+#loading-overlay{
+  display:none; position:fixed; inset:0;
+  background: rgba(0,0,0,.86);
+  color:#00ffcc; font-size:18px; font-weight:700;
+  z-index: 30000;
+  align-items:center; justify-content:center; flex-direction:column;
+}
+#loading-overlay.active{ display:flex; }
+.spinner{ width:56px; height:56px; border:4px solid rgba(0,255,150,.25); border-top:4px solid #00ff99; border-radius:50%; animation:spin .8s linear infinite; margin-bottom:12px; }
+@keyframes spin{ to { transform: rotate(360deg); } }
+
+/* Mobile dropdown width & touch targets (original behavior) */
 @media (max-width: 640px) {
   .att-dropdown {
-    left: 10px;
-    right: 10px;
-    min-width: unset;
-    width: calc(100% - 20px);
+    left: 10px; right: 10px; min-width: unset; width: calc(100% - 20px);
   }
-  .dropdown-btn {
-    font-size: 17px;
-    padding: 18px;
-  }
+  .dropdown-btn { font-size: 17px; padding: 18px; }
 }
 </style>
 
 <script>
-document.addEventListener("click", function(e) {
-  const card = e.target.closest(".att-card");
-  const allCards = document.querySelectorAll(".att-card");
+document.addEventListener("DOMContentLoaded", () => {
+  const loading = document.getElementById("loading-overlay");
+  const editModal = document.getElementById("edit-modal-backdrop");
+  const editForm  = document.getElementById("edit-form");
+  const deleteForm = document.getElementById("delete-form");
 
-  if (card) {
-    if (card.classList.contains("open")) {
-      card.classList.remove("open"); // close if already open
+  /* ========= 1) Keep your ORIGINAL dropdown behavior ========= */
+  document.addEventListener("click", function(e) {
+    const allCards = document.querySelectorAll(".att-card");
+    const isIcon = e.target.closest(".icon-btn");
+    const card = e.target.closest(".att-card");
+
+    // Clicking the edit/delete icons should NOT toggle the dropdown
+    if (isIcon) return;
+
+    if (card) {
+      if (card.classList.contains("open")) {
+        card.classList.remove("open"); // close if already open
+      } else {
+        allCards.forEach(c => c.classList.remove("open"));
+        card.classList.add("open"); // open this one
+      }
     } else {
-      allCards.forEach(c => c.classList.remove("open"));
-      card.classList.add("open"); // open this one
+      allCards.forEach(c => c.classList.remove("open")); // click outside closes all
     }
-  } else {
-    allCards.forEach(c => c.classList.remove("open")); // click outside closes all
-  }
+  });
+
+  /* Keep dropdown open when interacting inside it */
+  document.addEventListener("click", function(e){
+    if (e.target.closest(".att-dropdown")) {
+      e.stopPropagation();
+    }
+  }, true);
+
+  /* ========= 2) Loading overlay on any link/button marked data-loading ========= */
+  document.body.addEventListener("click", (e) => {
+    const a = e.target.closest("[data-loading]");
+    if (a && a.tagName === "A") {
+      loading.classList.add("active");
+    }
+  });
+  document.body.addEventListener("submit", (e) => {
+    if (e.target.matches("form")) {
+      loading.classList.add("active");
+    }
+  });
+
+  /* ========= 3) Edit (open modal, prefill, submit with loading) ========= */
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".attm-edit-btn");
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    const card = btn.closest(".att-card");
+    if (!card) return;
+
+    // Set action + values
+    editForm.action = card.dataset.editUrl;
+    editForm.querySelector("#edit-date").value = card.dataset.date;
+    editForm.querySelectorAll('input[name="status"]').forEach(r => {
+      r.checked = (r.value === card.dataset.status);
+    });
+
+    editModal.style.display = "flex";
+  });
+
+  // Save → show loading (server redirects with message “Attendance updated.”)
+  editForm.addEventListener("submit", () => {
+    loading.classList.add("active");
+  });
+
+  // Cancel closes modal
+  document.getElementById("modal-cancel").addEventListener("click", (e) => {
+    e.preventDefault();
+    editModal.style.display = "none";
+  });
+
+  // Clicking outside modal closes it
+  editModal.addEventListener("click", () => {
+    editModal.style.display = "none";
+  });
+
+  /* ========= 4) Delete (confirm, post via hidden form) ========= */
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".attm-del-btn");
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    const card = btn.closest(".att-card");
+    if (!card) return;
+
+    if (!confirm("Delete this attendance record?")) return;
+
+    deleteForm.action = card.dataset.deleteUrl;
+    loading.classList.add("active");
+    deleteForm.submit();
+  });
 });
 </script>
 {% endblock %}

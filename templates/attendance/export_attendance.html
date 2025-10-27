@@ -50,8 +50,14 @@
   </div>
 </div>
 
+<!-- Futuristic Loading Overlay (hidden by default) -->
+<div id="loading-overlay" class="loading-overlay hidden">
+  <div class="loading-spinner"></div>
+  <p class="loading-text">⚡ Previewing Data ...</p>
+</div>
+
 <style>
-/* Container */
+/* === MAIN CONTAINER === */
 .export-container {
   max-width: 700px;
   margin: 40px auto;
@@ -63,10 +69,9 @@
   box-shadow: 0 0 20px rgba(0, 255, 100, 0.25), inset 0 0 10px rgba(0, 255, 100, 0.05);
   text-align: center;
   animation: fadeIn 0.6s ease-out;
-  box-sizing: border-box;
 }
 
-/* Titles */
+/* === TITLES === */
 .export-title {
   font-size: 2rem;
   color: #00ff88;
@@ -79,7 +84,7 @@
   font-size: 1.05rem;
 }
 
-/* Form */
+/* === FORM === */
 .export-form {
   display: grid;
   gap: 20px;
@@ -96,8 +101,6 @@
   margin-bottom: 6px;
   font-size: 0.95rem;
 }
-
-/* Inputs */
 select, input[type="date"] {
   width: 100%;
   padding: 12px 14px;
@@ -113,13 +116,11 @@ select:focus, input[type="date"]:focus {
   box-shadow: 0 0 10px #00ff88;
   outline: none;
 }
-/* Compact dropdown options (panel) */
 #class_id option { font-size: 0.85rem; padding: 6px 10px; }
 
-/* Buttons */
+/* === BUTTONS === */
 .btn-preview, .btn-export {
   width: 100%;
-  margin-top: 5px;
   padding: 14px;
   border-radius: 14px;
   border: none;
@@ -142,15 +143,13 @@ select:focus, input[type="date"]:focus {
 .btn-export:hover:enabled { transform: translateY(-3px); box-shadow: 0 0 20px rgba(0, 255, 136, 0.9); }
 .btn-preview:disabled, .btn-export:disabled { background:#333; color:#777; box-shadow:none; cursor:not-allowed; }
 
-/* Preview section */
+/* === PREVIEW TABLE === */
 .preview-container {
   margin-top: 30px;
   text-align: left;
   width: 100%;
   overflow-x: auto;
 }
-
-/* Table (desktop base) */
 .preview-table {
   width: 100%;
   border-collapse: collapse;
@@ -158,7 +157,7 @@ select:focus, input[type="date"]:focus {
   overflow: hidden;
   background: rgba(25, 25, 25, 0.9);
   box-shadow: 0 0 12px rgba(0, 255, 100, 0.2);
-  table-layout: fixed; /* needed for truncation rules */
+  table-layout: fixed;
 }
 .preview-table th, .preview-table td {
   padding: 12px;
@@ -175,34 +174,70 @@ select:focus, input[type="date"]:focus {
   text-shadow: 0 0 6px rgba(0, 255, 100, 0.5);
 }
 .preview-table tr:hover td { background: rgba(0, 255, 100, 0.05); }
-
-/* Desktop widths + colors */
 .col-boxer   { text-align: left; width: 40%; }
 .col-present { width: 20%; color: #00ff88; }
 .col-excused { width: 20%; color: #ffcc00; }
 .col-absent  { width: 20%; color: #ff4444; }
 
-/* -------- Mobile-only behavior -------- */
+/* === MOBILE === */
 @media (max-width: 640px) {
   .preview-table { font-size: 0.85rem; }
   .preview-table th, .preview-table td { padding: 8px; }
-
-  /* Make boxer name column wider and truncate long names */
   .col-boxer { width: 60%; max-width: 0; }
   .preview-table td:first-child { text-align: left; }
-
-  /* Compact number columns */
-  .preview-table th:not(:first-child),
-  .preview-table td:not(:first-child) { width: 13%; }
-
-  /* Swap header text for symbols with colors */
+  .preview-table th:not(:first-child), .preview-table td:not(:first-child) { width: 13%; }
   .col-present .header-text,
   .col-excused .header-text,
-  .col-absent .header-text { display: none; } /* hide words on mobile */
-
+  .col-absent .header-text { display: none; }
   .col-present::after { content: "+";   color: #00ff88; font-weight: 800; }
   .col-excused::after { content: "+/-"; color: #ffcc00; font-weight: 800; }
-  .col-absent::after  { content: "−";   color: #ff4444; font-weight: 800; } /* en dash for nicer look */
+  .col-absent::after  { content: "−";   color: #ff4444; font-weight: 800; }
+}
+
+/* === FUTURISTIC LOADING OVERLAY === */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at center, rgba(0,255,136,0.1) 0%, rgba(0,0,0,0.9) 80%);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.loading-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+.loading-spinner {
+  width: 80px;
+  height: 80px;
+  border: 4px solid rgba(0,255,136,0.2);
+  border-top-color: #00ff88;
+  border-radius: 50%;
+  animation: spin 1.2s linear infinite, glow 2s ease-in-out infinite;
+}
+.loading-text {
+  color: #00ff88;
+  margin-top: 18px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-shadow: 0 0 12px rgba(0, 255, 136, 0.8);
+  letter-spacing: 2px;
+  animation: pulseText 1.2s ease-in-out infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes glow {
+  0%,100% { box-shadow: 0 0 15px rgba(0,255,136,0.3); }
+  50% { box-shadow: 0 0 30px rgba(0,255,136,0.7); }
+}
+@keyframes pulseText {
+  0%,100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
 }
 </style>
 
@@ -214,42 +249,48 @@ const exportBtn = document.getElementById('export-btn');
 const previewBtn = document.getElementById('preview-btn');
 const previewContainer = document.getElementById('preview-container');
 const previewBody = document.getElementById('preview-body');
+const loadingOverlay = document.getElementById('loading-overlay');
 
-// Calendar logic: sync min/max
-startDate.addEventListener('change', () => {
-  endDate.min = startDate.value || '';
-  validateForm();
-});
-endDate.addEventListener('change', () => {
-  startDate.max = endDate.value || '';
-  validateForm();
-});
-
-// Enable/disable buttons
+// Date validation logic
 function validateForm() {
   const ready = classSelect.value && startDate.value && endDate.value;
   exportBtn.disabled = !ready;
   previewBtn.disabled = !ready;
 }
+startDate.addEventListener('change', () => { endDate.min = startDate.value; validateForm(); });
+endDate.addEventListener('change', () => { startDate.max = endDate.value; validateForm(); });
 [classSelect, startDate, endDate].forEach(el => el.addEventListener('change', validateForm));
 
-// Preview via AJAX
+// Show loading overlay
+function showLoading() { loadingOverlay.classList.add('active'); }
+// Hide loading overlay
+function hideLoading() { loadingOverlay.classList.remove('active'); }
+
+// Preview data logic
 previewBtn.addEventListener('click', async () => {
   const url = `{% url 'export_attendance_preview' %}?class_id=${classSelect.value}&start_date=${startDate.value}&end_date=${endDate.value}`;
-  const res = await fetch(url);
-  const data = await res.json();
+  showLoading();
 
-  previewBody.innerHTML = '';
-  data.forEach(row => {
-    previewBody.innerHTML += `
-      <tr>
-        <td title="${row.boxer}">${row.boxer}</td>
-        <td>${row.present}</td>
-        <td>${row.excused}</td>
-        <td>${row.unexcused}</td>
-      </tr>`;
-  });
-  previewContainer.hidden = false;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    previewBody.innerHTML = '';
+    data.forEach(row => {
+      previewBody.innerHTML += `
+        <tr>
+          <td title="${row.boxer}">${row.boxer}</td>
+          <td>${row.present}</td>
+          <td>${row.excused}</td>
+          <td>${row.unexcused}</td>
+        </tr>`;
+    });
+    previewContainer.hidden = false;
+  } catch (err) {
+    alert('⚠️ Failed to load preview. Please try again.');
+  } finally {
+    hideLoading();
+  }
 });
 </script>
 {% endblock %}

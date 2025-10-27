@@ -16,7 +16,7 @@ from django.db import transaction, IntegrityError
 from django.db.models import Max, ProtectedError, Min, Avg, Count
 from django.db.models.functions import TruncDate
 from django.forms import formset_factory
-from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse, HttpResponseForbidden, Http404
+from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse, HttpResponseForbidden, Http404, HttpRequest
 from django.utils import timezone
 from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_POST
@@ -441,6 +441,102 @@ class AttendanceListView(LoginRequiredMixin, ListView):
         return ctx
 
 
+def _attendance_user_scope(request: HttpRequest):
+    """
+    Mirror AttendanceListView.base_scope() so edits/deletes use the same permission rules.
+    """
+    user = request.user
+    qs = (
+        Attendance.objects
+        .select_related("boxer", "class_template", "class_template__gym")
+        .order_by("-date", "boxer__first_name", "boxer__last_name")
+    )
+    if ParentProfile.objects.filter(user=user).exists():
+        # parents can *see* their kids’ records; usually they shouldn't edit/delete.
+        # We’ll keep them read-only by returning an empty qs for mutations.
+        return qs.none()
+    elif not user.is_superuser:
+        gym = user_gym(request)
+        if gym:
+            qs = qs.filter(
+                Q(boxer__gym=gym) |
+                Q(boxer__shared_with_gyms=gym) |
+                Q(boxer__coaches=user)
+            )
+        else:
+            qs = qs.filter(boxer__coaches=user)
+    return qs
+
+
+def _next_url(request: HttpRequest, fallback_name="attendance_list"):
+    """
+    Where to go back after edit/delete. Prefers ?next=…; then HTTP_REFERER; finally the list.
+    """
+    nxt = request.POST.get("next") or request.GET.get("next")
+    if nxt:
+        return nxt
+    ref = request.META.get("HTTP_REFERER")
+    if ref:
+        return ref
+    from django.urls import reverse
+    return reverse(fallback_name)
+
+
+@require_POST
+def attendance_edit(request: HttpRequest, pk: int):
+    qs = _attendance_user_scope(request)
+    att = get_object_or_404(qs, pk=pk)
+
+    date_str = (request.POST.get("date") or "").strip()
+    status = (request.POST.get("status") or "").strip().lower()
+    next_url = _next_url(request)
+
+    # validate inputs
+    new_date = parse_date(date_str)
+    if not new_date:
+        messages.error(request, "Invalid date.")
+        return redirect(next_url)
+
+    if status not in {"present", "absent", "excused"}:
+        messages.error(request, "Invalid status.")
+        return redirect(next_url)
+
+    # map status → fields
+    if status == "present":
+        att.is_present = True
+        att.is_excused = False
+    elif status == "absent":
+        att.is_present = False
+        att.is_excused = False
+    else:  # excused
+        att.is_present = False
+        att.is_excused = True
+
+    att.date = new_date
+
+    try:
+        with transaction.atomic():
+            att.save()  # respects unique_together (boxer, date, class_template)
+        messages.success(request, "Attendance updated.")
+    except IntegrityError:
+        messages.error(
+            request,
+            "Another attendance for this boxer/class on that date already exists.",
+        )
+
+    return redirect(next_url)
+
+
+@require_POST
+def attendance_delete(request: HttpRequest, pk: int):
+    qs = _attendance_user_scope(request)
+    att = get_object_or_404(qs, pk=pk)
+    next_url = _next_url(request)
+
+    att.delete()
+    messages.success(request, "Attendance deleted.")
+    return redirect(next_url)
+
 
 def parse_iso_date_or_today(s: str | None) -> date:
     try:
@@ -496,6 +592,16 @@ class MarkAttendanceView(LoginRequiredMixin, TemplateView):
             end = timezone.make_aware(end, tz)
         return start, end
 
+    def _excused_field_name(self):
+        """Return the field name used for excused on Attendance, or None."""
+        for fname in ("is_excused", "excused", "excused_absence"):
+            try:
+                Attendance._meta.get_field(fname)
+                return fname
+            except Exception:
+                continue
+        return None
+
     # ---------- GET ----------
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -506,40 +612,31 @@ class MarkAttendanceView(LoginRequiredMixin, TemplateView):
         # All classes for selector
         classes = ClassTemplate.objects.filter(gym=gym).order_by("title")
 
-        # Boxers scoped to this gym, and filtered by selected class enrollment (when chosen)
+        # Boxers scoped to this gym (and optionally by class enrollment)
         boxers = self._scoped_boxers_qs(gym, selected_class).order_by("first_name", "last_name")
 
-        # Pull any attendance already saved for this date + class
+        # Attendance for this date+class
         att_qs = Attendance.objects.filter(
-            boxer__in=boxers,
-            date=target_date,
-            class_template=selected_class,
+            boxer__in=boxers, date=target_date, class_template=selected_class
         )
 
-        # Find which field represents "excused" on Attendance (supports different field names)
-        excused_field = None
-        for fname in ("is_excused", "excused", "excused_absence"):
-            try:
-                Attendance._meta.get_field(fname)
-                excused_field = fname
-                break
-            except Exception:
-                pass
+        # Determine excused field (if any)
+        excused_field = self._excused_field_name()
 
-        # Build attendance map
+        # Build map boxer_id -> {status, excused}
         attendance_map = {}
-        for att in att_qs:
+        for att in att_qs.select_related("boxer"):
             excused = bool(getattr(att, excused_field)) if excused_field else False
             status = "present" if att.is_present else ("excused" if excused else "absent")
             attendance_map[att.boxer_id] = {"status": status, "excused": excused}
 
-        # Build boxer_data for the attendance form
+        # Data for template cards
         boxer_data = []
         for boxer in boxers:
             att = attendance_map.get(boxer.id)
             boxer_data.append({
                 "boxer": boxer,
-                "status": att["status"] if att else None,  # None = blank if no record yet
+                "status": att["status"] if att else None,   # None = blank if no record yet
                 "excused": att["excused"] if att else False,
             })
 
@@ -586,20 +683,51 @@ class MarkAttendanceView(LoginRequiredMixin, TemplateView):
             Enrollment.objects.filter(template=selected_class, boxer_id=boxer_id).delete()
             return redirect(self._preserve_redirect(selected_class, target_date))
 
-        # D) Save attendance
+        # C.5) Mark all UNMARKED as Absent (server-side, DB is the source of truth)
+        if action == "mark_all_unmarked_absent":
+            if not selected_class:
+                messages.error(request, "Please select a class first.")
+                return redirect(self._preserve_redirect(None, target_date))
+
+            excused_field = self._excused_field_name()
+            boxer_qs = self._scoped_boxers_qs(gym, selected_class)
+
+            # Boxer IDs with an existing attendance row for this day+class
+            existing_ids = set(
+                Attendance.objects.filter(
+                    boxer__in=boxer_qs, date=target_date, class_template=selected_class
+                ).values_list("boxer_id", flat=True)
+            )
+
+            # Create Absent rows for those without any record yet
+            to_create = []
+            for b in boxer_qs.only("id"):
+                if b.id in existing_ids:
+                    continue
+                row_kwargs = {
+                    "boxer": b,
+                    "date": target_date,
+                    "class_template": selected_class,
+                    "is_present": False,
+                }
+                if excused_field:
+                    row_kwargs[excused_field] = False
+                to_create.append(Attendance(**row_kwargs))
+
+            if to_create:
+                Attendance.objects.bulk_create(to_create, ignore_conflicts=True)
+                messages.success(request, "All unmarked boxers were set to Absent.")
+            else:
+                messages.info(request, "No unmarked boxers to set as Absent.")
+
+            return redirect(self._preserve_redirect(selected_class, target_date))
+
+        # D) Save attendance (individual entries)
         measured_dt = datetime.combine(target_date, dt_time(hour=12, minute=0))
         if timezone.is_naive(measured_dt):
             measured_dt = timezone.make_aware(measured_dt, timezone.get_current_timezone())
 
-        # Detect excused field dynamically
-        excused_field = None
-        for fname in ("is_excused", "excused", "excused_absence"):
-            try:
-                Attendance._meta.get_field(fname)
-                excused_field = fname
-                break
-            except Exception:
-                pass
+        excused_field = self._excused_field_name()
 
         boxer_qs = self._scoped_boxers_qs(gym, selected_class)
         if not selected_class:
