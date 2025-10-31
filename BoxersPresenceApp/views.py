@@ -1884,17 +1884,31 @@ class BoxerTestsView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         boxer = get_object_or_404(Boxer, uuid=kwargs["uuid"])
-        tests = BatteryTest.objects.all().order_by("display_order", "name")
 
+        # All available tests + annotate if boxer has results
+        tests = (
+            BatteryTest.objects
+            .annotate(
+                has_results=Exists(
+                    TestResult.objects.filter(boxer=boxer, test=OuterRef("pk"))
+                )
+            )
+            .order_by("display_order", "name")
+        )
+
+        # Which test is selected
         sel_test_id = self.request.GET.get("test")
-        selected_test = get_object_or_404(tests, pk=sel_test_id) if sel_test_id else tests.first()
+        selected_test = None
+        if sel_test_id:
+            selected_test = get_object_or_404(BatteryTest, pk=sel_test_id)
+            if not TestResult.objects.filter(boxer=boxer, test=selected_test).exists():
+                selected_test = None  # no results, skip chart
 
         labels, values, summary = [], [], []
 
         if selected_test:
             qs = (
-                TestResult.objects
-                .filter(boxer=boxer, test=selected_test)
+                TestResult.objects.filter(boxer=boxer, test=selected_test)
                 .annotate(day=TruncDate("measured_at"))
                 .values("day", "value1", "value2", "value3", "notes")
                 .order_by("day")
@@ -1914,14 +1928,9 @@ class BoxerTestsView(LoginRequiredMixin, TemplateView):
                         notes.append(item["notes"])
 
                 if nums:
-                    if lower_is_better(selected_test):
-                        best_val = min(nums)
-                    else:
-                        best_val = max(nums)
-
+                    best_val = min(nums) if lower_is_better(selected_test) else max(nums)
                     labels.append(d.strftime("%Y-%m-%d"))
                     values.append(float(best_val))
-
                     summary.append({
                         "date": d,
                         "avg": best_val,
@@ -1938,6 +1947,7 @@ class BoxerTestsView(LoginRequiredMixin, TemplateView):
             "summary": summary,
         })
         return ctx
+
 
 
 class BulkBoxerCreateView(LoginRequiredMixin, View):
@@ -2116,7 +2126,7 @@ def export_attendance_view(request):
 
     return render(request, "attendance/export_attendance.html", {"classes": classes})
 
-from django.db.models import Q
+
 
 @login_required
 def export_attendance_excel(request):

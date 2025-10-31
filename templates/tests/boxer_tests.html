@@ -1,33 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="page-title">📊 {{ boxer.first_name }} {{ boxer.last_name }} — Test Results</h2>
 
-<!-- Test selector -->
-<form method="get" action="{% url 'boxer_tests' boxer.uuid %}" class="filter-bar">
-  <label class="filter-label">Choose Test</label>
-  <select name="test" onchange="this.form.submit()">
-    {% for t in tests %}
-      <option value="{{ t.id }}" {% if selected_test and t.id == selected_test.id %}selected{% endif %}>
-        {{ t.name }}{% if t.unit %} [{{ t.unit }}]{% endif %}
-      </option>
-    {% endfor %}
-  </select>
-  <noscript><button class="btn btn--primary" type="submit">Apply</button></noscript>
-</form>
+<h2 class="page-title futuristic-title">
+  🥊 <span>{{ boxer.first_name }} {{ boxer.last_name }}</span> — Test Results
+</h2>
+
+<!-- Tests Grid -->
+<div class="tests-grid">
+  {% for t in tests %}
+    {% if t.has_results %}
+      <a href="?test={{ t.id }}" class="test-item has-results" data-loading>
+        <span class="test-name">{{ t.name }}</span>
+        {% if t.unit %}<span class="unit">[{{ t.unit }}]</span>{% endif %}
+      </a>
+    {% else %}
+      <div class="test-item no-results">
+        <span class="test-name">{{ t.name }}</span>
+        {% if t.unit %}<span class="unit">[{{ t.unit }}]</span>{% endif %}
+        <span class="muted small">No results yet</span>
+      </div>
+    {% endif %}
+  {% empty %}
+    <p>No tests defined.</p>
+  {% endfor %}
+</div>
 
 {% if selected_test %}
-  <h3 class="section-title">⚡ Progress for {{ selected_test.name }} {% if unit %}({{ unit }}){% endif %}</h3>
+  <h3 class="section-title neon-subtitle">
+    ⚡ Progress for {{ selected_test.name }} {% if unit %}({{ unit }}){% endif %}
+  </h3>
 
   <!-- Summary -->
-  <div class="summary-card">
+  <div class="summary-card futuristic-panel">
     <h4>📌 Summary</h4>
     {% if summary %}
       <ul>
         {% for row in summary %}
           <li>
-            {% if row.avg %}
-              <strong>{{ row.avg|floatformat:2 }}</strong>{% if unit %} {{ unit }}{% endif %}
-            {% endif %}
+            <strong>{{ row.avg|floatformat:2 }}</strong>{% if unit %} {{ unit }}{% endif %}
             <span class="muted"> — {{ row.date|date:"Y-m-d" }}</span>
             {% if row.notes %}
               <br><span class="notes">📝 {{ row.notes|join:", " }}</span>
@@ -43,7 +53,7 @@
   <!-- Chart -->
   {{ labels|json_script:"labels-data" }}
   {{ values|json_script:"values-data" }}
-  <div class="chart-box">
+  <div class="chart-box futuristic-panel">
     <canvas id="progressChart"></canvas>
   </div>
 
@@ -52,32 +62,42 @@
     (function(){
       const labels = JSON.parse(document.getElementById('labels-data').textContent || "[]");
       const values = JSON.parse(document.getElementById('values-data').textContent || "[]");
+      if (!labels.length) return;
 
       const ctx = document.getElementById('progressChart').getContext('2d');
       new Chart(ctx, {
         type: 'line',
         data: {
-          labels: labels,
+          labels,
           datasets: [{
             label: '{{ selected_test.name|escapejs }}{% if unit %} ({{ unit|escapejs }}){% endif %}',
             data: values,
-            tension: 0.35,
-            pointRadius: 4,
-            borderWidth: 2,
-            borderColor: '#00ff66',
-            backgroundColor: '#00ff66',
-            fill: false
+            tension: 0.4,
+            pointRadius: 5,
+            pointBackgroundColor: '#00ffcc',
+            borderWidth: 3,
+            borderColor: '#00ff99',
+            backgroundColor: '#00ff99',
+            fill: false,
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           scales: {
-            x: { title: { display: true, text: 'Date' } },
-            y: { title: { display: true, text: '{{ unit|default:"Value"|escapejs }}' }, beginAtZero: false }
+            x: {
+              ticks: { color: "#aaa" },
+              title: { display: true, text: "Date", color: "#0ff" },
+              grid: { color: "rgba(0,255,136,0.2)" },
+            },
+            y: {
+              ticks: { color: "#aaa" },
+              title: { display: true, text: "{{ unit|default:'Value'|escapejs }}", color: "#0ff" },
+              grid: { color: "rgba(0,255,136,0.1)" },
+            }
           },
           plugins: {
-            legend: { display: true, labels: { color: '#eee' } }
+            legend: { labels: { color: "#eee" } },
           }
         }
       });
@@ -86,62 +106,112 @@
 {% endif %}
 
 <style>
-/* Filter bar */
-.filter-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .6rem;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-.filter-label { font-weight:700; color:var(--brand); }
-.filter-bar select {
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: #0f0f0f;
-  color: var(--text);
-  font-weight: 600;
+/* === Futuristic Typography === */
+.futuristic-title {
+  font-size: 1.8rem;
+  text-align: center;
+  color: #00ffcc;
+  text-shadow: 0 0 10px #00ffcc, 0 0 20px rgba(0,255,136,0.3);
+  border-bottom: 1px solid rgba(0,255,136,0.2);
+  padding-bottom: 10px;
+  margin-bottom: 1.2rem;
 }
 
-/* Section titles */
-.section-title { margin-top:1.5rem; font-size:1.2rem; font-weight:700; }
+.neon-subtitle {
+  font-size: 1.2rem;
+  text-align: center;
+  color: #00ff88;
+  text-shadow: 0 0 8px rgba(0,255,136,0.6);
+  margin-top: 1.5rem;
+}
 
-/* Summary block */
-.summary-card {
-  background: linear-gradient(145deg,#0e0e0e,#181818);
-  border: 1px solid var(--border);
+/* === Tests Grid === */
+.tests-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  animation: fadeIn .6s ease-out;
+}
+
+.test-item {
+  padding: 1rem;
   border-radius: 14px;
-  padding: 16px;
-  margin: 1rem 0;
-  box-shadow:
-    0 -2px 6px rgba(0,255,102,.4),
-    0  2px 6px rgba(0,255,102,.4),
-    0  0 12px rgba(0,255,102,.2);
+  font-weight: 600;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0,255,136,0.25);
+  background: linear-gradient(135deg, rgba(0,255,136,0.06), rgba(0,255,136,0.02));
+  box-shadow: 0 0 10px rgba(0,255,136,0.1), inset 0 0 10px rgba(0,255,136,0.05);
 }
-.summary-card h4 { margin:0 0 .5rem; color:var(--brand); }
-.summary-card ul { margin:0; padding-left:18px; display:grid; gap:.5rem; }
-.summary-card li { font-size:15px; }
-.summary-card .muted { font-size:13px; color:var(--muted); }
-.summary-card .notes { font-size:13px; color:#ffaa00; }
 
-/* Chart container */
+.has-results {
+  color: #00ff99;
+  cursor: pointer;
+}
+.has-results:hover {
+  background: rgba(0,255,136,0.1);
+  box-shadow: 0 0 18px rgba(0,255,136,0.4);
+  transform: translateY(-3px);
+}
+.no-results {
+  color: #777;
+  border: 1px solid rgba(150,150,150,0.2);
+  background: linear-gradient(135deg, #111, #0a0a0a);
+  box-shadow: inset 0 0 8px rgba(255,255,255,0.05);
+  cursor: not-allowed;
+}
+.no-results .muted {
+  display: block;
+  font-size: 0.8rem;
+  color: #999;
+  margin-top: 6px;
+}
+.unit {
+  display: block;
+  font-size: 0.85rem;
+  opacity: 0.7;
+  margin-top: 3px;
+}
+
+/* === Shared glass panel style === */
+.futuristic-panel {
+  background: rgba(10,10,10,0.85);
+  border: 1px solid rgba(0,255,136,0.25);
+  border-radius: 16px;
+  box-shadow: 0 0 12px rgba(0,255,136,0.2), inset 0 0 20px rgba(0,255,136,0.05);
+  backdrop-filter: blur(8px);
+  padding: 1rem 1.2rem;
+}
+
+/* === Summary Card === */
+.summary-card h4 { margin-bottom: 0.5rem; color: #00ff99; }
+.summary-card ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+.summary-card li { font-size: 15px; color: #ddd; }
+.summary-card .muted { color: #aaa; font-size: 13px; }
+.summary-card .notes { color: #ffcc00; font-size: 13px; }
+
+/* === Chart Box === */
 .chart-box {
   position: relative;
   height: 360px;
   max-width: 100%;
   margin-top: 1rem;
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:10px;
-  background:#111;
-  box-shadow:
-    0 -2px 6px rgba(0,255,102,.3),
-    0  2px 6px rgba(0,255,102,.3);
+  border-radius: 16px;
 }
 
-/* Mobile fixes */
-*, *::before, *::after { box-sizing:border-box; }
-html, body { max-width:100%; overflow-x:hidden; }
+/* === Animations === */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === Mobile === */
+@media (max-width: 640px) {
+  .futuristic-title { font-size: 1.5rem; }
+  .tests-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .test-item { padding: 0.9rem; font-size: 0.9rem; }
+}
 </style>
+
 {% endblock %}

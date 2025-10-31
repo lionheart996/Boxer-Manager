@@ -49,7 +49,10 @@
             data-status="{% if a.is_present %}present{% elif a.is_excused %}excused{% else %}absent{% endif %}"
           >
             <div class="att-main">
-              <div class="att-date">{{ a.date|date:"d M Y (D)" }}</div>
+              <!-- Full date for desktop, compact for mobile -->
+              <div class="att-date att-date--desktop">{{ a.date|date:"d M Y (D)" }}</div>
+              <div class="att-date att-date--mobile" data-date="{{ a.date|date:'Y-m-d' }}"></div>
+
               <div class="att-boxer">{{ a.boxer.first_name }} {{ a.boxer.last_name }}</div>
               <div class="att-class">
                 {% if show_absences %}
@@ -64,14 +67,14 @@
                 – {% if a.class_template %}{{ a.class_template.title }}{% else %}–{% endif %}
               </div>
 
-              <!-- Right-side actions (do not toggle dropdown) -->
+              <!-- Right-side actions -->
               <div class="att-actions">
                 <button type="button" class="icon-btn attm-edit-btn" title="Edit" aria-label="Edit">✏️</button>
                 <button type="button" class="icon-btn attm-del-btn" title="Delete" aria-label="Delete">🗑️</button>
               </div>
             </div>
 
-            <!-- Dropdown popup (Report / Resume / Comments) -->
+            <!-- Dropdown popup -->
             <div class="att-dropdown">
               <a href="{% url 'boxer_report' a.boxer.id %}" class="dropdown-btn" data-loading>📊 Report</a>
               <a href="{% url 'boxer_resume' a.boxer.id %}" class="dropdown-btn" data-loading>📄 Resume</a>
@@ -130,19 +133,17 @@
   <input type="hidden" name="next" value="{{ request.get_full_path }}">
 </form>
 
-<!-- Futuristic Loading Overlay -->
+<!-- Loading Overlay -->
 <div id="loading-overlay">
   <div class="spinner"></div>
   <p>Loading...</p>
 </div>
 
 <style>
-/* Status colors */
 .present { color: #00cc55; }
 .excused { color: #fafa68; }
 .absent  { color: #b31010; }
 
-/* List + cards (original look, with subtle neon) */
 .attendance-list { display: grid; gap: 14px; }
 .att-card {
   background: linear-gradient(145deg, #0e0e0e, #181818);
@@ -156,16 +157,15 @@
   box-shadow: 0 8px 18px rgba(0,0,0,.45), inset 0 0 0 1px rgba(0,255,120,.06);
 }
 .att-card:hover { transform: translateY(-2px); box-shadow: 0 0 18px rgba(0,255,102,.25); }
-.att-card.open { z-index: 10000; } /* lift above neighbors */
+.att-card.open { z-index: 10000; }
 
 .att-main { display: grid; grid-template-columns: 1fr 2fr 1fr auto; gap: 10px; align-items: center; }
 .att-date { font-weight:700; color:var(--brand); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.att-boxer { font-size:15px; font-weight:600; color: #fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.att-boxer { font-size:15px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .att-class { font-size:13px; color:var(--muted); text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-/* Right-side action icons */
-.att-actions{ display:flex; gap:8px; justify-content:flex-end; }
-.icon-btn{
+.att-actions { display:flex; gap:8px; justify-content:flex-end; }
+.icon-btn {
   background: rgba(20,20,20,.9);
   border: 1px solid rgba(0,255,150,.25);
   width: 34px; height: 34px;
@@ -175,55 +175,36 @@
   transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease, color .2s ease;
   box-shadow: 0 0 10px rgba(0,255,150,0.18);
 }
-.icon-btn:hover{ transform: translateY(-1px) scale(1.04); border-color: rgba(0,255,150,0.5); color:#00ff99; }
+.icon-btn:hover { transform: translateY(-1px) scale(1.04); border-color: rgba(0,255,150,0.5); color:#00ff99; }
 
-/* Dropdown popup (kept as original absolute — just higher z-index) */
 .att-dropdown {
-  display: none;
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 14px;
-  background: #111;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  min-width: 180px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.8);
-  z-index: 10001; /* above open card */
-  animation: fadeIn .2s ease;
+  display:none; position:absolute; top:calc(100% + 6px); right:14px;
+  background:#111; border:1px solid var(--border); border-radius:12px;
+  min-width:180px; box-shadow:0 8px 20px rgba(0,0,0,0.8); z-index:10001;
+  animation:fadeIn .2s ease;
 }
-.att-card.open .att-dropdown { display: block; }
+.att-card.open .att-dropdown { display:block; }
 
 .dropdown-btn {
-  display: block;
-  padding: 14px 18px;
-  margin: 4px;
-  border-radius: 8px;
-  background: #1a1a1a;
-  font-weight: 600;
-  color: #00ffcc;
-  text-decoration: none;
-  text-align: center;
-  transition: all .2s ease;
-  box-shadow: 0 2px 6px rgba(0,0,0,.6);
+  display:block; padding:14px 18px; margin:4px; border-radius:8px;
+  background:#1a1a1a; font-weight:600; color:#00ffcc; text-decoration:none;
+  text-align:center; transition:all .2s ease; box-shadow:0 2px 6px rgba(0,0,0,.6);
 }
 .dropdown-btn:hover,
 .dropdown-btn:active {
-  background: #00ff66;
-  color: #000;
-  transform: scale(1.05);
-  box-shadow: 0 0 10px #00ff66;
+  background:#00ff66; color:#000; transform:scale(1.05);
+  box-shadow:0 0 10px #00ff66;
 }
 
 /* Modal */
 #edit-modal-backdrop{
   display:none; position:fixed; inset:0;
   background:rgba(0,0,0,.7); backdrop-filter:blur(4px);
-  z-index: 20000;
-  align-items:center; justify-content:center;
+  z-index:20000; align-items:center; justify-content:center;
 }
 #edit-modal{
   background:#111; border:1px solid #00ffcc; border-radius:14px;
-  padding:16px; width:min(420px, 92vw); max-height: 90vh; overflow:auto;
+  padding:16px; width:min(420px,92vw); max-height:90vh; overflow:auto;
   box-shadow:0 10px 30px rgba(0,255,120,.35); color:#fff;
 }
 #edit-modal h3{ margin:0 0 10px 0; color:#00ffcc; }
@@ -240,19 +221,63 @@
   display:none; position:fixed; inset:0;
   background: rgba(0,0,0,.86);
   color:#00ffcc; font-size:18px; font-weight:700;
-  z-index: 30000;
+  z-index:30000;
   align-items:center; justify-content:center; flex-direction:column;
 }
 #loading-overlay.active{ display:flex; }
 .spinner{ width:56px; height:56px; border:4px solid rgba(0,255,150,.25); border-top:4px solid #00ff99; border-radius:50%; animation:spin .8s linear infinite; margin-bottom:12px; }
 @keyframes spin{ to { transform: rotate(360deg); } }
 
-/* Mobile dropdown width & touch targets (original behavior) */
+/* Compact date visibility rules */
+.att-date--mobile { display:none; }
 @media (max-width: 640px) {
-  .att-dropdown {
-    left: 10px; right: 10px; min-width: unset; width: calc(100% - 20px);
+  .att-date--desktop { display: none; }
+  .att-date--mobile {
+    display: inline;
+    font-weight: 700;
+    color: var(--brand);
+    white-space: normal;        /* ✅ allow wrap */
+    overflow: visible;          /* ✅ show full text */
   }
-  .dropdown-btn { font-size: 17px; padding: 18px; }
+
+      .att-boxer {
+      white-space: normal;        /* ✅ allow wrapping */
+      overflow: visible;          /* ✅ show full name */
+      line-height: 1.3;
+      word-break: break-word;     /* ✅ break long names gracefully */
+      font-size: 14px;
+          margin-bottom: 2px;/* slightly smaller if needed */
+    }
+
+    /* Let the entire card grow vertically if the name wraps */
+    .att-card {
+      min-height: unset;          /* remove any fixed height */
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+
+    /* Slightly adjust grid so columns breathe better on mobile */
+    .att-main {
+      grid-template-columns: 1.3fr 2.5fr 1fr auto;  /* ✅ a bit more space for names */
+      align-items: start;                            /* top-align content when wrapping */
+    }
+
+  /* Give the date column a bit more space on mobile */
+  .att-main {
+    grid-template-columns: 1.2fr 2fr 1fr auto;
+  }
+
+  .att-dropdown {
+    left: 10px;
+    right: 10px;
+    min-width: unset;
+    width: calc(100% - 20px);
+  }
+
+  .dropdown-btn {
+    font-size: 17px;
+    padding: 18px;
+  }
 }
 </style>
 
@@ -263,99 +288,88 @@ document.addEventListener("DOMContentLoaded", () => {
   const editForm  = document.getElementById("edit-form");
   const deleteForm = document.getElementById("delete-form");
 
-  /* ========= 1) Keep your ORIGINAL dropdown behavior ========= */
   document.addEventListener("click", function(e) {
     const allCards = document.querySelectorAll(".att-card");
     const isIcon = e.target.closest(".icon-btn");
     const card = e.target.closest(".att-card");
-
-    // Clicking the edit/delete icons should NOT toggle the dropdown
     if (isIcon) return;
-
     if (card) {
       if (card.classList.contains("open")) {
-        card.classList.remove("open"); // close if already open
+        card.classList.remove("open");
       } else {
         allCards.forEach(c => c.classList.remove("open"));
-        card.classList.add("open"); // open this one
+        card.classList.add("open");
       }
     } else {
-      allCards.forEach(c => c.classList.remove("open")); // click outside closes all
+      allCards.forEach(c => c.classList.remove("open"));
     }
   });
 
-  /* Keep dropdown open when interacting inside it */
   document.addEventListener("click", function(e){
-    if (e.target.closest(".att-dropdown")) {
-      e.stopPropagation();
-    }
+    if (e.target.closest(".att-dropdown")) e.stopPropagation();
   }, true);
 
-  /* ========= 2) Loading overlay on any link/button marked data-loading ========= */
   document.body.addEventListener("click", (e) => {
     const a = e.target.closest("[data-loading]");
-    if (a && a.tagName === "A") {
-      loading.classList.add("active");
-    }
+    if (a && a.tagName === "A") loading.classList.add("active");
   });
   document.body.addEventListener("submit", (e) => {
-    if (e.target.matches("form")) {
-      loading.classList.add("active");
-    }
+    if (e.target.matches("form")) loading.classList.add("active");
   });
 
-  /* ========= 3) Edit (open modal, prefill, submit with loading) ========= */
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".attm-edit-btn");
     if (!btn) return;
-    e.preventDefault();
-    e.stopPropagation();
-
-    const card = btn.closest(".att-card");
-    if (!card) return;
-
-    // Set action + values
+    e.preventDefault(); e.stopPropagation();
+    const card = btn.closest(".att-card"); if (!card) return;
     editForm.action = card.dataset.editUrl;
     editForm.querySelector("#edit-date").value = card.dataset.date;
     editForm.querySelectorAll('input[name="status"]').forEach(r => {
       r.checked = (r.value === card.dataset.status);
     });
-
     editModal.style.display = "flex";
   });
 
-  // Save → show loading (server redirects with message “Attendance updated.”)
-  editForm.addEventListener("submit", () => {
-    loading.classList.add("active");
-  });
-
-  // Cancel closes modal
+  editForm.addEventListener("submit", () => loading.classList.add("active"));
   document.getElementById("modal-cancel").addEventListener("click", (e) => {
-    e.preventDefault();
-    editModal.style.display = "none";
+    e.preventDefault(); editModal.style.display = "none";
   });
+  editModal.addEventListener("click", () => { editModal.style.display = "none"; });
 
-  // Clicking outside modal closes it
-  editModal.addEventListener("click", () => {
-    editModal.style.display = "none";
-  });
-
-  /* ========= 4) Delete (confirm, post via hidden form) ========= */
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".attm-del-btn");
     if (!btn) return;
-    e.preventDefault();
-    e.stopPropagation();
-
-    const card = btn.closest(".att-card");
-    if (!card) return;
-
+    e.preventDefault(); e.stopPropagation();
+    const card = btn.closest(".att-card"); if (!card) return;
     if (!confirm("Delete this attendance record?")) return;
-
     deleteForm.action = card.dataset.deleteUrl;
     loading.classList.add("active");
     deleteForm.submit();
   });
 });
+
+/* ===== Compact date rendering for mobile ===== */
+function monthToRoman(m) {
+  const romans = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII"];
+  return romans[m - 1] || "";
+}
+function renderCompactDates() {
+  const isMobile = window.matchMedia("(max-width:640px)").matches;
+  document.querySelectorAll(".att-date--mobile").forEach(el => {
+    const d = el.dataset.date;
+    if (!d) return;
+    const [y, m, day] = d.split("-").map(Number);
+    if (isMobile) {
+      const yy = String(y).slice(-2);
+      el.textContent = `${day}.${monthToRoman(m)} '${yy}`;
+    } else {
+      // Clear text when resizing back to desktop
+      el.textContent = "";
+    }
+  });
+}
+document.addEventListener("DOMContentLoaded", renderCompactDates);
+window.addEventListener("resize", renderCompactDates);
+
 </script>
 {% endblock %}
