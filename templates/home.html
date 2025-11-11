@@ -6,7 +6,7 @@
 
   <!-- BOXER MANAGER -->
   <section class="card">
-    <h2>Boxer Manager</h2>
+    <h2>⚙️ Boxer Manager</h2>
     <div class="button-row">
       <a class="btn" href="{% url 'boxer_bulk_add' %}">➕ Add Boxer</a>
       <a class="btn" href="{% url 'boxer_list' %}">📋 Manage</a>
@@ -15,63 +15,78 @@
 
   <!-- BATTERY TESTS -->
   <section class="card">
-    <h2>Battery Tests</h2>
+    <h2>🧪 Battery Tests</h2>
     <div class="button-row">
-      <a class="btn" href="{% url 'tests_list' %}">🧪 Manage Tests</a>
-      <a class="btn" href="{% url 'tests_rankings' %}">🏆 Rankings</a>
-      <a class="btn" href="{% url 'tests_record' %}">⚙️ Record Singular</a>
-      <a class="btn" href="{% url 'tests_record_multi' %}">⚙️ Record Multiple</a>
+      <a class="btn" href="{% url 'tests_list' %}">Manage Tests</a>
+      <a class="btn" href="{% url 'tests_rankings' %}">Rankings</a>
+      <a class="btn" href="{% url 'tests_record' %}">Record Singular</a>
+      <a class="btn" href="{% url 'tests_record_multi' %}">Record Multiple</a>
     </div>
   </section>
 
   <!-- ATTENDANCE -->
   <section class="card">
-    <h2>Attendance</h2>
+    <h2>📆 Attendance</h2>
     <p class="subtitle">Quickly mark who’s present today.</p>
     <div class="button-row">
-      <a class="btn" href="{% url 'mark_attendance' %}">🗓️ Mark</a>
-      <a class="btn" href="{% url 'attendance_list' %}">📆 All Attendance</a>
-      <a class="btn" href="{% url 'export_attendance' %}">📤 Export</a>
+      <a class="btn" href="{% url 'mark_attendance' %}">Mark</a>
+      <a class="btn" href="{% url 'attendance_list' %}">All Attendance</a>
+      <a class="btn" href="{% url 'export_attendance' %}">Export</a>
     </div>
   </section>
 
   <!-- SPARRING FINDER -->
   <section class="card" id="sparring-finder">
-    <h2>💫 Sparring Partner Finder</h2>
-    <p class="subtitle">Select a boxer to find sparring partners in the same division.</p>
+    <h2>💫 Class & Sparring Partner Finder</h2>
+    <p class="subtitle">Select a class to view boxers — or search by name.</p>
 
     <div class="selector">
-      <label for="sparBoxerSelect"><strong>Choose Boxer A:</strong></label>
-      <select id="sparBoxerSelect">
-        <option value="">— Select a boxer —</option>
-        {% for b in boxer_weights %}
-          <option value="{{ b.id }}">
-            {{ b.name }} ({{ b.gender }}, {{ b.age_band|default_if_none:'?' }}, {{ b.weight_class|default_if_none:'?' }})
-          </option>
-        {% endfor %}
-      </select>
+      <div class="input-group">
+        <label for="classSelect"><strong>Choose Class:</strong></label>
+        <select id="classSelect" class="input-field">
+          <option value="">— All / search mode —</option>
+          {% for cls in classes %}
+            <option value="{{ cls.id }}">{{ cls.title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div id="searchBox" class="input-group">
+        <label for="sparBoxerSearch"><strong>Search Boxer:</strong></label>
+        <input type="text" id="sparBoxerSearch"
+               placeholder="Start typing a name..."
+               class="input-field" />
+        <div id="searchResults" class="dropdown"></div>
+      </div>
     </div>
 
+    <div id="classBoxerList" class="results" style="display:none;"></div>
     <div id="sparResults" class="results">
-      <p class="muted">No boxer selected.</p>
+      <p class="muted">Select a class or search a boxer to begin.</p>
     </div>
   </section>
 </main>
 
-<!-- ====================  STYLE ==================== -->
+<!-- ==================== FUTURISTIC STYLING ==================== -->
 <style>
 :root {
-  --brand: #00ff66;
+  --brand: #00ff88;
   --dark-bg: #0a0a0a;
-  --panel-bg: linear-gradient(145deg,#0f0f0f,#151515);
-  --border: rgba(0,255,102,0.3);
-  --text: #e6ffe6;
+  --card-bg: linear-gradient(145deg, #0f0f0f, #151515);
+  --border: rgba(0, 255, 136, 0.25);
+  --text: #e8ffe8;
+}
+
+body {
+  background: var(--dark-bg);
+  color: var(--text);
+  font-family: 'Orbitron', sans-serif;
 }
 
 .home-container {
-  max-width: 900px;
+  max-width: 950px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 22px;
@@ -80,186 +95,313 @@
 .title {
   text-align: center;
   color: var(--brand);
-  font-size: 1.8rem;
-  margin-bottom: 10px;
-  text-shadow: 0 0 15px rgba(0,255,102,0.4);
+  font-size: 2rem;
+  text-shadow: 0 0 15px rgba(0,255,136,0.5);
+  letter-spacing: 1px;
+  margin-bottom: 12px;
 }
 
 .card {
-  background: var(--panel-bg);
+  background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 18px;
-  box-shadow: 0 0 20px rgba(0,255,102,0.08);
-  transition: transform .2s ease, box-shadow .2s ease;
+  padding: 20px;
+  box-shadow: 0 0 25px rgba(0,255,136,0.15);
+  transition: all .3s ease;
 }
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 25px rgba(0,255,102,0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 0 35px rgba(0,255,136,0.4);
 }
-
 .card h2 {
   color: var(--brand);
-  margin-bottom: 12px;
   text-align: center;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  margin-bottom: 10px;
 }
 .subtitle {
   text-align: center;
   color: #aaa;
-  font-size: .95rem;
-  margin-bottom: 10px;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
 }
 
 .button-row {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
 }
+
 .btn {
   border: 1px solid var(--brand);
   color: var(--brand);
-  background: transparent;
+  padding: 8px 16px;
   border-radius: 10px;
-  padding: 8px 14px;
+  background: transparent;
   font-weight: 600;
   transition: all .2s ease;
   text-decoration: none;
+  box-shadow: 0 0 10px rgba(0,255,136,0.2);
 }
 .btn:hover {
   background: var(--brand);
   color: #000;
-  box-shadow: 0 0 12px rgba(0,255,102,0.8);
+  box-shadow: 0 0 20px rgba(0,255,136,0.8);
 }
 
 .selector {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   margin-top: 10px;
 }
-.selector select {
-  min-width: 250px;
-  padding: 8px 12px;
-  border: 1px solid var(--brand);
-  border-radius: 10px;
-  background: #0f0f0f;
-  color: var(--text);
-  outline: none;
-  transition: all .2s ease;
+.input-group {
+  width: 100%;
+  max-width: 450px;
+  text-align: left;
 }
-.selector select:hover,
-.selector select:focus {
-  box-shadow: 0 0 12px rgba(0,255,102,0.5);
+.input-field {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #111;
+  color: var(--text);
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+}
+.input-field:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 12px rgba(0,255,136,0.6);
+  outline: none;
+}
+
+.dropdown {
+  background: #0d0d0d;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-top: 6px;
+  width: 100%;
+  max-height: 180px;
+  overflow-y: auto;
+  display: none;
 }
 
 .results {
-  margin-top: 15px;
+  margin-top: 20px;
   border-top: 1px solid var(--border);
   padding-top: 12px;
 }
-.results ul {
-  list-style: none;
-  padding: 0;
-  margin: 10px 0 0 0;
-}
-.results li {
-  background: rgba(15,15,15,0.8);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 8px 12px;
-  margin-bottom: 6px;
-  color: var(--text);
-  transition: all .2s ease;
-}
-.results li:hover {
-  background: rgba(0,255,102,0.1);
-  transform: translateX(3px);
-}
 .results h4 {
   color: var(--brand);
-  margin-bottom: 4px;
 }
 .results h5 {
-  color: #adffb0;
+  color: #9effb0;
   margin-top: 10px;
 }
+.results li {
+  list-style: none;
+  margin-bottom: 6px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(0,255,136,0.05);
+  border: 1px solid rgba(0,255,136,0.2);
+  transition: all 0.2s ease;
+}
+.results li:hover {
+  background: rgba(0,255,136,0.15);
+  transform: translateX(3px);
+}
+
 .muted {
-  text-align: center;
   color: #888;
+  text-align: center;
 }
 
 @media(max-width:600px) {
   .home-container { padding: 14px; gap: 18px; }
-  .card { padding: 14px; }
-  .btn { padding: 7px 12px; font-size: .9rem; }
-  .selector select { width: 100%; }
-  .results li { font-size: .9rem; }
+  .btn { font-size: 0.9rem; }
 }
 </style>
 
-<!-- ====================  SCRIPT ==================== -->
+<!-- ==================== SCRIPT ==================== -->
 <script>
-(function(){
+(function () {
   const data = {{ boxer_weights_json|safe }};
-  const select = document.getElementById('sparBoxerSelect');
-  const result = document.getElementById('sparResults');
+  const input = document.getElementById("sparBoxerSearch");
+  const resultsBox = document.getElementById("searchResults");
+  const result = document.getElementById("sparResults");
+  const classSelect = document.getElementById("classSelect");
+  const classBoxerList = document.getElementById("classBoxerList");
+  const searchBox = document.getElementById("searchBox");
 
-  function renderList(main, partners){
-    if (!partners.length){
-      result.innerHTML = `<p class="muted">No suitable partners found for <strong>${main.name}</strong>.</p>`;
-      return;
-    }
-    const items = partners.map(p =>
-      `<li><strong style="color:var(--brand);">${p.name}</strong> — ${p.age || '?'} yrs, ${p.age_band || '–'}, ${p.weight_class || '?'} (${p.kg ? p.kg.toFixed(1)+' kg' : '–'})</li>`
-    ).join('');
-    result.innerHTML = `
-      <h4>${main.name}</h4>
-      <p><em>${main.gender}, ${main.age_band || '–'}, ${main.weight_class || '?'} (${main.kg ? main.kg.toFixed(1)+' kg' : '–'})</em></p>
-      <h5>Suggested partners:</h5>
-      <ul>${items}</ul>
-    `;
+  let currentClassId = null; // track selected class
+
+  // ✅ Normalize weight class (remove kg ranges)
+  function normalizeWeightClass(label) {
+    if (!label) return "";
+    return label.split("(")[0].trim().toLowerCase();
   }
 
-  function findPartners(mainId){
-    const main = data.find(b => b.id == mainId);
-    if (!main){
-      result.innerHTML = '<p class="muted">Select a boxer first.</p>';
+  /* ---------------------- SEARCH MODE ---------------------- */
+  function showSuggestions(query) {
+    if (!query.trim()) {
+      resultsBox.style.display = "none";
       return;
     }
 
-    if (!main.kg){
-      result.innerHTML = `<p class="muted" style="color:#f55;">⚠️ The boxer's weight is not measured.</p>`;
-      return;
-    }
-    if (!main.age){
-      result.innerHTML = `<p class="muted" style="color:#f55;">⚠️ The boxer's age is not specified.</p>`;
-      return;
-    }
-    if (!main.weight_class){
-      result.innerHTML = `<p class="muted" style="color:#f55;">⚠️ The boxer’s weight class cannot be determined.</p>`;
+    const matches = data.filter(b =>
+      b.name.toLowerCase().includes(query.toLowerCase())
+    );
+
+    if (!matches.length) {
+      resultsBox.innerHTML = `<p style="padding:8px 12px;color:#888;">No boxers found.</p>`;
+      resultsBox.style.display = "block";
       return;
     }
 
-    let partners = data.filter(b => b.id !== main.id && b.weight_class === main.weight_class);
-    partners.sort((a,b)=>{
-      const aSame = a.age_band === main.age_band;
-      const bSame = b.age_band === main.age_band;
-      if (aSame && !bSame) return -1;
-      if (!aSame && bSame) return 1;
-      const aDiff = a.age && main.age ? Math.abs(a.age - main.age) : 99;
-      const bDiff = b.age && main.age ? Math.abs(b.age - main.age) : 99;
-      if (aDiff !== bDiff) return aDiff - bDiff;
-      return a.name.localeCompare(b.name);
-    });
+    resultsBox.innerHTML = matches
+      .map(
+        b => `
+        <div onclick="selectBoxer(${b.id})"
+             style="padding:8px 12px;cursor:pointer;color:var(--text);"
+             onmouseover="this.style.background='rgba(0,255,136,0.1)'"
+             onmouseout="this.style.background='transparent'">
+          <strong style="color:var(--brand);">${b.name}</strong>
+          — ${b.gender}, ${b.age_band || "–"}, ${b.weight_class || "?"}
+        </div>`
+      )
+      .join("");
 
-    renderList(main, partners);
+    resultsBox.style.display = "block";
   }
 
-  select.addEventListener('change', e => findPartners(e.target.value));
+  /* ---------------------- CLASS MODE ---------------------- */
+  classSelect.addEventListener("change", e => {
+    currentClassId = parseInt(e.target.value, 10) || null;
+    resultsBox.style.display = "none";
+    result.innerHTML = "";
+
+    if (!currentClassId) {
+      searchBox.style.display = "block";
+      classBoxerList.style.display = "none";
+      result.innerHTML = '<p class="muted">Type a boxer’s name to begin.</p>';
+      return;
+    }
+
+    searchBox.style.display = "none";
+
+    // Filter boxers in the selected class
+    const classBoxers = data.filter(
+      b => Array.isArray(b.class_ids) && b.class_ids.includes(currentClassId)
+    );
+
+    if (!classBoxers.length) {
+      classBoxerList.innerHTML =
+        `<p class="muted">No boxers found for this class.</p>`;
+      classBoxerList.style.display = "block";
+      return;
+    }
+
+    classBoxerList.innerHTML =
+      "<ul>" +
+      classBoxers
+        .map(
+          b => `
+          <li onclick="selectBoxer(${b.id})"
+              style="padding:8px 12px;border-bottom:1px solid var(--border);
+                     cursor:pointer;color:var(--text);"
+              onmouseover="this.style.background='rgba(0,255,136,0.1)'"
+              onmouseout="this.style.background='transparent'">
+            <strong style="color:var(--brand);">${b.name}</strong> —
+            ${b.gender}, ${b.age_band || "–"}, ${b.weight_class || "?"}
+          </li>`
+        )
+        .join("") +
+      "</ul>";
+
+    classBoxerList.style.display = "block";
+  });
+
+  /* ---------------------- BOXER SELECTION ---------------------- */
+  window.selectBoxer = function (id) {
+    const main = data.find(b => b.id === id);
+    if (!main) return;
+
+    if (input) input.value = main.name;
+    resultsBox.style.display = "none";
+    classBoxerList.style.display = "none";
+
+    // ⚠️ Validate data
+    if (!main.kg || !main.age || !main.gender) {
+      result.innerHTML = `<p class="muted" style="color:#f55;">⚠️ Missing data for ${main.name}.</p>`;
+      return;
+    }
+
+    const mainClassNorm = normalizeWeightClass(main.weight_class);
+
+    // ✅ Find sparring partners across all gym boxers
+    const partners = data
+      .filter(b => {
+        if (b.id === main.id) return false;
+        const sameWeight = normalizeWeightClass(b.weight_class) === mainClassNorm;
+        const valid = b.gender && b.age && b.kg;
+        return sameWeight && valid;
+      })
+      .sort((a, b) => {
+        const sameBandA = a.age_band === main.age_band;
+        const sameBandB = b.age_band === main.age_band;
+        if (sameBandA && !sameBandB) return -1;
+        if (!sameBandA && sameBandB) return 1;
+        const diffA = a.age && main.age ? Math.abs(a.age - main.age) : 99;
+        const diffB = b.age && main.age ? Math.abs(b.age - main.age) : 99;
+        return diffA - diffB || a.name.localeCompare(b.name);
+      });
+
+    // 🧠 Build the result view
+    let html = `
+      <div style="background:linear-gradient(145deg,#0f0f0f,#181818);
+                  border:1px solid var(--brand);
+                  border-radius:12px;padding:12px 16px;
+                  box-shadow:0 0 18px rgba(0,255,136,0.3);">
+        <h4 style="color:var(--brand);text-shadow:0 0 10px rgba(0,255,136,0.8);margin-bottom:4px;">
+          ${main.name}
+        </h4>
+        <p><em>${main.gender}, ${main.age || "?"} yrs,
+        ${main.age_band || "–"}, ${main.weight_class || "?"}
+        (${main.kg ? main.kg.toFixed(1) + " kg" : "–"})</em></p>
+      </div>`;
+
+    if (partners.length) {
+      html += `
+        <h5 style="margin-top:14px;">🥊 Suggested partners (${partners.length}):</h5>
+        <ul style="list-style:none;padding:0;margin-top:6px;">
+          ${partners
+            .map(
+              p => `
+              <li style="background:rgba(15,15,15,0.8);
+                         border:1px solid rgba(0,255,136,0.3);
+                         border-radius:8px;padding:8px 10px;
+                         margin-bottom:6px;transition:all .2s ease;">
+                <strong style="color:var(--brand);text-shadow:0 0 6px rgba(0,255,136,0.5);">
+                  ${p.name}
+                </strong> —
+                ${p.gender}, ${p.age || "?"} yrs,
+                ${p.age_band || "–"}, ${p.weight_class || "?"}
+                (${p.kg ? p.kg.toFixed(1) + " kg" : "–"})
+              </li>`
+            )
+            .join("")}
+        </ul>`;
+    } else {
+      html += `<p class="muted" style="margin-top:8px;">No suitable partners found in this gym.</p>`;
+    }
+
+    result.innerHTML = html;
+  };
+
+  if (input) input.addEventListener("input", e => showSuggestions(e.target.value));
 })();
 </script>
 

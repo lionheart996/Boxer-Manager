@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="page-title" style="text-align:center;"> Add Multiple Boxers</h2>
+
+<h2 class="page-title" style="text-align:center;">➕ Add Multiple Boxers</h2>
 <p class="muted" style="margin-bottom:16px; text-align:center;">
-  Add as many as you need. Empty rows are ignored. Use the 🗑️ icon to remove a row.
+  Add as many boxers as you need. Empty rows are ignored. Use 🗑️ to remove a row.
 </p>
 
 <form method="post" id="bulk-form" class="bulk-form">
@@ -12,35 +13,34 @@
   <div id="rows" class="rows">
     {% for form in formset %}
       <article class="row-card" data-index="{{ forloop.counter0 }}">
-        <div class="row-grid">
+        <div class="row-top">
           <label>
-            <span class="lbl">First name *</span>
+            <span class="lbl">First Name *</span>
             {{ form.first_name }}
-            {% if form.first_name.errors %}<span class="err">{{ form.first_name.errors|join:", " }}</span>{% endif %}
           </label>
           <label>
-            <span class="lbl">Family name</span>
+            <span class="lbl">Last Name</span>
             {{ form.last_name }}
-            {% if form.last_name.errors %}<span class="err">{{ form.last_name.errors|join:", " }}</span>{% endif %}
-          </label>
-          <label>
-            <span class="lbl">Parent (optional)</span>
-            {{ form.parent_name }}
-            {% if form.parent_name.errors %}<span class="err">{{ form.parent_name.errors|join:", " }}</span>{% endif %}
-          </label>
-          <label>
-            <span class="lbl">Birthday (optional)</span>
-            {{ form.date_of_birth }}
-            {% if form.date_of_birth.errors %}<span class="err">{{ form.date_of_birth.errors|join:", " }}</span>{% endif %}
           </label>
         </div>
 
-        {{ form.DELETE }} {# hidden but managed via JS #}
-        {% if form.non_field_errors %}
-          <div class="err">{{ form.non_field_errors|join:", " }}</div>
-        {% endif %}
+        <div class="row-bottom">
+          <label>
+            <span class="lbl">Gender</span>
+            {{ form.gender }}
+          </label>
+          <label>
+            <span class="lbl">Birthday</span>
+            {{ form.date_of_birth }}
+          </label>
+          <label>
+            <span class="lbl">Parent Name</span>
+            {{ form.parent_name }}
+          </label>
+        </div>
 
-        <button type="button" class="btn btn--danger btn--sm row-remove" aria-label="Remove row">🗑️ Remove</button>
+        {{ form.DELETE }}
+        <button type="button" class="btn btn--danger btn--sm row-remove">🗑️ Remove</button>
       </article>
     {% endfor %}
   </div>
@@ -53,104 +53,145 @@
   </div>
 </form>
 
-{# Template for dynamic row creation #}
 <template id="row-template">
   <article class="row-card" data-index="__prefix__">
-    <div class="row-grid">
-      <label>
-        <span class="lbl">First name *</span>
-        {{ formset.empty_form.first_name }}
-      </label>
-      <label>
-        <span class="lbl">Family name</span>
-        {{ formset.empty_form.last_name }}
-      </label>
-      <label>
-        <span class="lbl">Parent (optional)</span>
-        {{ formset.empty_form.parent_name }}
-      </label>
-      <label>
-        <span class="lbl">Birthday (optional)</span>
-        {{ formset.empty_form.date_of_birth }}
-      </label>
+    <div class="row-top">
+      <label><span class="lbl">First Name *</span>{{ formset.empty_form.first_name }}</label>
+      <label><span class="lbl">Last Name</span>{{ formset.empty_form.last_name }}</label>
+    </div>
+    <div class="row-bottom">
+      <label><span class="lbl">Gender</span>{{ formset.empty_form.gender }}</label>
+      <label><span class="lbl">Birthday</span>{{ formset.empty_form.date_of_birth }}</label>
+      <label><span class="lbl">Parent Name</span>{{ formset.empty_form.parent_name }}</label>
     </div>
     {{ formset.empty_form.DELETE }}
-    <button type="button" class="btn btn--danger btn--sm row-remove" aria-label="Remove row">🗑️ Remove</button>
+    <button type="button" class="btn btn--danger btn--sm row-remove">🗑️ Remove</button>
   </article>
 </template>
 
 <style>
-.bulk-form { display: grid; gap: 16px; }
-.rows { display: grid; gap: 16px; }
+:root {
+  --brand: #00ff66;
+  --border: rgba(0,255,102,0.3);
+  --text: #e6ffe6;
+}
 
-/* Card style */
+.bulk-form { display: grid; gap: 18px; }
+.rows { display: grid; gap: 20px; }
+
+/* Boxer card */
 .row-card {
   background: linear-gradient(145deg, #0f0f0f, #181818);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px;
-  box-shadow: 0 0 12px rgba(0,255,102,0.2);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 0 15px rgba(0,255,102,0.2);
   transition: transform .2s ease, box-shadow .2s ease;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 .row-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 20px rgba(0,255,102,0.4);
+  box-shadow: 0 0 25px rgba(0,255,102,0.4);
 }
 
-.row-grid {
+/* Layout rows */
+.row-top {
   display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: 1fr 1fr; /* Equal width */
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.row-bottom {
+  display: grid;
+  grid-template-columns: 0.6fr 0.8fr 1.2fr; /* Gender | Birthday | Parent */
+  gap: 16px;
 }
 
-.lbl { display:block; font-size:13px; color:var(--brand); margin-bottom:4px; font-weight:600; }
-.err { display:block; color:#ff4d4d; font-size:12px; margin-top:4px; }
+/* Labels and inputs */
+.lbl {
+  display: block;
+  font-size: 13px;
+  color: var(--brand);
+  margin-bottom: 4px;
+  font-weight: 600;
+}
 
 .row-card input[type="text"],
-.row-card input[type="date"] {
-  width:100%;
-  padding:10px 12px;
-  border-radius:10px;
-  border:1px solid var(--border);
-  background:#0f0f0f;
-  color:var(--text);
-  font-family:monospace;
-  transition:border-color .2s ease, box-shadow .2s ease;
-}
-.row-card input:focus {
-  outline:none;
-  border-color:var(--brand);
-  box-shadow:0 0 8px rgba(0,255,102,0.5);
+.row-card input[type="date"],
+.row-card select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #0f0f0f;
+  color: var(--text);
+  font-size: 14px;
+  box-sizing: border-box;
+  min-height: 38px;
+  transition: border-color .2s ease, box-shadow .2s ease;
 }
 
+.row-card input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+}
+.row-card input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+  cursor: pointer;
+}
+
+.row-card input:focus,
+.row-card select:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 8px rgba(0,255,102,0.5);
+}
+
+/* Remove button */
 .row-remove {
-  margin-top:12px;
-  background:#1a1a1a;
-  border:1px solid #ff4d4d;
-  color:#ff4d4d;
-  border-radius:8px;
-  padding:6px 10px;
-  transition:all .2s ease;
+  margin-top: 10px;
+  background: #1a1a1a;
+  border: 1px solid #ff4d4d;
+  color: #ff4d4d;
+  border-radius: 8px;
+  padding: 6px 10px;
+  transition: all .2s ease;
 }
 .row-remove:hover {
-  background:#ff4d4d;
-  color:#000;
+  background: #ff4d4d;
+  color: #000;
 }
 
+/* Action buttons */
 .actions {
-  display:flex; align-items:center; gap:10px; margin-top:8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-.actions .spacer { flex:1; }
+.actions .spacer { flex: 1; }
 
 .btn--accent {
-  background:#00ff66;
-  color:#000;
-  font-weight:700;
-  border-radius:10px;
-  box-shadow:0 0 10px rgba(0,255,102,0.6);
-  transition:all .2s ease;
+  background: var(--brand);
+  color: #000;
+  font-weight: 700;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,255,102,0.6);
+  transition: all .2s ease;
 }
-.btn--accent:hover { transform:scale(1.05); box-shadow:0 0 18px rgba(0,255,102,0.9); }
+.btn--accent:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 18px rgba(0,255,102,0.9);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .row-top, .row-bottom { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .row-top, .row-bottom { grid-template-columns: 1fr; }
+}
 </style>
 
 <script>
@@ -162,9 +203,7 @@
                      document.querySelector('[name="form-TOTAL_FORMS"]');
 
   function hideDeleteBoxes(scope) {
-    (scope || document).querySelectorAll('input[type="checkbox"][name$="-DELETE"]').forEach(cb => {
-      cb.style.display = 'none';
-    });
+    (scope || document).querySelectorAll('input[type="checkbox"][name$="-DELETE"]').forEach(cb => cb.style.display = 'none');
   }
   hideDeleteBoxes();
 
@@ -176,7 +215,7 @@
         const card = btn.closest('.row-card');
         if (!card) return;
         const del = card.querySelector('input[name$="-DELETE"]');
-        if (del) { del.checked = true; }
+        if (del) del.checked = true;
         card.style.display = 'none';
       });
     });
@@ -193,10 +232,10 @@
     totalInput.value = String(current + 1);
     hideDeleteBoxes(node);
     wireRemoveButtons(node);
-    const first = node.querySelector('input, select, textarea');
-    if (first) first.focus();
     node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
 })();
 </script>
+
 {% endblock %}
+

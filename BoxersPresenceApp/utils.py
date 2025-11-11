@@ -138,8 +138,8 @@ IBA_WEIGHT_CLASSES = {
         ("Welterweight", 63.0, 66.0),
         ("Light Middleweight", 66.0, 70.0),
         ("Middleweight", 70.0, 75.0),
-        ("Light Heavyweight", 75.0, 80.0),
-        ("Heavyweight", 80.0, 999.0),
+        ("Light Heavyweight", 75.0, 81.0),
+        ("Heavyweight", 81.0, 999.0),
     ],
     ("F", "YOUTH"): [
         ("Minimumweight", 45.0, 48.0),
@@ -180,15 +180,16 @@ def calc_age(dob):
 
 
 def age_band(age):
+    """Return competition band name from age."""
     if age is None:
         return None
+    if age < 15:
+        return "JUNIOR"   # treat sub-15 as Junior
     if 15 <= age <= 16:
         return "JUNIOR"
     if 17 <= age <= 18:
         return "YOUTH"
-    if age >= 19:
-        return "ELITE"
-    return None
+    return "ELITE"
 
 
 def olympic_weight_class(kg, gender_code, age):
@@ -200,19 +201,14 @@ def olympic_weight_class(kg, gender_code, age):
         "Below minimum"
         "Super Heavyweight (92kg+)"
     """
-
     if kg is None:
         return None  # no weight recorded
 
-    # Unspecified gender defaults to Male
     gender = "M" if gender_code in (None, "U") else gender_code
-
-    # Determine the correct age group (Junior / Youth / Elite)
     band = age_band(age)
     if not band:
-        return None  # too young or unknown age
+        band = "JUNIOR"  # safe fallback for very young
 
-    # Get all classes for gender/age band
     classes = IBA_WEIGHT_CLASSES.get((gender, band))
     if not classes:
         return None
@@ -223,16 +219,12 @@ def olympic_weight_class(kg, gender_code, age):
 
     # Too heavy
     if kg > classes[-1][2]:
-        # use lower bound of last class for proper "+"
         top_class_name, top_low, _ = classes[-1]
         return f"{top_class_name} ({int(top_low)}kg+)"
 
-    # Find the right range
+    # Match correct class
     for name, low, high in classes:
         if low <= kg <= high:
-            if high >= 999:  # last open-ended class
-                return f"{name} ({int(low)}kg+)"
-            else:
-                return f"{name} ({int(low)}–{int(high)}kg)"
+            return f"{name} ({int(low)}–{int(high)}kg)" if high < 999 else f"{name} ({int(low)}kg+)"
 
     return None

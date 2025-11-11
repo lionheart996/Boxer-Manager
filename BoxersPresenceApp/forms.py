@@ -231,29 +231,41 @@ class UnenrollForm(forms.Form):
     boxer_id = forms.IntegerField(widget=forms.HiddenInput)
 
 class BulkBoxerForm(forms.Form):
-    first_name   = forms.CharField(label="Name", required=False)
-    last_name    = forms.CharField(label="Family name", required=False)
-    parent_name  = forms.CharField(label="Parent", required=False)
+    GENDER_CHOICES = [
+        ("M", "Male"),
+        ("F", "Female"),
+        ("U", "Unspecified"),
+    ]
+
+    first_name = forms.CharField(label="First name", required=False)
+    last_name = forms.CharField(label="Family name", required=False)
+    parent_name = forms.CharField(label="Parent", required=False)
     date_of_birth = forms.DateField(
-        label="Birthday", required=False,
+        label="Birthday",
+        required=False,
         widget=forms.DateInput(attrs={"type": "date"})
+    )
+    gender = forms.ChoiceField(
+        label="Gender",
+        required=False,
+        choices=GENDER_CHOICES
     )
 
     def clean(self):
         cleaned = super().clean()
-        fn  = (cleaned.get("first_name") or "").strip()
-        ln  = (cleaned.get("last_name") or "").strip()
+        fn = (cleaned.get("first_name") or "").strip()
+        ln = (cleaned.get("last_name") or "").strip()
         par = (cleaned.get("parent_name") or "").strip()
         dob = cleaned.get("date_of_birth")
 
-        # If the entire row is blank -> mark as empty; NO error
+        # If completely empty, mark and ignore
         if not fn and not ln and not par and not dob:
             cleaned["_empty_row"] = True
             return cleaned
 
-        # If there’s any data, require at least one of first/last name
+        # Require at least first or last name if any data present
         if not fn and not ln:
-            raise forms.ValidationError("Please provide at least a Name or a Family name.")
+            raise forms.ValidationError("Please provide at least a First or Last name.")
 
         cleaned["_empty_row"] = False
         return cleaned
