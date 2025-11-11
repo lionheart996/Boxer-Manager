@@ -39,6 +39,12 @@ def create_coach_profile(sender, instance, created, **kwargs):
 
 
 class Boxer(models.Model):
+    class Gender(models.TextChoices):
+        MALE = "M", "Male"
+        FEMALE = "F", "Female"
+        UNSPECIFIED = "U", "Unspecified"  # default
+
+
     uuid = models.UUIDField(default=uuid4, editable=False, db_index=True)
 
     # keep this for now!
@@ -61,8 +67,16 @@ class Boxer(models.Model):
         help_text="Parent accounts who can view this boxer’s attendance and weight"
     )
 
+    gender = models.CharField(
+        max_length=1,
+        choices=Gender.choices,
+        default=Gender.UNSPECIFIED,
+        db_index=True,
+    )
+
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name}".strip() or self.name
+
 
 
 class BoxerComment(models.Model):

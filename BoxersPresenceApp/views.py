@@ -1,5 +1,6 @@
 # ===== BATTERY TESTS =====
 import io
+import json
 from collections import defaultdict
 from datetime import datetime, timedelta
 from datetime import date, time as dt_time
@@ -13,7 +14,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.db import transaction, IntegrityError
-from django.db.models import Max, ProtectedError, Min, Avg, Count
+from django.db.models import Max, ProtectedError, Min, Avg, Count, Subquery
 from django.db.models.functions import TruncDate
 from django.forms import formset_factory
 from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse, HttpResponseForbidden, Http404, HttpRequest
@@ -33,7 +34,7 @@ from .forms import BatteryTestForm, BoxerAndTestSelectForm, BoxerForm, HeartRate
     WeightQuickForm, ParentSignupForm, GymForm, TestResultForm, EnrollBoxerForm, ClassCreateForm, UnenrollForm, \
     BulkBoxerForm, BoxerCommentForm
 from .models import TestResult
-from .utils import user_gym, resolve_boxer, expand_rrule
+from .utils import user_gym, resolve_boxer, expand_rrule, calc_age, olympic_weight_class, age_band
 
 from decimal import Decimal
 from django.db.models import Exists, OuterRef, Q
@@ -72,27 +73,54 @@ class HomeView(LoginRequiredMixin, TemplateView):
         ctx = super().get_context_data(**kwargs)
         gym = user_gym(self.request)
 
-        # Who can you see?
+        # --- Which boxers this user can see ---
         if self.request.user.is_superuser:
             boxers_qs = Boxer.objects.all()
+        elif gym:
+            boxers_qs = Boxer.objects.filter(
+                Q(gym=gym) | Q(shared_with_gyms=gym) | Q(coaches=self.request.user)
+            ).distinct()
         else:
-            if gym:
-                boxers_qs = Boxer.objects.filter(
-                    Q(gym=gym) | Q(shared_with_gyms=gym) | Q(coaches=self.request.user)
-                ).distinct()
-            else:
-                boxers_qs = Boxer.objects.filter(coaches=self.request.user).distinct()
+            boxers_qs = Boxer.objects.filter(coaches=self.request.user).distinct()
 
         boxers_qs = boxers_qs.order_by("name")
 
-        # Build the HR quick form and restrict its boxer queryset to what you can see
+        # --- Heart rate quick form restriction ---
         hr_form = HeartRateQuickForm()
         if "boxer" in hr_form.fields and hasattr(hr_form.fields["boxer"], "queryset"):
             hr_form.fields["boxer"].queryset = boxers_qs
 
+        # --- Annotate each boxer with latest weight ---
+        latest_weight_qs = Weight.objects.filter(boxer=OuterRef("pk")).order_by("-measured_at")
+        latest_kg_sq = Subquery(latest_weight_qs.values("kg")[:1])
+        latest_dt_sq = Subquery(latest_weight_qs.values("measured_at")[:1])
+        boxers = boxers_qs.annotate(latest_kg=latest_kg_sq, latest_measured_at=latest_dt_sq)
+
+        # --- Compute age, band, and Olympic weight class ---
+        boxer_weights = []
+        for b in boxers:
+            age = calc_age(b.date_of_birth)
+            kg = float(b.latest_kg) if b.latest_kg is not None else None
+            if age is not None and age < 15:
+                continue  # skip under 15
+            wc = olympic_weight_class(kg, getattr(b, "gender", "U"), age)
+            boxer_weights.append({
+                "id": b.id,
+                "name": f"{b.first_name} {b.last_name}".strip() or b.name,
+                "gender": getattr(b, "gender", "U"),
+                "age": age,
+                "age_band": age_band(age) if age is not None else None,
+                "kg": kg,
+                "measured_at": b.latest_measured_at,
+                "weight_class": wc,
+            })
+
+        # --- Add everything to context ---
         ctx.update({
             "boxers": boxers_qs,
             "hr_form": hr_form,
+            "boxer_weights": boxer_weights,
+            "boxer_weights_json": json.dumps(boxer_weights, default=str),
         })
         return ctx
 
@@ -135,6 +163,10 @@ class BoxerListView(LoginRequiredMixin, ListView):
                     Q(name__icontains=term) |
                     Q(parent_name__icontains=term)
                 )
+
+        # ✅ Add comment count per boxer (non-breaking)
+        qs = qs.annotate(comment_count=Count("comments"))
+
         return qs.order_by("first_name", "last_name", "name")
 
     def get_context_data(self, **kwargs):
@@ -148,6 +180,28 @@ class BoxerListView(LoginRequiredMixin, ListView):
         ctx["classes"] = ClassTemplate.objects.filter(gym=gym).order_by("title")
 
         return ctx
+
+class BoxerUpdateView(LoginRequiredMixin, UpdateView):
+    model = Boxer
+    form_class = BoxerForm
+    template_name = "boxers/boxer_edit.html"
+
+    def get_queryset(self):
+        gym = user_gym(self.request)
+        u = self.request.user
+        qs = Boxer.objects.all()
+        if u.is_superuser:
+            return qs
+        if gym:
+            return qs.filter(Q(gym=gym) | Q(shared_with_gyms=gym) | Q(coaches=u)).distinct()
+        return qs.filter(coaches=u).distinct()
+
+    def form_valid(self, form):
+        messages.success(self.request, "Boxer updated successfully.")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return self.request.GET.get("next") or reverse("boxer_list")
 
 class TestsListView(LoginRequiredMixin, TemplateView):
     template_name = "tests/tests_list.html"

@@ -1,44 +1,266 @@
 {% extends "base.html" %}
-
 {% block content %}
 
-<h1>Boxer Factory</h1>
+<main class="home-container">
+  <h1 class="title">🥊 Boxer Factory Control Panel 🥊</h1>
 
-<!-- Boxer Manager -->
-<div class="card" style="background:#111;border:1px solid #00ff66;border-radius:12px;padding:16px;">
-  <h3>Manage Boxers</h3>
-  <div style="display:inline-flex;gap:6px;align-items:center; justify-content: center; flex-wrap:wrap;">
-    <a class="btn" href="{% url 'boxer_bulk_add' %}">Add Boxer</a>
-    <a class="btn" href="{% url 'boxer_list' %}">Manage</a>
-  </div>
-</div>
-
-<!-- Battery Tests -->
-<div class="grid" style="display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:16px;">
-  <div class="card" style="background:#111;border:1px solid #00ff66;border-radius:12px;padding:16px;">
-    <h3>Battery Tests</h3>
-    <p>
-        <a class="btn" href="{% url 'tests_list' %}">Manage Tests</a>
-        <a class="btn" href="{% url 'tests_rankings' %}">Rankings</a>
-        <a class="btn" href="{% url 'tests_record' %}">Record Singular</a>
-        <a class="btn" href="{% url 'tests_record_multi' %}">Record Multiple</a>
-
-    </p>
-  </div>
-</div>
-
-<!-- Attendance -->
-<div class="grid" style="margin-top:16px; border: 1px solid #00ff66; border-radius: 10px">
-  <div class="card" style="padding: 15px; text-align: center;">
-    <h3>Mark Attendance</h3>
-    <p style="font-style: italic">Quickly mark who’s present today.</p>
-    <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 10px;">
-      <a class="btn" href="{% url 'mark_attendance' %}">Mark</a>
-      <a class="btn" href="{% url 'attendance_list' %}">All Attendance</a>
-      <a class="btn" href="{% url 'export_attendance' %}">Export Attendance</a>
+  <!-- BOXER MANAGER -->
+  <section class="card">
+    <h2>Boxer Manager</h2>
+    <div class="button-row">
+      <a class="btn" href="{% url 'boxer_bulk_add' %}">➕ Add Boxer</a>
+      <a class="btn" href="{% url 'boxer_list' %}">📋 Manage</a>
     </div>
-  </div>
-</div>
+  </section>
+
+  <!-- BATTERY TESTS -->
+  <section class="card">
+    <h2>Battery Tests</h2>
+    <div class="button-row">
+      <a class="btn" href="{% url 'tests_list' %}">🧪 Manage Tests</a>
+      <a class="btn" href="{% url 'tests_rankings' %}">🏆 Rankings</a>
+      <a class="btn" href="{% url 'tests_record' %}">⚙️ Record Singular</a>
+      <a class="btn" href="{% url 'tests_record_multi' %}">⚙️ Record Multiple</a>
+    </div>
+  </section>
+
+  <!-- ATTENDANCE -->
+  <section class="card">
+    <h2>Attendance</h2>
+    <p class="subtitle">Quickly mark who’s present today.</p>
+    <div class="button-row">
+      <a class="btn" href="{% url 'mark_attendance' %}">🗓️ Mark</a>
+      <a class="btn" href="{% url 'attendance_list' %}">📆 All Attendance</a>
+      <a class="btn" href="{% url 'export_attendance' %}">📤 Export</a>
+    </div>
+  </section>
+
+  <!-- SPARRING FINDER -->
+  <section class="card" id="sparring-finder">
+    <h2>💫 Sparring Partner Finder</h2>
+    <p class="subtitle">Select a boxer to find sparring partners in the same division.</p>
+
+    <div class="selector">
+      <label for="sparBoxerSelect"><strong>Choose Boxer A:</strong></label>
+      <select id="sparBoxerSelect">
+        <option value="">— Select a boxer —</option>
+        {% for b in boxer_weights %}
+          <option value="{{ b.id }}">
+            {{ b.name }} ({{ b.gender }}, {{ b.age_band|default_if_none:'?' }}, {{ b.weight_class|default_if_none:'?' }})
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div id="sparResults" class="results">
+      <p class="muted">No boxer selected.</p>
+    </div>
+  </section>
+</main>
+
+<!-- ====================  STYLE ==================== -->
+<style>
+:root {
+  --brand: #00ff66;
+  --dark-bg: #0a0a0a;
+  --panel-bg: linear-gradient(145deg,#0f0f0f,#151515);
+  --border: rgba(0,255,102,0.3);
+  --text: #e6ffe6;
+}
+
+.home-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.title {
+  text-align: center;
+  color: var(--brand);
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  text-shadow: 0 0 15px rgba(0,255,102,0.4);
+}
+
+.card {
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 0 20px rgba(0,255,102,0.08);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px rgba(0,255,102,0.4);
+}
+
+.card h2 {
+  color: var(--brand);
+  margin-bottom: 12px;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.subtitle {
+  text-align: center;
+  color: #aaa;
+  font-size: .95rem;
+  margin-bottom: 10px;
+}
+
+.button-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.btn {
+  border: 1px solid var(--brand);
+  color: var(--brand);
+  background: transparent;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-weight: 600;
+  transition: all .2s ease;
+  text-decoration: none;
+}
+.btn:hover {
+  background: var(--brand);
+  color: #000;
+  box-shadow: 0 0 12px rgba(0,255,102,0.8);
+}
+
+.selector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.selector select {
+  min-width: 250px;
+  padding: 8px 12px;
+  border: 1px solid var(--brand);
+  border-radius: 10px;
+  background: #0f0f0f;
+  color: var(--text);
+  outline: none;
+  transition: all .2s ease;
+}
+.selector select:hover,
+.selector select:focus {
+  box-shadow: 0 0 12px rgba(0,255,102,0.5);
+}
+
+.results {
+  margin-top: 15px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+.results ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0 0;
+}
+.results li {
+  background: rgba(15,15,15,0.8);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  color: var(--text);
+  transition: all .2s ease;
+}
+.results li:hover {
+  background: rgba(0,255,102,0.1);
+  transform: translateX(3px);
+}
+.results h4 {
+  color: var(--brand);
+  margin-bottom: 4px;
+}
+.results h5 {
+  color: #adffb0;
+  margin-top: 10px;
+}
+.muted {
+  text-align: center;
+  color: #888;
+}
+
+@media(max-width:600px) {
+  .home-container { padding: 14px; gap: 18px; }
+  .card { padding: 14px; }
+  .btn { padding: 7px 12px; font-size: .9rem; }
+  .selector select { width: 100%; }
+  .results li { font-size: .9rem; }
+}
+</style>
+
+<!-- ====================  SCRIPT ==================== -->
+<script>
+(function(){
+  const data = {{ boxer_weights_json|safe }};
+  const select = document.getElementById('sparBoxerSelect');
+  const result = document.getElementById('sparResults');
+
+  function renderList(main, partners){
+    if (!partners.length){
+      result.innerHTML = `<p class="muted">No suitable partners found for <strong>${main.name}</strong>.</p>`;
+      return;
+    }
+    const items = partners.map(p =>
+      `<li><strong style="color:var(--brand);">${p.name}</strong> — ${p.age || '?'} yrs, ${p.age_band || '–'}, ${p.weight_class || '?'} (${p.kg ? p.kg.toFixed(1)+' kg' : '–'})</li>`
+    ).join('');
+    result.innerHTML = `
+      <h4>${main.name}</h4>
+      <p><em>${main.gender}, ${main.age_band || '–'}, ${main.weight_class || '?'} (${main.kg ? main.kg.toFixed(1)+' kg' : '–'})</em></p>
+      <h5>Suggested partners:</h5>
+      <ul>${items}</ul>
+    `;
+  }
+
+  function findPartners(mainId){
+    const main = data.find(b => b.id == mainId);
+    if (!main){
+      result.innerHTML = '<p class="muted">Select a boxer first.</p>';
+      return;
+    }
+
+    if (!main.kg){
+      result.innerHTML = `<p class="muted" style="color:#f55;">⚠️ The boxer's weight is not measured.</p>`;
+      return;
+    }
+    if (!main.age){
+      result.innerHTML = `<p class="muted" style="color:#f55;">⚠️ The boxer's age is not specified.</p>`;
+      return;
+    }
+    if (!main.weight_class){
+      result.innerHTML = `<p class="muted" style="color:#f55;">⚠️ The boxer’s weight class cannot be determined.</p>`;
+      return;
+    }
+
+    let partners = data.filter(b => b.id !== main.id && b.weight_class === main.weight_class);
+    partners.sort((a,b)=>{
+      const aSame = a.age_band === main.age_band;
+      const bSame = b.age_band === main.age_band;
+      if (aSame && !bSame) return -1;
+      if (!aSame && bSame) return 1;
+      const aDiff = a.age && main.age ? Math.abs(a.age - main.age) : 99;
+      const bDiff = b.age && main.age ? Math.abs(b.age - main.age) : 99;
+      if (aDiff !== bDiff) return aDiff - bDiff;
+      return a.name.localeCompare(b.name);
+    });
+
+    renderList(main, partners);
+  }
+
+  select.addEventListener('change', e => findPartners(e.target.value));
+})();
+</script>
 
 {% endblock %}
-

@@ -25,7 +25,24 @@ class AttendanceForm(forms.ModelForm):
 class BoxerForm(forms.ModelForm):
     class Meta:
         model = Boxer
-        fields = ['name', 'date_of_birth']
+        fields = ["first_name", "last_name", "gender", "date_of_birth"]
+        widgets = {
+            "date_of_birth": forms.DateInput(attrs={"type": "date"}),
+            "gender": forms.RadioSelect,   # nicer than a dropdown; remove if you prefer Select
+        }
+
+    def save(self, commit=True):
+        """
+        Keep Boxer.name in sync with first/last for display elsewhere.
+        """
+        obj = super().save(commit=False)
+        combined = f"{(obj.first_name or '').strip()} {(obj.last_name or '').strip()}".strip()
+        if combined:
+            obj.name = combined
+        if commit:
+            obj.save()
+            self.save_m2m()
+        return obj
 
 class MultiAttendanceForm(forms.Form):
     date = forms.DateField(widget=forms.SelectDateWidget())

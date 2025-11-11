@@ -2,6 +2,7 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
+from django.db.models import OuterRef, Subquery
 
 from .models import (
     Boxer,
@@ -12,6 +13,8 @@ from .models import (
     CoachProfile,
     Gym, Weight, Enrollment, ClassTemplate, ParentProfile,
 )
+from .utils import calc_age, age_band, olympic_weight_class
+
 
 # --- Simple registrations ---
 @admin.register(Attendance)
@@ -58,14 +61,62 @@ class HeartRateAdmin(admin.ModelAdmin):
     list_filter = ("boxer", "measured_at")
     ordering = ("-measured_at",)
 
-# --- Boxer ---
 @admin.register(Boxer)
 class BoxerAdmin(admin.ModelAdmin):
-    list_display = ("first_name", "last_name", "parent_name", "date_of_birth", "gym")
-    list_filter = ("gym",)
+    list_display = (
+        "first_name",
+        "last_name",
+        "gender",
+        "display_age",
+        "age_band_display",
+        "latest_weight_display",
+        "weight_class_display",
+        "gym",
+    )
+    list_filter = ("gym", "gender")
     search_fields = ("first_name", "last_name", "parent_name")
     autocomplete_fields = ("gym",)
     filter_horizontal = ("coaches",)
+    readonly_fields = ("uuid",)
+    ordering = ("last_name", "first_name")
+
+    fieldsets = (
+        ("Identity", {
+            "fields": ("uuid", "first_name", "last_name", "name", "gender", "date_of_birth", "parent_name"),
+        }),
+        ("Affiliations", {
+            "fields": ("gym", "coaches", "shared_with_gyms", "parents"),
+        }),
+    )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        latest_weight_qs = Weight.objects.filter(boxer=OuterRef("pk")).order_by("-measured_at")
+        return qs.annotate(
+            latest_kg=Subquery(latest_weight_qs.values("kg")[:1]),
+            latest_measured_at=Subquery(latest_weight_qs.values("measured_at")[:1]),
+        )
+
+    # --- Computed columns ---
+    def display_age(self, obj):
+        age = calc_age(obj.date_of_birth)
+        return age if age is not None else "—"
+    display_age.short_description = "Age"
+
+    def age_band_display(self, obj):
+        a = calc_age(obj.date_of_birth)
+        return age_band(a) or "—"
+    age_band_display.short_description = "Band"
+
+    def latest_weight_display(self, obj):
+        return f"{obj.latest_kg:.1f} kg" if obj.latest_kg else "—"
+    latest_weight_display.short_description = "Latest weight"
+
+    def weight_class_display(self, obj):
+        age = calc_age(obj.date_of_birth)
+        wc = olympic_weight_class(obj.latest_kg, obj.gender, age)
+        return wc or "—"
+    weight_class_display.short_description = "Weight class"
 
 # --- Gym ---
 @admin.register(Gym)

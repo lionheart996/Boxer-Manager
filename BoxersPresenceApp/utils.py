@@ -1,5 +1,5 @@
 # BoxersPresenceApp/utils.py
-from datetime import datetime, time, timedelta
+from datetime import datetime, time, timedelta, date
 from uuid import UUID
 
 from dateutil.rrule import rrulestr
@@ -76,3 +76,147 @@ def expand_rrule(rrule_str: str, start_date, end_date, default_hour=18, default_
         end_dt = start_dt + timedelta(minutes=duration_minutes)
         results.append((start_dt, end_dt))
     return results
+
+IBA_WEIGHT_CLASSES = {
+    # ---------------- MEN ----------------
+    ("M", "JUNIOR"): [
+        ("Pinweight", 44.0, 46.0),
+        ("Light Flyweight", 46.0, 48.0),
+        ("Flyweight", 48.0, 50.0),
+        ("Light Bantamweight", 50.0, 52.0),
+        ("Bantamweight", 52.0, 54.0),
+        ("Featherweight", 54.0, 57.0),
+        ("Lightweight", 57.0, 60.0),
+        ("Light Welterweight", 60.0, 63.0),
+        ("Welterweight", 63.0, 66.0),
+        ("Light Middleweight", 66.0, 70.0),
+        ("Middleweight", 70.0, 75.0),
+        ("Light Heavyweight", 75.0, 80.0),
+        ("Heavyweight", 80.0, 999.0),
+    ],
+    ("M", "YOUTH"): [
+        ("Minimumweight", 46.0, 48.0),
+        ("Flyweight", 48.0, 51.0),
+        ("Bantamweight", 51.0, 54.0),
+        ("Featherweight", 54.0, 57.0),
+        ("Lightweight", 57.0, 60.0),
+        ("Light Welterweight", 60.0, 63.5),
+        ("Welterweight", 63.5, 67.0),
+        ("Light Middleweight", 67.0, 71.0),
+        ("Middleweight", 71.0, 75.0),
+        ("Light Heavyweight", 75.0, 80.0),
+        ("Cruiserweight", 80.0, 86.0),
+        ("Heavyweight", 86.0, 92.0),
+        ("Super Heavyweight", 92.0, 999.0),
+    ],
+    ("M", "ELITE"): [  # same as Youth
+        ("Minimumweight", 46.0, 48.0),
+        ("Flyweight", 48.0, 51.0),
+        ("Bantamweight", 51.0, 54.0),
+        ("Featherweight", 54.0, 57.0),
+        ("Lightweight", 57.0, 60.0),
+        ("Light Welterweight", 60.0, 63.5),
+        ("Welterweight", 63.5, 67.0),
+        ("Light Middleweight", 67.0, 71.0),
+        ("Middleweight", 71.0, 75.0),
+        ("Light Heavyweight", 75.0, 80.0),
+        ("Cruiserweight", 80.0, 86.0),
+        ("Heavyweight", 86.0, 92.0),
+        ("Super Heavyweight", 92.0, 999.0),
+    ],
+
+    # ---------------- WOMEN ----------------
+    ("F", "JUNIOR"): [
+        ("Pinweight", 44.0, 46.0),
+        ("Light Flyweight", 46.0, 48.0),
+        ("Flyweight", 48.0, 50.0),
+        ("Light Bantamweight", 50.0, 52.0),
+        ("Bantamweight", 52.0, 54.0),
+        ("Featherweight", 54.0, 57.0),
+        ("Lightweight", 57.0, 60.0),
+        ("Light Welterweight", 60.0, 63.0),
+        ("Welterweight", 63.0, 66.0),
+        ("Light Middleweight", 66.0, 70.0),
+        ("Middleweight", 70.0, 75.0),
+        ("Light Heavyweight", 75.0, 80.0),
+        ("Heavyweight", 80.0, 999.0),
+    ],
+    ("F", "YOUTH"): [
+        ("Minimumweight", 45.0, 48.0),
+        ("Flyweight", 48.0, 50.0),
+        ("Bantamweight", 50.0, 52.0),
+        ("Featherweight", 52.0, 54.0),
+        ("Lightweight", 54.0, 57.0),
+        ("Light Welterweight", 57.0, 60.0),
+        ("Welterweight", 60.0, 63.0),
+        ("Light Middleweight", 63.0, 66.0),
+        ("Middleweight", 66.0, 70.0),
+        ("Light Heavyweight", 70.0, 75.0),
+        ("Heavyweight", 75.0, 81.0),
+        ("Super Heavyweight", 81.0, 999.0),
+    ],
+    ("F", "ELITE"): [  # same as Youth
+        ("Minimumweight", 45.0, 48.0),
+        ("Flyweight", 48.0, 50.0),
+        ("Bantamweight", 50.0, 52.0),
+        ("Featherweight", 52.0, 54.0),
+        ("Lightweight", 54.0, 57.0),
+        ("Light Welterweight", 57.0, 60.0),
+        ("Welterweight", 60.0, 63.0),
+        ("Light Middleweight", 63.0, 66.0),
+        ("Middleweight", 66.0, 70.0),
+        ("Light Heavyweight", 70.0, 75.0),
+        ("Heavyweight", 75.0, 81.0),
+        ("Super Heavyweight", 81.0, 999.0),
+    ],
+}
+
+
+def calc_age(dob):
+    if not dob:
+        return None
+    today = date.today()
+    return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+
+
+def age_band(age):
+    if age is None:
+        return None
+    if 15 <= age <= 16:
+        return "JUNIOR"
+    if 17 <= age <= 18:
+        return "YOUTH"
+    if age >= 19:
+        return "ELITE"
+    return None
+
+
+def olympic_weight_class(kg, gender_code, age):
+    """Return readable IBA weight class string like 'Heavyweight (86–92kg)'."""
+    if kg is None:
+        return None
+
+    effective_gender = "M" if gender_code in {None, "U"} else gender_code
+    band = age_band(age)
+    if not band:
+        return None  # too young or unknown
+
+    classes = IBA_WEIGHT_CLASSES.get((effective_gender, band))
+    if not classes:
+        return None
+
+    # Too light
+    if kg < classes[0][1]:
+        return "Below minimum"
+
+    # Too heavy
+    if kg > classes[-1][2]:
+        return f"Above maximum ({int(classes[-1][2])}kg+)"
+
+    # Within defined range
+    for name, lo, hi in classes:
+        if lo <= kg <= hi:
+            hi_str = f"{int(hi)}kg+" if hi >= 999 else f"{int(lo)}–{int(hi)}kg"
+            return f"{name} ({hi_str})"
+
+    return None

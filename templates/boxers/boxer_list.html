@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="page-title" style="text-align:center;">🥊 Boxers</h2>
+<h2 class="page-title" style="text-align:center;">🥊 Boxers 🥊</h2>
 
 <div class="content-container">
 
@@ -39,7 +39,11 @@
         <div class="boxer-card__actions">
           <a class="btn btn--sm btn--glow" href="{% url 'boxer_report' b.id %}">📊 Report</a>
           <a class="btn btn--sm btn--glow" href="{% url 'boxer_resume' b.id %}">📄 Resume</a>
-          <a class="btn btn--sm btn--glow" href="{% url 'boxer_comments' b.id %}">💬 Comments</a>
+            <a class="btn btn--sm btn--glow" href="{% url 'boxer_comments' b.id %}">
+              💬 Comments[{{ b.comment_count }}]
+            </a>
+            <a class="btn btn--sm btn--glow" href="{% url 'boxer_edit' b.id %}?next={{ request.get_full_path|urlencode }}">✏️ Edit</a>
+
           <form method="post"
                 action="{% url 'delete_boxer' b.pk %}"
                 style="display:inline"
