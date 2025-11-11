@@ -192,16 +192,28 @@ def age_band(age):
 
 
 def olympic_weight_class(kg, gender_code, age):
-    """Return readable IBA weight class string like 'Heavyweight (86–92kg)'."""
-    if kg is None:
-        return None
+    """
+    Returns the IBA (Olympic) weight class label.
 
-    effective_gender = "M" if gender_code in {None, "U"} else gender_code
+    Example outputs:
+        "Lightweight (57–60kg)"
+        "Below minimum"
+        "Super Heavyweight (92kg+)"
+    """
+
+    if kg is None:
+        return None  # no weight recorded
+
+    # Unspecified gender defaults to Male
+    gender = "M" if gender_code in (None, "U") else gender_code
+
+    # Determine the correct age group (Junior / Youth / Elite)
     band = age_band(age)
     if not band:
-        return None  # too young or unknown
+        return None  # too young or unknown age
 
-    classes = IBA_WEIGHT_CLASSES.get((effective_gender, band))
+    # Get all classes for gender/age band
+    classes = IBA_WEIGHT_CLASSES.get((gender, band))
     if not classes:
         return None
 
@@ -211,12 +223,16 @@ def olympic_weight_class(kg, gender_code, age):
 
     # Too heavy
     if kg > classes[-1][2]:
-        return f"Above maximum ({int(classes[-1][2])}kg+)"
+        # use lower bound of last class for proper "+"
+        top_class_name, top_low, _ = classes[-1]
+        return f"{top_class_name} ({int(top_low)}kg+)"
 
-    # Within defined range
-    for name, lo, hi in classes:
-        if lo <= kg <= hi:
-            hi_str = f"{int(hi)}kg+" if hi >= 999 else f"{int(lo)}–{int(hi)}kg"
-            return f"{name} ({hi_str})"
+    # Find the right range
+    for name, low, high in classes:
+        if low <= kg <= high:
+            if high >= 999:  # last open-ended class
+                return f"{name} ({int(low)}kg+)"
+            else:
+                return f"{name} ({int(low)}–{int(high)}kg)"
 
     return None
