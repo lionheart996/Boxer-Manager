@@ -3,9 +3,9 @@
 
 <main class="sf-container">
   <h1 class="sf-title">💫 Sparring Partner Finder</h1>
-  <p class="sf-subtitle">Select a class, search a boxer, or enter a guest boxer to see ideal sparring partners.</p>
+  <p class="sf-subtitle">Search or select a boxer — or enter a guest boxer to test matchups.</p>
 
-  <!-- ========== NORMAL GYM BOXERS (CLASS + SEARCH) ========== -->
+  <!-- ====================== CLASS / SEARCH BOX ====================== -->
   <section class="sf-card">
     <div class="sf-controls">
 
@@ -28,36 +28,39 @@
       </div>
     </div>
 
+    <!-- CLASS RESULTS -->
     <div id="classBoxerList" class="sf-results" style="display:none;"></div>
 
+    <!-- MAIN RESULTS -->
     <div id="sparResults" class="sf-results">
-      <p class="sf-muted">Select a class, search a boxer or use the guest boxer form to begin.</p>
+      <p class="sf-muted">Select a class, search a boxer, or use guest boxer form below.</p>
     </div>
   </section>
 
-  <!-- ========== GUEST BOXER (NOT IN GYM) ========== -->
+  <!-- ====================== GUEST BOXER FORM ====================== -->
   <section class="sf-card" style="margin-top:18px;">
     <h2 class="sf-section-title">🧪 Guest Boxer (Not in Gym)</h2>
-    <p class="sf-subtitle">Quickly test sparring matches for an external boxer without adding them to the database.</p>
+    <p class="sf-subtitle">Enter a boxer that is not in the gym roster.</p>
 
     <div class="sf-controls">
+
       <div class="sf-group">
         <label class="sf-label" for="guestName">Name</label>
-        <input type="text" id="guestName" class="sf-input" placeholder="e.g. Boxer A" />
+        <input type="text" id="guestName" class="sf-input" placeholder="e.g. Boxer A">
       </div>
 
       <div class="sf-group">
-        <label class="sf-label" for="guestAge">Age (years)</label>
-        <input type="number" id="guestAge" class="sf-input" placeholder="e.g. 14" min="4" max="80" />
+        <label class="sf-label" for="guestAge">Age</label>
+        <input type="number" id="guestAge" class="sf-input" placeholder="e.g. 14" min="4" max="80">
       </div>
 
       <div class="sf-group">
         <label class="sf-label" for="guestWeight">Weight (kg)</label>
-        <input type="number" id="guestWeight" class="sf-input" placeholder="e.g. 56" step="0.1" min="20" max="200" />
+        <input type="number" id="guestWeight" class="sf-input" placeholder="e.g. 56" step="0.1" min="20" max="200">
       </div>
 
       <div class="sf-group">
-        <label class="sf-label" for="guestGender">Gender (optional)</label>
+        <label class="sf-label" for="guestGender">Gender</label>
         <select id="guestGender" class="sf-input">
           <option value="U">Unspecified</option>
           <option value="M">Male</option>
@@ -71,8 +74,8 @@
     </button>
   </section>
 
-  <!-- OPTIONAL BACK BUTTON -->
-  <div class="sf-center">
+  <!-- BACK BUTTON -->
+  <div class="sf-center" style="margin-top:16px;">
     <a href="{% url 'home' %}" class="sf-btn-back">⬅ Back to Control Panel</a>
   </div>
 </main>
@@ -93,10 +96,9 @@ body {
   font-family: 'Orbitron', sans-serif;
 }
 
-/* Layout */
 .sf-container {
   max-width: 900px;
-  margin: 0 auto;
+  margin: auto;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -108,52 +110,39 @@ body {
   color: var(--brand);
   font-size: 2.1rem;
   text-shadow: 0 0 18px rgba(0,255,136,0.55);
-  margin-bottom: -6px;
 }
+
 .sf-subtitle {
   text-align: center;
   color: #aaa;
   font-size: 0.95rem;
 }
 
-/* Cards */
 .sf-card {
   background: var(--card-bg);
   border-radius: 16px;
   padding: 18px;
   border: 1px solid var(--border);
   box-shadow: 0 0 24px rgba(0,255,136,0.16);
-  transition: 0.25s;
-}
-.sf-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 34px rgba(0,255,136,0.38);
 }
 
-.sf-section-title {
-  text-align: center;
-  color: var(--brand);
-  margin-bottom: 6px;
-}
-
-/* Inputs */
 .sf-controls {
   display: flex;
   flex-direction: column;
   gap: 12px;
   margin-top: 6px;
 }
-.sf-group {
-  width: 100%;
-}
+
+.sf-group { width: 100%; }
+
 .sf-label {
   display: block;
   margin-bottom: 3px;
   font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
   color: #b2ffce;
 }
+
 .sf-input {
   width: 100%;
   padding: 10px 14px;
@@ -162,15 +151,8 @@ body {
   background: #111;
   color: var(--text);
   font-size: 0.95rem;
-  transition: 0.2s;
-}
-.sf-input:focus {
-  outline: none;
-  border-color: var(--brand);
-  box-shadow: 0 0 12px rgba(0,255,136,0.6);
 }
 
-/* Dropdown */
 .sf-dropdown {
   display: none;
   background: #101010;
@@ -179,112 +161,196 @@ body {
   margin-top: 6px;
   max-height: 220px;
   overflow-y: auto;
-  box-shadow: 0 0 22px rgba(0,255,136,0.2);
-}
-.sf-dropdown-item {
-  padding: 8px 12px;
-  cursor: pointer;
-}
-.sf-dropdown-item:hover {
-  background: rgba(0,255,136,0.15);
 }
 
-/* Results */
 .sf-results {
   margin-top: 18px;
   border-top: 1px solid var(--border);
   padding-top: 12px;
 }
+
 .sf-muted {
   color: #777;
   text-align: center;
 }
 
-/* Main boxer card */
 .sf-main-boxer {
   background: rgba(0,255,136,0.07);
   border-radius: 14px;
   padding: 10px 14px;
   border: 1px solid var(--brand);
-  box-shadow: 0 0 18px rgba(0,255,136,0.35);
-}
-.sf-main-boxer h3 {
-  margin-bottom: 4px;
-  color: var(--brand);
-  text-shadow: 0 0 6px rgba(0,255,136,0.4);
 }
 
-/* Partner list */
 .sf-partner-item {
   list-style: none;
-  padding: 8px 12px;
+  padding: 10px 12px;
   margin-bottom: 6px;
   border-radius: 10px;
   border: 1px solid rgba(0,255,136,0.25);
   background: rgba(0,255,136,0.04);
-  transition: 0.2s;
-}
-.sf-partner-item:hover {
-  background: rgba(0,255,136,0.14);
-  transform: translateX(3px);
 }
 
-/* Buttons */
 .sf-btn-primary {
   margin-top: 12px;
   width: 100%;
-  padding: 9px 18px;
+  padding: 10px;
   border-radius: 10px;
   border: 1px solid var(--brand);
-  background: transparent;
   color: var(--brand);
-  font-weight: 600;
+  background: transparent;
   cursor: pointer;
-  box-shadow: 0 0 16px rgba(0,255,136,0.3);
-  transition: 0.25s;
-}
-.sf-btn-primary:hover {
-  background: var(--brand);
-  color: #000;
-  box-shadow: 0 0 28px rgba(0,255,136,0.9);
 }
 
-.sf-center {
-  text-align: center;
-}
 .sf-btn-back {
-  display: inline-block;
-  margin-top: 4px;
   padding: 8px 14px;
   border-radius: 10px;
   border: 1px solid var(--brand);
   color: var(--brand);
   text-decoration: none;
-  transition: 0.2s;
-}
-.sf-btn-back:hover {
-  background: var(--brand);
-  color: #000;
-}
-
-/* Mobile */
-@media(max-width: 620px) {
-  .sf-container { padding: 14px; }
-  .sf-title { font-size: 1.8rem; }
 }
 </style>
 
 <!-- ====================== SCRIPT ====================== -->
 <script>
 (function () {
+
+  /* ==========================================================
+     FULL IBA WEIGHT CLASS TABLE IN JAVASCRIPT (NO ERRORS)
+     ========================================================== */
+  const IBA = {
+    "M_JUNIOR": [
+      ["Pinweight", 44, 46],
+      ["Light Flyweight", 46, 48],
+      ["Flyweight", 48, 50],
+      ["Light Bantamweight", 50, 52],
+      ["Bantamweight", 52, 54],
+      ["Featherweight", 54, 57],
+      ["Lightweight", 57, 60],
+      ["Light Welterweight", 60, 63],
+      ["Welterweight", 63, 66],
+      ["Light Middleweight", 66, 70],
+      ["Middleweight", 70, 75],
+      ["Light Heavyweight", 75, 80],
+      ["Heavyweight", 80, 999],
+    ],
+    "M_YOUTH": [
+      ["Minimumweight", 46, 48],
+      ["Flyweight", 48, 51],
+      ["Bantamweight", 51, 54],
+      ["Featherweight", 54, 57],
+      ["Lightweight", 57, 60],
+      ["Light Welterweight", 60, 63.5],
+      ["Welterweight", 63.5, 67],
+      ["Light Middleweight", 67, 71],
+      ["Middleweight", 71, 75],
+      ["Light Heavyweight", 75, 80],
+      ["Cruiserweight", 80, 86],
+      ["Heavyweight", 86, 92],
+      ["Super Heavyweight", 92, 999],
+    ],
+    "M_ELITE": [
+      ["Minimumweight", 46, 48],
+      ["Flyweight", 48, 51],
+      ["Bantamweight", 51, 54],
+      ["Featherweight", 54, 57],
+      ["Lightweight", 57, 60],
+      ["Light Welterweight", 60, 63.5],
+      ["Welterweight", 63.5, 67],
+      ["Light Middleweight", 67, 71],
+      ["Middleweight", 71, 75],
+      ["Light Heavyweight", 75, 80],
+      ["Cruiserweight", 80, 86],
+      ["Heavyweight", 86, 92],
+      ["Super Heavyweight", 92, 999],
+    ],
+
+    "F_JUNIOR": [
+      ["Pinweight", 44, 46],
+      ["Light Flyweight", 46, 48],
+      ["Flyweight", 48, 50],
+      ["Light Bantamweight", 50, 52],
+      ["Bantamweight", 52, 54],
+      ["Featherweight", 54, 57],
+      ["Lightweight", 57, 60],
+      ["Light Welterweight", 60, 63],
+      ["Welterweight", 63, 66],
+      ["Light Middleweight", 66, 70],
+      ["Middleweight", 70, 75],
+      ["Light Heavyweight", 75, 81],
+      ["Heavyweight", 81, 999],
+    ],
+
+    "F_YOUTH": [
+      ["Minimumweight", 45, 48],
+      ["Flyweight", 48, 50],
+      ["Bantamweight", 50, 52],
+      ["Featherweight", 52, 54],
+      ["Lightweight", 54, 57],
+      ["Light Welterweight", 57, 60],
+      ["Welterweight", 60, 63],
+      ["Light Middleweight", 63, 66],
+      ["Middleweight", 66, 70],
+      ["Light Heavyweight", 70, 75],
+      ["Heavyweight", 75, 81],
+      ["Super Heavyweight", 81, 999],
+    ],
+
+    "F_ELITE": [
+      ["Minimumweight", 45, 48],
+      ["Flyweight", 48, 50],
+      ["Bantamweight", 50, 52],
+      ["Featherweight", 52, 54],
+      ["Lightweight", 54, 57],
+      ["Light Welterweight", 57, 60],
+      ["Welterweight", 60, 63],
+      ["Light Middleweight", 63, 66],
+      ["Middleweight", 66, 70],
+      ["Light Heavyweight", 70, 75],
+      ["Heavyweight", 75, 81],
+      ["Super Heavyweight", 81, 999],
+    ]
+  };
+
+  /* ==========================================================
+     UTILITY FUNCTIONS
+     ========================================================== */
+
+  function ageBand(age) {
+    if (age == null) return null;
+    if (age <= 14) return "JUNIOR";
+    if (age <= 16) return "JUNIOR";
+    if (age <= 18) return "YOUTH";
+    return "ELITE";
+  }
+
+  function getIBAClass(kg, gender, age) {
+    const band = ageBand(age) || "JUNIOR";
+    const key = `${gender}_${band}`;
+    const classes = IBA[key];
+    if (!classes) return null;
+
+    for (const c of classes) {
+      if (kg >= c[1] && kg <= c[2]) {
+        if (c[2] >= 999) {
+          return `${c[0]} (${c[1]}kg+)`;
+        }
+        return `${c[0]} (${c[1]}–${c[2]}kg)`;
+      }
+    }
+    return null;
+  }
+
+  /* ==========================================================
+     LOAD GYM DATA
+     ========================================================== */
   const data = JSON.parse('{{ boxer_data_json|escapejs }}');
 
-  const input          = document.getElementById("sparBoxerSearch");
-  const resultsBox     = document.getElementById("searchResults");
-  const sparResults    = document.getElementById("sparResults");
-  const classSelect    = document.getElementById("classSelect");
+  const input = document.getElementById("sparBoxerSearch");
+  const resultsBox = document.getElementById("searchResults");
+  const sparResults = document.getElementById("sparResults");
+  const classSelect = document.getElementById("classSelect");
   const classBoxerList = document.getElementById("classBoxerList");
-  const searchBox      = document.getElementById("searchBox");
+  const searchBox = document.getElementById("searchBox");
 
   const guestName   = document.getElementById("guestName");
   const guestAge    = document.getElementById("guestAge");
@@ -292,87 +358,34 @@ body {
   const guestGender = document.getElementById("guestGender");
   const guestBtn    = document.getElementById("guestFindBtn");
 
-  function normalize(label) {
-    if (!label) return "";
-    return label.split("(")[0].trim().toLowerCase();
-  }
+  /* ==========================================================
+     PARTNER FINDER (GYM + GUEST)
+     ========================================================== */
 
-  /* ------- Helper: render matches (used by both real & guest boxers) ------- */
-  function findPartners(main) {
-    let partners;
-
-    // guest boxer: infer by kg/age instead of weight_class string
-    if (main.id === "guest") {
-      partners = data.filter(b => b.kg && b.age && b.gender && b.weight_class);
-
-      // Optional: limit to +/- 5kg, but still sort by closeness
-      partners = partners
-        .filter(b => Math.abs(b.kg - main.kg) <= 7)  // soft window
-        .sort((a, b) => {
-          const bandA = a.age_band === main.age_band;
-          const bandB = b.age_band === main.age_band;
-          if (bandA && !bandB) return -1;
-          if (!bandA && bandB) return 1;
-
-          const diffA = Math.abs(a.kg - main.kg);
-          const diffB = Math.abs(b.kg - main.kg);
-          if (diffA !== diffB) return diffA - diffB;
-
-          const ageDiffA = Math.abs(a.age - main.age);
-          const ageDiffB = Math.abs(b.age - main.age);
-          return ageDiffA - ageDiffB || a.name.localeCompare(b.name);
-        });
-
-      return partners;
-    }
-
-    // normal boxer: match by same weight class (your original logic)
-    const mainNorm = normalize(main.weight_class);
-
-    partners = data.filter(b => {
-      if (b.id === main.id) return false;
-      const sameW = normalize(b.weight_class) === mainNorm;
-      return sameW && b.gender && b.age && b.kg;
-    });
-
-    partners = partners.sort((a, b) => {
-      const bandA = a.age_band === main.age_band;
-      const bandB = b.age_band === main.age_band;
-      if (bandA && !bandB) return -1;
-      if (!bandA && bandB) return 1;
-
-      const diffA = Math.abs(a.age - main.age);
-      const diffB = Math.abs(b.age - main.age);
-
-      return diffA - diffB || a.name.localeCompare(b.name);
-    });
-
-    return partners;
-  }
-
-  function renderMatches(main) {
-    const partners = findPartners(main);
+  function renderMatches(main, partners) {
 
     let html = `
       <div class="sf-main-boxer">
         <h3>${main.name}${main.id === "guest" ? " (Guest Boxer)" : ""}</h3>
-        <p><em>${main.gender}, ${main.age || "?"} yrs,
-        ${main.age_band || "–"},
-        ${main.weight_class || "?"} (${main.kg ? main.kg + " kg" : "–"})</em></p>
+        <p><em>
+          ${main.gender}, ${main.age} yrs,
+          ${main.age_band},
+          ${main.weight_class || "?"}
+          (${main.kg} kg)
+        </em></p>
       </div>
     `;
 
     if (!partners.length) {
       html += `<p class="sf-muted" style="margin-top:10px;">No suitable partners found.</p>`;
     } else {
-      html += `<h4 style="margin-top:14px;color:var(--brand);">🥊 Suggested partners (${partners.length}):</h4>`;
+      html += `<h4 style="margin-top:16px;color:var(--brand);">🥊 Suggested partners (${partners.length}):</h4>`;
       html += `<ul style="margin-top:6px;padding:0;">`;
       html += partners.map(p => `
         <li class="sf-partner-item">
-          <strong style="color:var(--brand);">${p.name}</strong> —
-          ${p.gender}, ${p.age || "?"} yrs,
-          ${p.age_band || "–"},
-          ${p.weight_class || "?"} (${p.kg ? p.kg + " kg" : "–"})
+          <strong style="color:var(--brand);">${p.name}</strong>
+          — ${p.gender}, ${p.age} yrs,
+          ${p.age_band}, ${p.weight_class} (${p.kg} kg)
         </li>
       `).join("");
       html += `</ul>`;
@@ -381,141 +394,61 @@ body {
     sparResults.innerHTML = html;
   }
 
-  /* -------------------- SEARCH MODE -------------------- */
-  function showSuggestions(query) {
-    if (!query.trim()) {
-      resultsBox.style.display = "none";
-      resultsBox.innerHTML = "";
-      return;
-    }
-
-    const matches = data.filter(b =>
-      (b.name || "").toLowerCase().includes(query.toLowerCase())
-    );
-
-    if (!matches.length) {
-      resultsBox.innerHTML = `<div class="sf-dropdown-item sf-muted">No boxers found</div>`;
-      resultsBox.style.display = "block";
-      return;
-    }
-
-    resultsBox.innerHTML = matches.map(b => `
-      <div class="sf-dropdown-item" onclick="selectBoxer(${b.id})">
-        <strong style="color:var(--brand);">${b.name}</strong> —
-        ${b.gender}, ${b.age_band || "–"}, ${b.weight_class || "?"}
-      </div>
-    `).join("");
-
-    resultsBox.style.display = "block";
+  function normalize(label) {
+    if (!label) return "";
+    return label.split("(")[0].trim().toLowerCase();
   }
 
-  if (input) {
-    input.addEventListener("input", e => showSuggestions(e.target.value));
-  }
-
-  /* -------------------- CLASS MODE -------------------- */
-  if (classSelect) {
-    classSelect.addEventListener("change", e => {
-      const classId = parseInt(e.target.value) || null;
-      sparResults.innerHTML = "";
-      resultsBox.style.display = "none";
-
-      if (!classId) {
-        searchBox.style.display = "block";
-        classBoxerList.style.display = "none";
-        sparResults.innerHTML = '<p class="sf-muted">Search for a boxer to begin.</p>';
-        return;
-      }
-
-      searchBox.style.display = "none";
-
-      const classBoxers = data.filter(b =>
-        Array.isArray(b.class_ids) && b.class_ids.includes(classId)
-      );
-
-      if (!classBoxers.length) {
-        classBoxerList.innerHTML = `<p class="sf-muted">No boxers in this class.</p>`;
-        classBoxerList.style.display = "block";
-        return;
-      }
-
-      classBoxerList.innerHTML = `
-        <ul>
-          ${classBoxers.map(b => `
-            <li class="sf-partner-item" onclick="selectBoxer(${b.id})">
-              <strong style="color:var(--brand);">${b.name}</strong> —
-              ${b.gender}, ${b.age_band || "–"}, ${b.weight_class || "?"}
-            </li>
-          `).join("")}
-        </ul>
-      `;
-      classBoxerList.style.display = "block";
-    });
-  }
-
-  /* -------------------- REAL BOXER SELECT -------------------- */
+  /* Gym boxer */
   window.selectBoxer = function (id) {
     const main = data.find(b => b.id === id);
     if (!main) return;
 
-    if (input) input.value = main.name;
-    if (resultsBox) resultsBox.style.display = "none";
-    if (classBoxerList) classBoxerList.style.display = "none";
+    const mainNorm = normalize(main.weight_class);
 
-    if (!main.gender || !main.age || !main.kg) {
-      sparResults.innerHTML =
-        `<p class="sf-muted" style="color:#f66;">⚠ Missing data for ${main.name}.</p>`;
+    const partners = data
+      .filter(b => b.id !== main.id && normalize(b.weight_class) === mainNorm)
+      .sort((a, b) => Math.abs(a.age - main.age) - Math.abs(b.age - main.age));
+
+    renderMatches(main, partners);
+  }
+
+  /* Guest boxer */
+  guestBtn.addEventListener("click", () => {
+    const name = guestName.value.trim();
+    const age = parseInt(guestAge.value);
+    const kg = parseFloat(guestWeight.value);
+    const gender = guestGender.value || "U";
+
+    if (!name || !age || !kg) {
+      sparResults.innerHTML = `<p class="sf-muted" style="color:#f66;">Fill name, age, and weight.</p>`;
       return;
     }
 
-    renderMatches(main);
-  };
+    const band = ageBand(age);
+    const wc = getIBAClass(kg, gender, age);
 
-  /* -------------------- GUEST BOXER BUTTON -------------------- */
-  if (guestBtn) {
-    guestBtn.addEventListener("click", () => {
-      const name = (guestName.value || "").trim();
-      const age  = parseInt(guestAge.value);
-      const kg   = parseFloat(guestWeight.value);
-      const gender = guestGender.value || "U";
+    const guest = {
+      id: "guest",
+      name,
+      age,
+      kg,
+      gender,
+      age_band: band,
+      weight_class: wc,
+      class_ids: []
+    };
 
-      if (!name || !age || !kg) {
-        sparResults.innerHTML =
-          `<p class="sf-muted" style="color:#f66;">Please fill in name, age and weight for the guest boxer.</p>`;
-        return;
-      }
+    const partners = data
+      .filter(b => {
+        return b.weight_class && wc &&
+               normalize(b.weight_class) === normalize(wc);
+      })
+      .sort((a, b) => Math.abs(a.age - guest.age) - Math.abs(b.age - guest.age));
 
-      // simple age band, to mirror backend-ish behaviour
-      function ageBand(a) {
-        if (a <= 11) return "Aspirant";
-        if (12 <= a <= 14) return "SBG";
-        if (15 <= a <= 17) return "Junior";
-        if (18 <= a <= 19) return "Youth";
-        if (a >= 19) return "Elite";
+    renderMatches(guest, partners);
+  });
 
-      }
-
-      const guest = {
-        id: "guest",
-        name,
-        age,
-        kg,
-        gender,
-        age_band: ageBand(age),
-        // we don't know exact official weight class; leave null,
-        // partner-finding for guest uses kg based logic
-        weight_class: null,
-        class_ids: []
-      };
-
-      // make sure search mode UI doesn't interfere
-      if (resultsBox) resultsBox.style.display = "none";
-      if (classBoxerList) classBoxerList.style.display = "none";
-      if (input) input.value = "";
-
-      renderMatches(guest);
-    });
-  }
 })();
 </script>
 
