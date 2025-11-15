@@ -487,12 +487,12 @@ body {
 
       // simple age band, to mirror backend-ish behaviour
       function ageBand(a) {
-        if (a < 12) return "U12";
-        if (a < 14) return "U14";
-        if (a < 16) return "U16";
-        if (a < 18) return "U18";
-        if (a < 40) return "Senior";
-        return "Masters";
+        if (a <= 11) return "Aspirant";
+        if (12 <= a <= 14) return "SBG";
+        if (15 <= a <= 17) return "Junior";
+        if (18 <= a <= 19) return "Youth";
+        if (a >= 19) return "Elite";
+
       }
 
       const guest = {
