@@ -1,24 +1,23 @@
 {% extends "base.html" %}
 {% block content %}
 
-<main class="home-wrapper">
+<main class="home-container">
 
-  <h1 class="home-title">🥊 Boxer Factory Control Panel</h1>
-  <p class="home-subtitle">Manage boxers, tests, attendance & sparring — fast.</p>
+  <h1 class="title">🥊 Boxer Factory Control Panel 🥊</h1>
 
-  <!-- ================== BOXER MANAGER ================== -->
-  <section class="home-card">
+  <!-- BOXER MANAGER -->
+  <section class="card">
     <h2>⚙️ Boxer Manager</h2>
-    <div class="home-buttons">
+    <div class="button-row">
       <a class="btn" href="{% url 'boxer_bulk_add' %}">➕ Add Boxer</a>
       <a class="btn" href="{% url 'boxer_list' %}">📋 Manage</a>
     </div>
   </section>
 
-  <!-- ================== BATTERY TESTS ================== -->
-  <section class="home-card">
+  <!-- BATTERY TESTS -->
+  <section class="card">
     <h2>🧪 Battery Tests</h2>
-    <div class="home-buttons">
+    <div class="button-row">
       <a class="btn" href="{% url 'tests_list' %}">Manage Tests</a>
       <a class="btn" href="{% url 'tests_rankings' %}">Rankings</a>
       <a class="btn" href="{% url 'tests_record' %}">Record Singular</a>
@@ -26,136 +25,179 @@
     </div>
   </section>
 
-  <!-- ================== ATTENDANCE ================== -->
-  <section class="home-card">
+  <!-- ATTENDANCE -->
+  <section class="card">
     <h2>📆 Attendance</h2>
-    <p class="card-subtitle">Quickly mark who’s present today.</p>
-    <div class="home-buttons">
+    <p class="subtitle">Quickly mark who’s present today.</p>
+    <div class="button-row">
       <a class="btn" href="{% url 'mark_attendance' %}">Mark</a>
       <a class="btn" href="{% url 'attendance_list' %}">All Attendance</a>
       <a class="btn" href="{% url 'export_attendance' %}">Export</a>
     </div>
   </section>
 
-  <!-- ================== SPARRING FINDER ================== -->
-  <section class="home-card">
-    <h2>💫 Sparring Tools</h2>
-    <p class="card-subtitle">Smart sparring matchmaker (weight-class based).</p>
-    <div class="home-buttons">
-      <a class="btn btn-glow" href="{% url 'sparring_finder' %}">🥊 Sparring Finder</a>
+  <!-- SPARRING FINDER BUTTON -->
+  <section class="card">
+    <h2>💫 Sparring Partner Finder</h2>
+    <p class="subtitle">Open the sparring analysis module.</p>
+
+    <div class="button-row">
+      <a class="btn" id="sparringFinderBtn" href="{% url 'sparring_finder' %}">
+        🔍 Open Sparring Finder
+      </a>
     </div>
   </section>
 
 </main>
 
-<!-- ====================== STYLING ====================== -->
+
+<!-- ==================== LOADING OVERLAY ==================== -->
+<div id="sparring-loading">
+  <div class="loader-circle"></div>
+  <p>Loading…</p>
+</div>
+
+
+<!-- ==================== SCRIPT ==================== -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("sparringFinderBtn");
+  const overlay = document.getElementById("sparring-loading");
+
+  btn.addEventListener("click", (e) => {
+    // Show loading overlay
+    overlay.classList.add("active");
+  });
+});
+</script>
+
+
+<!-- ==================== STYLES ==================== -->
 <style>
 :root {
   --brand: #00ff88;
   --dark-bg: #0a0a0a;
-  --card-bg: linear-gradient(145deg, #0e0e0e, #151515);
+  --card-bg: linear-gradient(145deg, #0f0f0f, #151515);
   --border: rgba(0, 255, 136, 0.25);
-  --text: #eaffea;
+  --text: #e8ffe8;
 }
 
-/* PAGE WRAPPER */
+/* ---------- MAIN LAYOUT ---------- */
 body {
   background: var(--dark-bg);
   color: var(--text);
   font-family: 'Orbitron', sans-serif;
 }
 
-.home-wrapper {
-  max-width: 960px;
+.home-container {
+  max-width: 950px;
   margin: 0 auto;
-  padding: 26px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 26px;
+  gap: 24px;
 }
 
-/* TITLES */
-.home-title {
+.title {
   text-align: center;
   color: var(--brand);
-  text-shadow: 0 0 18px rgba(0,255,136,0.55);
   font-size: 2.2rem;
-  letter-spacing: 1px;
-  margin-bottom: -8px;
-}
-.home-subtitle {
-  text-align: center;
-  color: #9edfb8;
-  font-size: 1rem;
-  margin-bottom: 6px;
+  text-shadow: 0 0 18px rgba(0,255,136,0.6);
+  margin-bottom: 12px;
 }
 
-/* CARDS */
-.home-card {
+/* ---------- CARDS ---------- */
+.card {
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 20px;
-  box-shadow: 0 0 22px rgba(0,255,136,0.15);
-  transition: 0.25s;
+  box-shadow: 0 0 25px rgba(0,255,136,0.15);
+  transition: all .3s ease;
 }
-.home-card:hover {
+.card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 0 32px rgba(0,255,136,0.35);
+  box-shadow: 0 0 35px rgba(0,255,136,0.4);
 }
-.home-card h2 {
+.subtitle {
   text-align: center;
-  color: var(--brand);
-  margin-bottom: 10px;
-}
-.card-subtitle {
-  text-align: center;
-  color: #92ffa8;
+  color: #aaa;
   font-size: 0.9rem;
   margin-bottom: 12px;
 }
 
-/* BUTTON GROUP */
-.home-buttons {
+/* ---------- BUTTONS ---------- */
+.button-row {
   display: flex;
   justify-content: center;
-  gap: 14px;
   flex-wrap: wrap;
+  gap: 12px;
 }
 
-/* BUTTONS */
 .btn {
   border: 1px solid var(--brand);
   color: var(--brand);
-  padding: 9px 18px;
+  padding: 10px 18px;
   border-radius: 10px;
   background: transparent;
-  text-decoration: none;
   font-weight: 600;
-  box-shadow: 0 0 12px rgba(0,255,136,0.18);
-  transition: 0.25s;
+  text-decoration: none;
+  transition: all .2s ease;
+  box-shadow: 0 0 12px rgba(0,255,136,0.25);
 }
+
+.btn-big {
+  font-size: 1.2rem;
+  padding: 14px 26px;
+}
+
 .btn:hover {
   background: var(--brand);
   color: #000;
-  box-shadow: 0 0 22px rgba(0,255,136,0.85);
+  box-shadow: 0 0 22px rgba(0,255,136,0.8);
 }
 
-/* Special glowing button */
-.btn-glow {
-  box-shadow: 0 0 16px rgba(0,255,136,0.5);
-}
-.btn-glow:hover {
-  box-shadow: 0 0 28px rgba(0,255,136,0.9);
+/* ---------- LOADING OVERLAY ---------- */
+#sparring-loading {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.88);
+  color: var(--brand);
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-shadow: 0 0 10px var(--brand);
+  z-index: 999999;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  backdrop-filter: blur(6px);
 }
 
-/* MOBILE */
-@media (max-width: 600px) {
-  .home-wrapper { padding: 16px; }
-  .btn { font-size: 0.92rem; }
-  .home-title { font-size: 1.7rem; }
+#sparring-loading.active {
+  display: flex;
+}
+
+.loader-circle {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(0,255,136,0.2);
+  border-top: 4px solid var(--brand);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------- MOBILE ---------- */
+@media(max-width:600px) {
+  .home-container { padding: 16px; }
+  .btn { font-size: 0.95rem; }
+  .btn-big { font-size: 1.05rem; padding: 12px 22px; }
 }
 </style>
 
 {% endblock %}
-
