@@ -7,7 +7,8 @@ from .api import BoxerViewSet, TestResultViewSet, TestViewSet, WeightViewSet
 from .async_views import boxers_search
 from .views import WeightProgressView, ParentHomeView, ParentAttendanceView, \
     ParentSignupView, GymCreateView, GymListView, BoxerTestsView, TestResultCreateView, BoxerClassesView, \
-    BoxerCommentsView, EditCommentView, DeleteCommentView, export_attendance_preview, BoxerUpdateView
+    BoxerCommentsView, EditCommentView, DeleteCommentView, export_attendance_preview, BoxerUpdateView, \
+    SparringFinderView
 
 router = DefaultRouter()
 router.register(r'boxers', BoxerViewSet, basename='boxer')
@@ -26,6 +27,7 @@ urlpatterns = [
 
     # Boxers
     path('boxers/', views.BoxerListView.as_view(), name='boxer_list'),
+    path("sparring-finder/", SparringFinderView.as_view(), name="sparring_finder"),
     path("boxers/<int:pk>/edit/", BoxerUpdateView.as_view(), name="boxer_edit"),
     path('boxers/delete/<int:pk>/', views.delete_boxer, name='delete_boxer'),
     path('boxer/<int:boxer_id>/report/', views.BoxerReportView.as_view(), name='boxer_report'),

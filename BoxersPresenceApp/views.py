@@ -72,83 +72,85 @@ class HomeView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+
+        # Only load minimal data: user's gym + simple list of classes
         gym = user_gym(self.request)
 
-        # ---------------- Visible boxers ----------------
         if self.request.user.is_superuser:
-            boxers_qs = Boxer.objects.all()
+            classes_qs = ClassTemplate.objects.all().order_by("title")
         elif gym:
-            boxers_qs = Boxer.objects.filter(
-                Q(gym=gym) | Q(shared_with_gyms=gym) | Q(coaches=self.request.user)
+            classes_qs = ClassTemplate.objects.filter(gym=gym).order_by("title")
+        else:
+            classes_qs = ClassTemplate.objects.filter(coaches=self.request.user).order_by("title")
+
+        ctx["classes"] = classes_qs
+        return ctx
+
+class SparringFinderView(LoginRequiredMixin, TemplateView):
+    template_name = "boxers/sparring_finder.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        gym = user_gym(self.request)
+
+        # boxers available to the user
+        if self.request.user.is_superuser:
+            boxers = Boxer.objects.all()
+        else:
+            boxers = Boxer.objects.filter(
+                Q(gym=gym) |
+                Q(shared_with_gyms=gym) |
+                Q(coaches=self.request.user)
             ).distinct()
-        else:
-            boxers_qs = Boxer.objects.filter(coaches=self.request.user).distinct()
 
-        boxers_qs = boxers_qs.select_related("gym").prefetch_related("coaches").order_by("name")
+        boxers = boxers.order_by("name")
 
-        # ---------------- Heart rate quick form ----------------
-        hr_form = HeartRateQuickForm()
-        if "boxer" in hr_form.fields and hasattr(hr_form.fields["boxer"], "queryset"):
-            hr_form.fields["boxer"].queryset = boxers_qs
-
-        # ---------------- Class list (robust) ----------------
+        # classes
         if self.request.user.is_superuser:
-            classes_qs = ClassTemplate.objects.all()
-        elif gym:
-            classes_qs = ClassTemplate.objects.filter(gym=gym)
+            classes = ClassTemplate.objects.all()
         else:
-            # classes coached by the user OR classes that have any of the visible boxers enrolled
-            coach_classes = ClassTemplate.objects.filter(coaches=self.request.user)
-            boxer_gym_classes = ClassTemplate.objects.filter(gym__in=boxers_qs.values("gym_id"))
-            classes_qs = (coach_classes | boxer_gym_classes).distinct()
+            classes = ClassTemplate.objects.filter(gym=gym)
 
-        classes_qs = classes_qs.order_by("title")
-
-        # ---------------- Enrollment map: boxer_id -> [class_ids] ----------------
+        # Enrollment -> boxer.class_ids
         enrollments = (
             Enrollment.objects
-            .filter(boxer__in=boxers_qs)
+            .filter(boxer__in=boxers)
             .values("boxer_id", "template_id")
         )
+
         boxer_to_classes = {}
-        for row in enrollments:
-            boxer_to_classes.setdefault(row["boxer_id"], []).append(row["template_id"])
+        for e in enrollments:
+            boxer_to_classes.setdefault(e["boxer_id"], []).append(e["template_id"])
 
-        # ---------------- Build JSON-safe boxer payload ----------------
-        boxer_weights = []
-        for b in boxers_qs:
+        boxer_data = []
+        for b in boxers:
             latest = Weight.objects.filter(boxer=b).order_by("-measured_at").first()
-            kg = float(latest.kg) if latest and latest.kg is not None else None
-            measured_at = latest.measured_at.isoformat() if latest else None
-
+            kg = float(latest.kg) if latest else None
             age = calc_age(b.date_of_birth)
             gender = b.gender or "U"
+
             try:
                 wc = olympic_weight_class(kg, gender, age)
             except Exception:
                 wc = None
 
-            boxer_weights.append({
+            boxer_data.append({
                 "id": b.id,
-                "name": (f"{b.first_name} {b.last_name}".strip() or b.name or f"Boxer {b.id}"),
+                "name": f"{b.first_name} {b.last_name}".strip() or b.name,
                 "gender": gender,
                 "age": age,
-                "age_band": age_band(age) if age is not None else None,
-                "kg": kg,
-                "measured_at": measured_at,
+                "age_band": age_band(age) if age else None,
                 "weight_class": wc,
-                # IMPORTANT: a boxer can belong to multiple classes
+                "kg": kg,
                 "class_ids": boxer_to_classes.get(b.id, []),
+
+                # ready for future extensions:
+                # "skill": getattr(b, "skill_level", None),
+                # "photo_url": getattr(b, "photo_url", None),
             })
 
-        ctx.update({
-            "boxers": boxers_qs,
-            "hr_form": hr_form,
-            "classes": classes_qs,
-            "boxer_weights": boxer_weights,
-            "boxer_weights_json": json.dumps(boxer_weights, default=str),
-            "classes_json": json.dumps(list(classes_qs.values("id", "title")), default=str),
-        })
+        ctx["classes"] = classes
+        ctx["boxer_data_json"] = json.dumps(boxer_data, cls=DjangoJSONEncoder)
         return ctx
 
 class RegisterView(FormView):
