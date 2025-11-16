@@ -28,6 +28,7 @@ urlpatterns = [
     # Boxers
     path('boxers/', views.BoxerListView.as_view(), name='boxer_list'),
     path("sparring-finder/", SparringFinderView.as_view(), name="sparring_finder"),
+
     path("boxers/<int:pk>/edit/", BoxerUpdateView.as_view(), name="boxer_edit"),
     path('boxers/delete/<int:pk>/', views.delete_boxer, name='delete_boxer'),
     path('boxer/<int:boxer_id>/report/', views.BoxerReportView.as_view(), name='boxer_report'),

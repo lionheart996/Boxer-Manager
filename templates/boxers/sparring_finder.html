@@ -3,7 +3,7 @@
 
 <main class="sf-container">
   <h1 class="sf-title">💫 Sparring Partner Finder</h1>
-  <p class="sf-subtitle">Search or select a boxer — or enter a guest boxer to test matchups.</p>
+  <p class="sf-subtitle">Select a class, search a boxer, or enter a guest boxer to test matchups.</p>
 
   <!-- ====================== CLASS / SEARCH BOX ====================== -->
   <section class="sf-card">
@@ -28,12 +28,12 @@
       </div>
     </div>
 
-    <!-- CLASS RESULTS -->
+    <!-- CLASS RESULTS (LIST OF BOXERS) -->
     <div id="classBoxerList" class="sf-results" style="display:none;"></div>
 
-    <!-- MAIN RESULTS -->
+    <!-- MAIN RESULTS (SELECTED BOXER + PARTNERS OR GUEST RESULTS) -->
     <div id="sparResults" class="sf-results">
-      <p class="sf-muted">Select a class, search a boxer, or use guest boxer form below.</p>
+      <p class="sf-muted">Select a class, search a boxer, or use the guest boxer form.</p>
     </div>
   </section>
 
@@ -179,6 +179,7 @@ body {
   border-radius: 14px;
   padding: 10px 14px;
   border: 1px solid var(--brand);
+  margin-bottom: 10px;
 }
 
 .sf-partner-item {
@@ -188,6 +189,21 @@ body {
   border-radius: 10px;
   border: 1px solid rgba(0,255,136,0.25);
   background: rgba(0,255,136,0.04);
+  cursor: pointer;
+}
+
+.sf-partner-item:hover {
+  background: rgba(0,255,136,0.12);
+  transform: translateX(2px);
+}
+
+/* secondary dropdown under clicked boxer */
+.sf-boxer-expand {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--brand);
+  background: rgba(0,255,136,0.06);
+  border-radius: 10px;
 }
 
 .sf-btn-primary {
@@ -213,10 +229,24 @@ body {
 <!-- ====================== SCRIPT ====================== -->
 <script>
 (function () {
+  /* ===== DATA FROM BACKEND ===== */
+  const data = JSON.parse('{{ boxer_data_json|escapejs }}');
 
-  /* ==========================================================
-     FULL IBA WEIGHT CLASS TABLE IN JAVASCRIPT (NO ERRORS)
-     ========================================================== */
+  /* ===== DOM ELEMENTS ===== */
+  const input          = document.getElementById("sparBoxerSearch");
+  const resultsBox     = document.getElementById("searchResults");
+  const sparResults    = document.getElementById("sparResults");
+  const classSelect    = document.getElementById("classSelect");
+  const classBoxerList = document.getElementById("classBoxerList");
+  const searchBox      = document.getElementById("searchBox");
+
+  const guestName   = document.getElementById("guestName");
+  const guestAge    = document.getElementById("guestAge");
+  const guestWeight = document.getElementById("guestWeight");
+  const guestGender = document.getElementById("guestGender");
+  const guestBtn    = document.getElementById("guestFindBtn");
+
+  /* ===== IBA TABLE ===== */
   const IBA = {
     "M_JUNIOR": [
       ["Pinweight", 44, 46],
@@ -311,65 +341,62 @@ body {
     ]
   };
 
-  /* ==========================================================
-     UTILITY FUNCTIONS
-     ========================================================== */
-
   function ageBand(age) {
-    if (age == null) return null;
-    if (age <= 14) return "JUNIOR";
+    if (age == null) return None;
+    if (age < 15) return "JUNIOR";
     if (age <= 16) return "JUNIOR";
     if (age <= 18) return "YOUTH";
     return "ELITE";
   }
 
-  function getIBAClass(kg, gender, age) {
+  function ageBand(age) {
+    if (age == null) return null;
+    if (age < 9) return "Sweetpee";
+    if (age < 13) return "Aspirant";
+    if (age < 15) return "SBG";
+    if (age <= 16) return "JUNIOR";
+    if (age <= 18) return "YOUTH";
+    return "ELITE";
+  }
+
+  function getIBAClass(kg, gender_code, age) {
+    if (!kg) return null;
+    const gender = (gender_code === "F" || gender_code === "M") ? gender_code : "M";
     const band = ageBand(age) || "JUNIOR";
     const key = `${gender}_${band}`;
     const classes = IBA[key];
     if (!classes) return null;
 
-    for (const c of classes) {
-      if (kg >= c[1] && kg <= c[2]) {
-        if (c[2] >= 999) {
-          return `${c[0]} (${c[1]}kg+)`;
+    for (const [name, low, high] of classes) {
+      if (kg >= low && kg <= high) {
+        if (high >= 999) {
+          return `${name} (${low}kg+)`;
         }
-        return `${c[0]} (${c[1]}–${c[2]}kg)`;
+        return `${name} (${low}–${high}kg)`;
       }
     }
     return null;
   }
 
-  /* ==========================================================
-     LOAD GYM DATA
-     ========================================================== */
-  const data = JSON.parse('{{ boxer_data_json|escapejs }}');
+  function normalize(label) {
+    if (!label) return "";
+    return label.split("(")[0].trim().toLowerCase();
+  }
 
-  const input = document.getElementById("sparBoxerSearch");
-  const resultsBox = document.getElementById("searchResults");
-  const sparResults = document.getElementById("sparResults");
-  const classSelect = document.getElementById("classSelect");
-  const classBoxerList = document.getElementById("classBoxerList");
-  const searchBox = document.getElementById("searchBox");
+  /* ===== CORE: render selected boxer + partners INTO sparResults (used for GUEST + your original behavior) ===== */
+  function renderMatches(main) {
+    const mainNorm = main.weight_class ? normalize(main.weight_class) : null;
 
-  const guestName   = document.getElementById("guestName");
-  const guestAge    = document.getElementById("guestAge");
-  const guestWeight = document.getElementById("guestWeight");
-  const guestGender = document.getElementById("guestGender");
-  const guestBtn    = document.getElementById("guestFindBtn");
-
-  /* ==========================================================
-     PARTNER FINDER (GYM + GUEST)
-     ========================================================== */
-
-  function renderMatches(main, partners) {
+    const partners = data
+      .filter(b => b.id !== main.id && mainNorm && normalize(b.weight_class) === mainNorm)
+      .sort((a, b) => Math.abs(a.age - main.age) - Math.abs(b.age - main.age));
 
     let html = `
       <div class="sf-main-boxer">
         <h3>${main.name}${main.id === "guest" ? " (Guest Boxer)" : ""}</h3>
         <p><em>
           ${main.gender}, ${main.age} yrs,
-          ${main.age_band},
+          ${main.age_band || "–"},
           ${main.weight_class || "?"}
           (${main.kg} kg)
         </em></p>
@@ -382,10 +409,10 @@ body {
       html += `<h4 style="margin-top:16px;color:var(--brand);">🥊 Suggested partners (${partners.length}):</h4>`;
       html += `<ul style="margin-top:6px;padding:0;">`;
       html += partners.map(p => `
-        <li class="sf-partner-item">
+        <li class="sf-partner-item" data-boxer-id="${p.id}">
           <strong style="color:var(--brand);">${p.name}</strong>
           — ${p.gender}, ${p.age} yrs,
-          ${p.age_band}, ${p.weight_class} (${p.kg} kg)
+          ${p.age_band || "–"}, ${p.weight_class || "?"} (${p.kg} kg)
         </li>
       `).join("");
       html += `</ul>`;
@@ -394,39 +421,157 @@ body {
     sparResults.innerHTML = html;
   }
 
-  function normalize(label) {
-    if (!label) return "";
-    return label.split("(")[0].trim().toLowerCase();
+  /* ===== secondary panel handling for GYM boxers (class/search) ===== */
+
+  function closeAllPanels() {
+    document.querySelectorAll(".sf-boxer-expand").forEach(panel => panel.remove());
   }
 
-  /* Gym boxer */
-  window.selectBoxer = function (id) {
+  function renderPanelUnderBoxer(main, clickedEl) {
+    closeAllPanels();
+
+    const mainNorm = main.weight_class ? normalize(main.weight_class) : null;
+
+    const partners = data
+      .filter(b => b.id !== main.id && mainNorm && normalize(b.weight_class) === mainNorm)
+      .sort((a, b) => Math.abs(a.age - main.age) - Math.abs(b.age - main.age));
+
+    const panel = document.createElement("div");
+    panel.className = "sf-boxer-expand";
+
+    let html = `
+      <div class="sf-main-boxer" style="margin-bottom:10px;">
+        <strong>${main.name}</strong><br>
+        <em>${main.gender}, ${main.age} yrs, ${main.weight_class || "?"} (${main.kg}kg)</em>
+      </div>
+    `;
+
+    if (!partners.length) {
+      html += `<p class="sf-muted">No suitable partners found.</p>`;
+    } else {
+      html += partners.map(p => `
+        <div class="sf-partner-item">
+          <strong>${p.name}</strong> — ${p.gender}, ${p.age} yrs,
+          ${p.weight_class || "?"} (${p.kg}kg)
+        </div>
+      `).join("");
+    }
+
+    panel.innerHTML = html;
+    clickedEl.insertAdjacentElement("afterend", panel);
+  }
+
+  /* ===== Event delegation: handle gym boxer clicks only in class/search, not in sparResults ===== */
+  document.addEventListener("click", function (e) {
+    const el = e.target.closest("[data-boxer-id]");
+    if (!el) return;
+
+    // ignore clicks coming from main result panel (keep guest + old behavior intact)
+    if (el.closest("#sparResults")) {
+      return;
+    }
+
+    const id = parseInt(el.dataset.boxerId, 10);
     const main = data.find(b => b.id === id);
     if (!main) return;
 
-    const mainNorm = normalize(main.weight_class);
+    // keep search input synced and hide dropdown
+    if (input) input.value = main.name;
+    resultsBox.style.display = "none";
 
-    const partners = data
-      .filter(b => b.id !== main.id && normalize(b.weight_class) === mainNorm)
-      .sort((a, b) => Math.abs(a.age - main.age) - Math.abs(b.age - main.age));
+    // show secondary panel under clicked boxer (class / search lists)
+    renderPanelUnderBoxer(main, el);
+  });
 
-    renderMatches(main, partners);
+  /* ===== Search mode ===== */
+  function showSuggestions(query) {
+    const q = (query || "").trim().toLowerCase();
+    if (!q) {
+      resultsBox.style.display = "none";
+      resultsBox.innerHTML = "";
+      return;
+    }
+
+    const matches = data.filter(b =>
+      (b.name || "").toLowerCase().includes(q)
+    );
+
+    if (!matches.length) {
+      resultsBox.innerHTML = `<div style="padding:8px 12px;color:#777;">No boxers found.</div>`;
+      resultsBox.style.display = "block";
+      return;
+    }
+
+    resultsBox.innerHTML = matches.map(b => `
+      <div class="sf-dropdown-item" data-boxer-id="${b.id}"
+           style="padding:8px 12px;cursor:pointer;">
+        <strong style="color:var(--brand);">${b.name}</strong>
+        — ${b.gender}, ${b.age_band || "–"}, ${b.weight_class || "?"}
+      </div>
+    `).join("");
+    resultsBox.style.display = "block";
   }
 
-  /* Guest boxer */
+  if (input) {
+    input.addEventListener("input", e => showSuggestions(e.target.value));
+  }
+
+  /* ===== Class mode ===== */
+  if (classSelect) {
+    classSelect.addEventListener("change", () => {
+      const classId = parseInt(classSelect.value, 10) || null;
+
+      resultsBox.style.display = "none";
+      sparResults.innerHTML = "";
+
+      if (!classId) {
+        searchBox.style.display = "block";
+        classBoxerList.style.display = "none";
+        sparResults.innerHTML = `<p class="sf-muted">Search a boxer or use guest mode.</p>`;
+        return;
+      }
+
+      searchBox.style.display = "none";
+
+      const boxersInClass = data.filter(b =>
+        Array.isArray(b.class_ids) && b.class_ids.includes(classId)
+      );
+
+      if (!boxersInClass.length) {
+        classBoxerList.innerHTML = `<p class="sf-muted">No boxers in this class.</p>`;
+        classBoxerList.style.display = "block";
+        return;
+      }
+
+      classBoxerList.innerHTML = `
+        <ul style="margin:0;padding:0;">
+          ${boxersInClass.map(b => `
+            <li class="sf-partner-item" data-boxer-id="${b.id}">
+              <strong style="color:var(--brand);">${b.name}</strong>
+              — ${b.gender}, ${b.age_band || "–"}, ${b.weight_class || "?"}
+            </li>
+          `).join("")}
+        </ul>
+      `;
+      classBoxerList.style.display = "block";
+    });
+  }
+
+  /* ===== Guest boxer (kept EXACTLY as before: uses sparResults) ===== */
   guestBtn.addEventListener("click", () => {
-    const name = guestName.value.trim();
-    const age = parseInt(guestAge.value);
-    const kg = parseFloat(guestWeight.value);
+    const name = (guestName.value || "").trim();
+    const age  = parseInt(guestAge.value, 10);
+    const kg   = parseFloat(guestWeight.value);
     const gender = guestGender.value || "U";
 
     if (!name || !age || !kg) {
-      sparResults.innerHTML = `<p class="sf-muted" style="color:#f66;">Fill name, age, and weight.</p>`;
+      sparResults.innerHTML =
+        `<p class="sf-muted" style="color:#f66;">Please fill name, age and weight.</p>`;
       return;
     }
 
     const band = ageBand(age);
-    const wc = getIBAClass(kg, gender, age);
+    const wc   = getIBAClass(kg, gender, age);
 
     const guest = {
       id: "guest",
@@ -439,14 +584,12 @@ body {
       class_ids: []
     };
 
-    const partners = data
-      .filter(b => {
-        return b.weight_class && wc &&
-               normalize(b.weight_class) === normalize(wc);
-      })
-      .sort((a, b) => Math.abs(a.age - guest.age) - Math.abs(b.age - guest.age));
+    // make sure search dropdown doesn't interfere
+    resultsBox.style.display = "none";
+    if (input) input.value = "";
 
-    renderMatches(guest, partners);
+    // use original behavior: render guest in main sparResults panel
+    renderMatches(guest);
   });
 
 })();

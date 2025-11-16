@@ -153,6 +153,8 @@ class SparringFinderView(LoginRequiredMixin, TemplateView):
         ctx["boxer_data_json"] = json.dumps(boxer_data, cls=DjangoJSONEncoder)
         return ctx
 
+
+
 class RegisterView(FormView):
     template_name = 'login/register.html'
     form_class = UserCreationForm
